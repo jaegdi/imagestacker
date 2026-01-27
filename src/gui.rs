@@ -731,31 +731,82 @@ impl ImageStacker {
 
         let feature_detector_label = text("Feature Detector:");
         
+        let orb_selected = self.config.feature_detector == FeatureDetector::ORB;
         let orb_button = button(
-            text(if self.config.feature_detector == FeatureDetector::ORB { 
-                "● ORB (Fast)" 
+            text(if orb_selected { 
+                "✓ ORB (Fast)" 
             } else { 
-                "○ ORB (Fast)" 
+                "  ORB (Fast)" 
             })
         )
+        .style(move |theme, status| {
+            if orb_selected {
+                button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.3))),
+                    text_color: iced::Color::WHITE,
+                    border: iced::Border {
+                        color: iced::Color::from_rgb(0.4, 0.7, 0.4),
+                        width: 2.0,
+                        radius: 4.0.into(),
+                    },
+                    ..Default::default()
+                }
+            } else {
+                button::secondary(theme, status)
+            }
+        })
         .on_press(Message::FeatureDetectorChanged(FeatureDetector::ORB));
 
+        let sift_selected = self.config.feature_detector == FeatureDetector::SIFT;
         let sift_button = button(
-            text(if self.config.feature_detector == FeatureDetector::SIFT { 
-                "● SIFT (Best)" 
+            text(if sift_selected { 
+                "✓ SIFT (Best)" 
             } else { 
-                "○ SIFT (Best)" 
+                "  SIFT (Best)" 
             })
         )
+        .style(move |theme, status| {
+            if sift_selected {
+                button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.3))),
+                    text_color: iced::Color::WHITE,
+                    border: iced::Border {
+                        color: iced::Color::from_rgb(0.4, 0.7, 0.4),
+                        width: 2.0,
+                        radius: 4.0.into(),
+                    },
+                    ..Default::default()
+                }
+            } else {
+                button::secondary(theme, status)
+            }
+        })
         .on_press(Message::FeatureDetectorChanged(FeatureDetector::SIFT));
 
+        let akaze_selected = self.config.feature_detector == FeatureDetector::AKAZE;
         let akaze_button = button(
-            text(if self.config.feature_detector == FeatureDetector::AKAZE { 
-                "● AKAZE (Balanced)" 
+            text(if akaze_selected { 
+                "✓ AKAZE (Balanced)" 
             } else { 
-                "○ AKAZE (Balanced)" 
+                "  AKAZE (Balanced)" 
             })
         )
+        .style(move |theme, status| {
+            if akaze_selected {
+                button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.3))),
+                    text_color: iced::Color::WHITE,
+                    border: iced::Border {
+                        color: iced::Color::from_rgb(0.4, 0.7, 0.4),
+                        width: 2.0,
+                        radius: 4.0.into(),
+                    },
+                    ..Default::default()
+                }
+            } else {
+                button::secondary(theme, status)
+            }
+        })
         .on_press(Message::FeatureDetectorChanged(FeatureDetector::AKAZE));
 
         let feature_row = row![
