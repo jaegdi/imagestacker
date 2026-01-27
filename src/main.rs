@@ -1,5 +1,6 @@
 mod gui;
 mod processing;
+mod system_info;
 
 use gui::ImageStacker;
 use iced::application;
@@ -16,6 +17,7 @@ pub fn main() -> iced::Result {
         ImageStacker::update,
         ImageStacker::view,
     )
+    .subscription(ImageStacker::subscription)
     .theme(ImageStacker::theme)
     .run()
 }

@@ -1,13 +1,15 @@
 use crate::processing;
+use crate::system_info;
 use iced::widget::{
-    button, column, container, image as iced_image, row, scrollable, text, text_input,
+    button, checkbox, column, container, image as iced_image, row, scrollable, slider, text, text_input,
 };
 use iced::Length;
 use iced::{Element, Task, Theme};
 use opencv::prelude::*;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, RwLock};
+use std::time::Duration;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -24,8 +26,54 @@ pub enum Message {
     SaveImage,
     OpenImage(PathBuf),
     RefreshPanes,
+    AutoRefreshTick,
+    // New: Configuration messages
+    ToggleSettings,
+    SharpnessThresholdChanged(f32),
+    UseAdaptiveBatchSizes(bool),
+    UseCLAHE(bool),
+    FeatureDetectorChanged(FeatureDetector),
+    ProgressUpdate(String, f32),
     Exit,
     None,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum FeatureDetector {
+    ORB,
+    SIFT,
+    AKAZE,
+}
+
+impl std::fmt::Display for FeatureDetector {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            FeatureDetector::ORB => write!(f, "ORB (Fast)"),
+            FeatureDetector::SIFT => write!(f, "SIFT (Best Quality)"),
+            FeatureDetector::AKAZE => write!(f, "AKAZE (Balanced)"),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ProcessingConfig {
+    pub sharpness_threshold: f32,
+    pub use_adaptive_batches: bool,
+    pub use_clahe: bool,
+    pub feature_detector: FeatureDetector,
+    pub batch_config: system_info::BatchSizeConfig,
+}
+
+impl Default for ProcessingConfig {
+    fn default() -> Self {
+        Self {
+            sharpness_threshold: 30.0,
+            use_adaptive_batches: true,
+            use_clahe: true,
+            feature_detector: FeatureDetector::ORB,
+            batch_config: system_info::BatchSizeConfig::default_config(),
+        }
+    }
 }
 
 pub struct ImageStacker {
@@ -33,11 +81,17 @@ pub struct ImageStacker {
     aligned_images: Vec<PathBuf>,
     bunch_images: Vec<PathBuf>,
     final_images: Vec<PathBuf>,
-    thumbnail_cache: Arc<Mutex<HashMap<PathBuf, iced::widget::image::Handle>>>,
+    thumbnail_cache: Arc<RwLock<HashMap<PathBuf, iced::widget::image::Handle>>>,
     status: String,
     preview_handle: Option<iced::widget::image::Handle>,
     result_mat: Option<Mat>,
     crop_rect: Option<opencv::core::Rect>,
+    is_processing: bool,
+    // New: Configuration and progress
+    config: ProcessingConfig,
+    show_settings: bool,
+    progress_message: String,
+    progress_value: f32,
 }
 
 impl Default for ImageStacker {
@@ -47,16 +101,37 @@ impl Default for ImageStacker {
             aligned_images: Vec::new(),
             bunch_images: Vec::new(),
             final_images: Vec::new(),
-            thumbnail_cache: Arc::new(Mutex::new(HashMap::new())),
+            thumbnail_cache: Arc::new(RwLock::new(HashMap::new())),
             status: "Ready".to_string(),
             preview_handle: None,
             result_mat: None,
             crop_rect: None,
+            is_processing: false,
+            config: ProcessingConfig::default(),
+            show_settings: false,
+            progress_message: String::new(),
+            progress_value: 0.0,
         }
     }
 }
 
 impl ImageStacker {
+    fn create_processing_config(&self) -> processing::ProcessingConfig {
+        processing::ProcessingConfig {
+            sharpness_threshold: self.config.sharpness_threshold,
+            use_clahe: self.config.use_clahe,
+            feature_detector: match self.config.feature_detector {
+                FeatureDetector::ORB => processing::FeatureDetectorType::ORB,
+                FeatureDetector::SIFT => processing::FeatureDetectorType::SIFT,
+                FeatureDetector::AKAZE => processing::FeatureDetectorType::AKAZE,
+            },
+            sharpness_batch_size: self.config.batch_config.sharpness_batch_size,
+            feature_batch_size: self.config.batch_config.feature_batch_size,
+            warp_batch_size: self.config.batch_config.warp_batch_size,
+            stacking_batch_size: self.config.batch_config.stacking_batch_size,
+        }
+    }
+
     pub fn update(&mut self, message: Message) -> Task<Message> {
         let task = match message {
             Message::AddImages => Task::perform(
@@ -106,26 +181,47 @@ impl ImageStacker {
                 |msg| msg,
             ),
             Message::ImagesSelected(paths) => {
+                // Clear all existing image lists to start a new project
+                self.images.clear();
+                self.aligned_images.clear();
+                self.bunch_images.clear();
+                self.final_images.clear();
+                self.preview_handle = None;
+                self.result_mat = None;
+                self.crop_rect = None;
+
+                // Clear thumbnail cache
+                {
+                    let mut cache = self.thumbnail_cache.write().unwrap();
+                    cache.clear();
+                }
+
+                // Add new images
                 self.images.extend(paths.clone());
                 self.status = format!("Loaded {} images", self.images.len());
 
                 let cache = self.thumbnail_cache.clone();
-                // Use rayon to generate thumbnails in parallel but still return individual messages
-                Task::batch(paths.into_iter().map(|path| {
-                    let cache = cache.clone();
-                    Task::perform(
-                        async move {
-                            if let Ok(handle) = generate_thumbnail(&path) {
-                                let mut locked = cache.lock().unwrap();
-                                locked.insert(path.clone(), handle.clone());
-                                Message::ThumbnailUpdated(path, handle)
-                            } else {
-                                Message::None
-                            }
-                        },
-                        |msg| msg,
-                    )
-                }))
+                // Generate thumbnails in parallel using rayon
+                Task::run(
+                    iced::stream::channel(100, move |sender| async move {
+                        std::thread::spawn(move || {
+                            use rayon::prelude::*;
+                            let sender = Arc::new(std::sync::Mutex::new(sender));
+                            
+                            paths.par_iter().for_each(|path| {
+                                if let Ok(handle) = generate_thumbnail(path) {
+                                    let mut locked = cache.write().unwrap();
+                                    locked.insert(path.clone(), handle.clone());
+                                    drop(locked);
+                                    if let Ok(mut sender_lock) = sender.lock() {
+                                        let _ = sender_lock.try_send(Message::ThumbnailUpdated(path.clone(), handle));
+                                    }
+                                }
+                            });
+                        });
+                    }),
+                    |msg| msg,
+                )
             }
             Message::ThumbnailUpdated(path, _handle) => {
                 log::trace!("Thumbnail updated for {}", path.display());
@@ -136,22 +232,32 @@ impl ImageStacker {
                 self.bunch_images = bunches;
                 self.final_images = final_imgs;
 
+                if paths_to_process.is_empty() {
+                    return Task::none();
+                }
+
                 let cache = self.thumbnail_cache.clone();
-                Task::batch(paths_to_process.into_iter().map(|path| {
-                    let cache = cache.clone();
-                    Task::perform(
-                        async move {
-                            if let Ok(handle) = generate_thumbnail(&path) {
-                                let mut locked = cache.lock().unwrap();
-                                locked.insert(path.clone(), handle.clone());
-                                Message::ThumbnailUpdated(path, handle)
-                            } else {
-                                Message::None
-                            }
-                        },
-                        |msg| msg,
-                    )
-                }))
+                // Generate thumbnails in parallel using rayon
+                Task::run(
+                    iced::stream::channel(100, move |sender| async move {
+                        std::thread::spawn(move || {
+                            use rayon::prelude::*;
+                            let sender = Arc::new(std::sync::Mutex::new(sender));
+                            
+                            paths_to_process.par_iter().for_each(|path| {
+                                if let Ok(handle) = generate_thumbnail(path) {
+                                    let mut locked = cache.write().unwrap();
+                                    locked.insert(path.clone(), handle.clone());
+                                    drop(locked);
+                                    if let Ok(mut sender_lock) = sender.lock() {
+                                        let _ = sender_lock.try_send(Message::ThumbnailUpdated(path.clone(), handle));
+                                    }
+                                }
+                            });
+                        });
+                    }),
+                    |msg| msg,
+                )
             }
             Message::AlignImages => {
                 if let Some(first_path) = self.images.first() {
@@ -164,8 +270,18 @@ impl ImageStacker {
                     if aligned_dir.exists() && aligned_dir.is_dir() {
                         // Check if it contains images
                         let has_images = std::fs::read_dir(&aligned_dir)
-                            .map(|mut entries| {
-                                entries.any(|e| e.is_ok() && e.unwrap().path().is_file())
+                            .map(|entries| {
+                                entries.flatten().any(|e| {
+                                    let p = e.path();
+                                    p.is_file()
+                                        && p.extension()
+                                            .and_then(|ext| ext.to_str())
+                                            .map(|ext| {
+                                                ["jpg", "jpeg", "png", "tif", "tiff"]
+                                                    .contains(&ext.to_lowercase().as_str())
+                                            })
+                                            .unwrap_or(false)
+                                })
                             })
                             .unwrap_or(false);
 
@@ -207,25 +323,44 @@ impl ImageStacker {
                         self.status = "Using existing aligned images".to_string();
                         Task::done(Message::RefreshPanes)
                     } else {
-                        self.status =
-                            format!("Aligning images (saving to {})...", output_dir.display());
+                        self.status = "Aligning images...".to_string();
+                        self.progress_message = "Starting alignment...".to_string();
+                        self.progress_value = 0.0;
                         let images_paths = self.images.clone();
+                        let proc_config = self.create_processing_config();
+                        self.is_processing = true;  // Mark as processing
 
-                        Task::perform(
-                            async move {
-                                // Load images on demand
-                                let mut mats = Vec::new();
-                                for path in &images_paths {
-                                    if let Ok(mat) = processing::load_image(path) {
-                                        mats.push(mat);
+                        Task::run(
+                            iced::stream::channel(100, move |mut sender| async move {
+                                // Run processing in a separate thread
+                                std::thread::spawn(move || {
+                                    let progress_cb = std::sync::Arc::new(std::sync::Mutex::new(
+                                        {
+                                            let mut sender_clone = sender.clone();
+                                            move |msg: String, pct: f32| {
+                                                let _ = sender_clone.try_send(Message::ProgressUpdate(msg, pct));
+                                            }
+                                        }
+                                    ));
+
+                                    let result = processing::align_images(
+                                        &images_paths, 
+                                        &output_dir,
+                                        &proc_config,
+                                        Some(progress_cb),
+                                    );
+                                    
+                                    // Send final result
+                                    match result {
+                                        Ok(rect) => {
+                                            let _ = sender.try_send(Message::AlignmentDone(Ok(rect)));
+                                        }
+                                        Err(e) => {
+                                            let _ = sender.try_send(Message::AlignmentDone(Err(e.to_string())));
+                                        }
                                     }
-                                }
-
-                                match processing::align_images(&mut mats, &output_dir) {
-                                    Ok(rect) => Message::AlignmentDone(Ok(rect)),
-                                    Err(e) => Message::AlignmentDone(Err(e.to_string())),
-                                }
-                            },
+                                });
+                            }),
                             |msg| msg,
                         )
                     }
@@ -234,6 +369,7 @@ impl ImageStacker {
                 }
             }
             Message::AlignmentDone(result) => {
+                self.is_processing = false;  // Processing complete
                 match result {
                     Ok(rect) => {
                         self.status = "Aligned".to_string();
@@ -244,23 +380,62 @@ impl ImageStacker {
                 Task::done(Message::RefreshPanes)
             }
             Message::StackImages => {
-                if let Some(first_path) = self.images.first() {
-                    let output_dir = first_path
+                // Determine which images to stack and get output directory
+                let (images_to_stack, output_dir) = if !self.aligned_images.is_empty() {
+                    // Use aligned images if available
+                    let first_path = &self.aligned_images[0];
+                    // Go up one level from aligned directory to the base directory
+                    let out_dir = first_path
+                        .parent()  // aligned/
+                        .and_then(|p| p.parent())  // base/
+                        .unwrap_or(std::path::Path::new("."))
+                        .to_path_buf();
+                    (self.aligned_images.clone(), out_dir)
+                } else if !self.images.is_empty() {
+                    // Fall back to original images
+                    let first_path = &self.images[0];
+                    let out_dir = first_path
                         .parent()
                         .unwrap_or(std::path::Path::new("."))
                         .to_path_buf();
-                    self.status =
-                        format!("Stacking images (saving to {})...", output_dir.display());
-                    let images_paths = if self.aligned_images.is_empty() {
-                        self.images.clone()
-                    } else {
-                        self.aligned_images.clone()
-                    };
+                    (self.images.clone(), out_dir)
+                } else {
+                    // No images at all
+                    self.status = "No images loaded".to_string();
+                    return Task::none();
+                };
 
-                    let crop_rect = self.crop_rect;
-                    Task::perform(
-                        async move {
-                            match processing::stack_images(&images_paths, &output_dir, crop_rect) {
+                self.status = "Stacking images...".to_string();
+                self.progress_message = "Starting stacking...".to_string();
+                self.progress_value = 0.0;
+                
+                let crop_rect = self.crop_rect;
+                let proc_config = self.create_processing_config();
+                self.is_processing = true;  // Mark as processing
+                
+                Task::run(
+                    iced::stream::channel(100, move |mut sender| async move {
+                        // Run processing in a separate thread
+                        std::thread::spawn(move || {
+                            let progress_cb = std::sync::Arc::new(std::sync::Mutex::new(
+                                {
+                                    let mut sender_clone = sender.clone();
+                                    move |msg: String, pct: f32| {
+                                        let _ = sender_clone.try_send(Message::ProgressUpdate(msg, pct));
+                                    }
+                                }
+                            ));
+
+                            let result = processing::stack_images(
+                                &images_to_stack, 
+                                &output_dir, 
+                                crop_rect,
+                                &proc_config,
+                                Some(progress_cb),
+                            );
+                            
+                            // Send final result
+                            match result {
                                 Ok(res) => {
                                     // Convert to PNG bytes for display
                                     let mut buf = opencv::core::Vector::new();
@@ -272,24 +447,24 @@ impl ImageStacker {
                                     )
                                     .is_ok()
                                     {
-                                        Message::StackingDone(Ok((buf.to_vec(), res)))
+                                        let _ = sender.try_send(Message::StackingDone(Ok((buf.to_vec(), res))));
                                     } else {
-                                        Message::StackingDone(Err(
+                                        let _ = sender.try_send(Message::StackingDone(Err(
                                             "Failed to encode image".to_string()
-                                        ))
+                                        )));
                                     }
                                 }
-                                Err(e) => Message::StackingDone(Err(e.to_string())),
+                                Err(e) => {
+                                    let _ = sender.try_send(Message::StackingDone(Err(e.to_string())));
+                                }
                             }
-                        },
-                        |msg| msg,
-                    )
-                } else {
-                    self.status = "No images loaded".to_string();
-                    Task::none()
-                }
+                        });
+                    }),
+                    |msg| msg,
+                )
             }
             Message::StackingDone(result) => {
+                self.is_processing = false;  // Processing complete
                 match result {
                     Ok((bytes, mat)) => {
                         self.status = "Stacking complete".to_string();
@@ -382,7 +557,7 @@ impl ImageStacker {
                             all_new_paths.extend(bunches.clone());
                             all_new_paths.extend(final_imgs.clone());
 
-                            let cache_locked = cache.lock().unwrap();
+                            let cache_locked = cache.read().unwrap();
                             let paths_to_process: Vec<_> = all_new_paths
                                 .into_iter()
                                 .filter(|p| !cache_locked.contains_key(p))
@@ -407,12 +582,62 @@ impl ImageStacker {
                 }
                 Task::none()
             }
+            Message::AutoRefreshTick => {
+                // Auto-refresh file lists when processing is active
+                if self.is_processing {
+                    Task::done(Message::RefreshPanes)
+                } else {
+                    Task::none()
+                }
+            }
+            Message::ToggleSettings => {
+                self.show_settings = !self.show_settings;
+                Task::none()
+            }
+            Message::SharpnessThresholdChanged(value) => {
+                self.config.sharpness_threshold = value;
+                Task::none()
+            }
+            Message::UseAdaptiveBatchSizes(enabled) => {
+                self.config.use_adaptive_batches = enabled;
+                if enabled {
+                    // Recalculate batch sizes based on system RAM
+                    let available_gb = system_info::get_available_memory_gb();
+                    // Estimate average image size (assume 24MP RGB image ~72MB)
+                    let avg_size_mb = 72.0;
+                    self.config.batch_config = 
+                        system_info::BatchSizeConfig::calculate_optimal(available_gb, avg_size_mb);
+                }
+                Task::none()
+            }
+            Message::UseCLAHE(enabled) => {
+                self.config.use_clahe = enabled;
+                Task::none()
+            }
+            Message::FeatureDetectorChanged(detector) => {
+                self.config.feature_detector = detector;
+                Task::none()
+            }
+            Message::ProgressUpdate(msg, value) => {
+                self.progress_message = msg;
+                self.progress_value = value;
+                Task::none()
+            }
             Message::Exit => {
                 std::process::exit(0);
             }
             Message::None => Task::none(),
         };
         task
+    }
+    
+    pub fn subscription(&self) -> iced::Subscription<Message> {
+        // Only refresh when processing is active
+        if self.is_processing {
+            iced::time::every(Duration::from_secs(2)).map(|_| Message::AutoRefreshTick)
+        } else {
+            iced::Subscription::none()
+        }
     }
 
     pub fn view(&self) -> Element<'_, Message> {
@@ -422,10 +647,42 @@ impl ImageStacker {
             button("Align").on_press(Message::AlignImages),
             button("Stack").on_press(Message::StackImages),
             button("Save").on_press(Message::SaveImage),
+            button(if self.show_settings { "Hide Settings" } else { "Settings" })
+                .on_press(Message::ToggleSettings),
             button("Exit").on_press(Message::Exit),
         ]
         .spacing(10)
         .padding(10);
+
+        let mut main_column = column![buttons];
+
+        // Settings panel
+        if self.show_settings {
+            let settings_panel = self.render_settings_panel();
+            main_column = main_column.push(settings_panel);
+        }
+
+        // Progress bar (only visible when processing)
+        if self.is_processing {
+            let progress_bar = container(
+                column![
+                    text(if self.progress_message.is_empty() {
+                        "Processing..."
+                    } else {
+                        &self.progress_message
+                    }).size(14),
+                    iced::widget::progress_bar(0.0..=100.0, self.progress_value)
+                        .width(Length::Fill)
+                ]
+                .spacing(5)
+            )
+            .padding(10)
+            .width(Length::Fill)
+            .style(|_| container::Style::default()
+                .background(iced::Color::from_rgb(0.15, 0.25, 0.35)));
+            
+            main_column = main_column.push(progress_bar);
+        }
 
         let panes = row![
             self.render_pane("Imported", &self.images),
@@ -437,20 +694,110 @@ impl ImageStacker {
         .padding(10)
         .height(Length::Fill);
 
-        column![
-            buttons,
-            panes,
-            container(text_input("", &self.status).size(14))
-                .padding(5)
-                .width(Length::Fill)
-                .style(|_| container::Style::default()
-                    .background(iced::Color::from_rgb(0.1, 0.1, 0.1)))
+        main_column = main_column
+            .push(panes)
+            .push(
+                container(text_input("", &self.status).size(14))
+                    .padding(5)
+                    .width(Length::Fill)
+                    .style(|_| container::Style::default()
+                        .background(iced::Color::from_rgb(0.1, 0.1, 0.1)))
+            );
+
+        main_column.into()
+    }
+
+    fn render_settings_panel(&self) -> Element<'_, Message> {
+        let sharpness_slider = row![
+            text("Blur Threshold:"),
+            slider(10.0..=100.0, self.config.sharpness_threshold, Message::SharpnessThresholdChanged)
+                .width(200),
+            text(format!("{:.1}", self.config.sharpness_threshold)),
         ]
+        .spacing(10)
+        .align_y(iced::Alignment::Center);
+
+        let adaptive_batch_checkbox = checkbox(
+            "Auto-adjust batch sizes (RAM-based)",
+            self.config.use_adaptive_batches
+        )
+        .on_toggle(Message::UseAdaptiveBatchSizes);
+
+        let clahe_checkbox = checkbox(
+            "Use CLAHE (enhances dark images)",
+            self.config.use_clahe
+        )
+        .on_toggle(Message::UseCLAHE);
+
+        let feature_detector_label = text("Feature Detector:");
+        
+        let orb_button = button(
+            text(if self.config.feature_detector == FeatureDetector::ORB { 
+                "● ORB (Fast)" 
+            } else { 
+                "○ ORB (Fast)" 
+            })
+        )
+        .on_press(Message::FeatureDetectorChanged(FeatureDetector::ORB));
+
+        let sift_button = button(
+            text(if self.config.feature_detector == FeatureDetector::SIFT { 
+                "● SIFT (Best)" 
+            } else { 
+                "○ SIFT (Best)" 
+            })
+        )
+        .on_press(Message::FeatureDetectorChanged(FeatureDetector::SIFT));
+
+        let akaze_button = button(
+            text(if self.config.feature_detector == FeatureDetector::AKAZE { 
+                "● AKAZE (Balanced)" 
+            } else { 
+                "○ AKAZE (Balanced)" 
+            })
+        )
+        .on_press(Message::FeatureDetectorChanged(FeatureDetector::AKAZE));
+
+        let feature_row = row![
+            feature_detector_label,
+            orb_button,
+            sift_button,
+            akaze_button,
+        ]
+        .spacing(10);
+
+        let batch_info = if self.config.use_adaptive_batches {
+            text(format!(
+                "Batch sizes: Sharp={}, Features={}, Warp={}, Stack={}",
+                self.config.batch_config.sharpness_batch_size,
+                self.config.batch_config.feature_batch_size,
+                self.config.batch_config.warp_batch_size,
+                self.config.batch_config.stacking_batch_size,
+            )).size(12)
+        } else {
+            text("Using default batch sizes").size(12)
+        };
+
+        container(
+            column![
+                text("Processing Settings").size(18),
+                sharpness_slider,
+                adaptive_batch_checkbox,
+                clahe_checkbox,
+                feature_row,
+                batch_info,
+            ]
+            .spacing(10)
+        )
+        .padding(15)
+        .width(Length::Fill)
+        .style(|_| container::Style::default()
+            .background(iced::Color::from_rgb(0.2, 0.2, 0.25)))
         .into()
     }
 
     fn render_pane<'a>(&self, title: &'a str, images: &'a [PathBuf]) -> Element<'a, Message> {
-        let cache = self.thumbnail_cache.lock().unwrap();
+        let cache = self.thumbnail_cache.read().unwrap();
         let content = column(images.iter().map(|path| {
             let path_clone = path.clone();
             let handle = cache.get(path).cloned();
