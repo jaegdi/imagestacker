@@ -1,6 +1,13 @@
 [package]
 name = "imagestacker"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
+iced = { version = "0.13", features = ["image", "canvas"] }
+opencv = "0.94"
+image = "0.25"
+rfd = "0.15"
+anyhow = "1.0"
+log = "0.4"
+env_logger = "0.11"
