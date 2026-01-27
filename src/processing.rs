@@ -3,6 +3,44 @@ use opencv::prelude::*;
 use opencv::{calib3d, core, features2d, imgproc};
 use rayon::prelude::*;
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
+
+/// Progress callback: (message, percentage)
+pub type ProgressCallback = Arc<Mutex<dyn FnMut(String, f32) + Send>>;
+
+/// Feature detector type
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum FeatureDetectorType {
+    ORB,
+    SIFT,
+    AKAZE,
+}
+
+/// Processing configuration
+#[derive(Debug, Clone)]
+pub struct ProcessingConfig {
+    pub sharpness_threshold: f32,
+    pub use_clahe: bool,
+    pub feature_detector: FeatureDetectorType,
+    pub sharpness_batch_size: usize,
+    pub feature_batch_size: usize,
+    pub warp_batch_size: usize,
+    pub stacking_batch_size: usize,
+}
+
+impl Default for ProcessingConfig {
+    fn default() -> Self {
+        Self {
+            sharpness_threshold: 30.0,
+            use_clahe: true,
+            feature_detector: FeatureDetectorType::ORB,
+            sharpness_batch_size: 8,
+            feature_batch_size: 16,
+            warp_batch_size: 16,
+            stacking_batch_size: 12,
+        }
+    }
+}
 
 pub fn load_image(path: &PathBuf) -> Result<Mat> {
     use opencv::imgcodecs;
@@ -143,7 +181,94 @@ fn compute_sharpness(img: &Mat) -> Result<f64> {
     Ok(combined_score)
 }
 
-pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Result<core::Rect> {
+/// Extract features from an image using the specified detector
+fn extract_features(
+    img: &Mat,
+    detector_type: FeatureDetectorType,
+) -> Result<(opencv::core::Vector<core::KeyPoint>, core::Mat)> {
+    let mut keypoints = opencv::core::Vector::new();
+    let mut descriptors = core::Mat::default();
+
+    match detector_type {
+        FeatureDetectorType::ORB => {
+            let mut orb = features2d::ORB::create(
+                3000, // Increased from 1500 for better feature detection in difficult images
+                1.2,  // scaleFactor
+                8,    // nlevels - multi-scale detection
+                15,   // edgeThreshold - reduced from 31 for more edge features
+                0,    // firstLevel
+                2,    // WTA_K
+                features2d::ORB_ScoreType::HARRIS_SCORE,
+                31, // patchSize
+                10, // fastThreshold - reduced from 20 for more sensitive detection
+            )?;
+            orb.detect_and_compute(
+                img,
+                &core::Mat::default(),
+                &mut keypoints,
+                &mut descriptors,
+                false,
+            )?;
+        }
+        FeatureDetectorType::SIFT => {
+            // SIFT: Scale-Invariant Feature Transform - best quality, slower
+            let mut sift = features2d::SIFT::create(
+                0,     // nfeatures (0 = unlimited)
+                3,     // nOctaveLayers
+                0.04,  // contrastThreshold
+                10.0,  // edgeThreshold
+                1.6,   // sigma
+                false, // enable_precise_upscale
+            )?;
+            sift.detect_and_compute(
+                img,
+                &core::Mat::default(),
+                &mut keypoints,
+                &mut descriptors,
+                false,
+            )?;
+        }
+        FeatureDetectorType::AKAZE => {
+            // AKAZE: Accelerated-KAZE - good balance of speed and quality
+            let mut akaze = features2d::AKAZE::create(
+                features2d::AKAZE_DescriptorType::DESCRIPTOR_MLDB,
+                0,      // descriptor_size
+                3,      // descriptor_channels
+                0.001,  // threshold
+                4,      // nOctaves
+                4,      // nOctaveLayers
+                features2d::KAZE_DiffusivityType::DIFF_PM_G2,
+                512,    // max_points
+            )?;
+            akaze.detect_and_compute(
+                img,
+                &core::Mat::default(),
+                &mut keypoints,
+                &mut descriptors,
+                false,
+            )?;
+        }
+    }
+
+    Ok((keypoints, descriptors))
+}
+
+pub fn align_images(
+    image_paths: &[PathBuf], 
+    output_dir: &std::path::Path,
+    config: &ProcessingConfig,
+    progress_cb: Option<ProgressCallback>,
+) -> Result<core::Rect> {
+    let report_progress = |msg: &str, pct: f32| {
+        if let Some(ref cb) = progress_cb {
+            if let Ok(mut cb_lock) = cb.lock() {
+                cb_lock(msg.to_string(), pct);
+            }
+        }
+    };
+
+    report_progress("Starting alignment...", 0.0);
+
     if image_paths.len() < 2 {
         let first_img = load_image(&image_paths[0])?;
         return Ok(core::Rect::new(0, 0, first_img.cols(), first_img.rows()));
@@ -157,17 +282,21 @@ pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Re
     println!("\n=== BLUR DETECTION STARTING ===");
     println!("Analyzing {} images for sharpness (parallel batches)...", image_paths.len());
     
+    report_progress("Analyzing image sharpness...", 5.0);
+
     // Process images in batches to avoid excessive memory usage
-    const SHARPNESS_BATCH_SIZE: usize = 8;
+    let batch_size = config.sharpness_batch_size;
     let mut sharpness_scores: Vec<(usize, PathBuf, f64)> = Vec::new();
     
-    for (batch_idx, batch) in image_paths.chunks(SHARPNESS_BATCH_SIZE).enumerate() {
-        let batch_start = batch_idx * SHARPNESS_BATCH_SIZE;
+    let total_batches = (image_paths.len() + batch_size - 1) / batch_size;
+    for (batch_idx, batch) in image_paths.chunks(batch_size).enumerate() {
+        let batch_start = batch_idx * batch_size;
         println!("  Processing batch {}/{} ({} images)...", 
-                 batch_idx + 1, 
-                 (image_paths.len() + SHARPNESS_BATCH_SIZE - 1) / SHARPNESS_BATCH_SIZE,
-                 batch.len());
+                 batch_idx + 1, total_batches, batch.len());
         
+        let progress_pct = 5.0 + (batch_idx as f32 / total_batches as f32) * 15.0;
+        report_progress(&format!("Blur detection: batch {}/{}", batch_idx + 1, total_batches), progress_pct);
+
         let batch_results: Vec<(usize, PathBuf, f64)> = batch
             .par_iter()
             .enumerate()
@@ -216,8 +345,8 @@ pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Re
     let q3 = sorted_scores[(3 * sorted_scores.len()) / 4];
     
     // Adaptive threshold: Use multiple criteria to detect outliers
-    // 1. Absolute threshold (for very blurry images) - lowered from 50 to 30
-    let absolute_threshold = 30.0;
+    // 1. Absolute threshold from config
+    let absolute_threshold = config.sharpness_threshold as f64;
     // 2. Statistical threshold (mean - 1.0 * stddev) - more aggressive than before
     let statistical_threshold = (mean_sharpness - 1.0 * stddev).max(absolute_threshold);
     // 3. Quartile-based threshold (Q1 - 1.0 * IQR) for robust outlier detection - more aggressive
@@ -307,22 +436,36 @@ pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Re
         sharp_image_paths.len() - 1
     );
     println!("\nExtracting features and matching {} image pairs...", sharp_image_paths.len() - 1);
+    println!("Using {} feature detector", match config.feature_detector {
+        FeatureDetectorType::ORB => "ORB (Fast)",
+        FeatureDetectorType::SIFT => "SIFT (Best Quality)",
+        FeatureDetectorType::AKAZE => "AKAZE (Balanced)",
+    });
     
+    report_progress("Feature extraction starting...", 20.0);
+
     let start_matching = std::time::Instant::now();
     use rayon::prelude::*;
 
     // Alignment scale: less downsampling to preserve small sharp areas
     const ALIGNMENT_SCALE: f64 = 0.7; // Increased from 0.5 to preserve more detail
-    const FEATURE_BATCH_SIZE: usize = 16; // Increased from 8 for better parallelism
+    let feature_batch_size = config.feature_batch_size;
     let mut pairwise_transforms = Vec::new();
 
+    let total_feature_batches = (sharp_image_paths.len() + feature_batch_size) / feature_batch_size;
+    let mut feature_batch_count = 0;
+
     // Process sharp images in batches for memory efficiency with parallel processing within batches
-    for batch_start in (0..sharp_image_paths.len()).step_by(FEATURE_BATCH_SIZE) {
-        let batch_end = (batch_start + FEATURE_BATCH_SIZE + 1).min(sharp_image_paths.len());
+    for batch_start in (0..sharp_image_paths.len()).step_by(feature_batch_size) {
+        let batch_end = (batch_start + feature_batch_size + 1).min(sharp_image_paths.len());
         let batch_paths: Vec<&PathBuf> = sharp_image_paths[batch_start..batch_end]
             .iter()
             .map(|(_, path)| path)
             .collect();
+
+        feature_batch_count += 1;
+        let progress_pct = 20.0 + (feature_batch_count as f32 / total_feature_batches as f32) * 30.0;
+        report_progress(&format!("Feature extraction: batch {}/{}", feature_batch_count, total_feature_batches), progress_pct);
 
         log::info!(
             "Extracting features for batch {}-{} of {} (batch size: {})",
@@ -331,6 +474,9 @@ pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Re
             sharp_image_paths.len() - 1,
             batch_paths.len()
         );
+
+        let detector_type = config.feature_detector;
+        let use_clahe = config.use_clahe;
 
         // Extract features for this batch in parallel
         let batch_features: Vec<Result<(Vec<core::KeyPoint>, core::Mat, f64)>> = batch_paths
@@ -352,17 +498,21 @@ pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Re
                     gray = img.clone();
                 }
 
-                // Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) for dark images
-                // This dramatically improves feature detection in low-contrast/dark regions
-                let mut clahe = imgproc::create_clahe(2.0, core::Size::new(8, 8))?;
-                let mut enhanced = Mat::default();
-                clahe.apply(&gray, &mut enhanced)?;
+                // Apply CLAHE if enabled (dramatically improves feature detection in dark images)
+                let preprocessed = if use_clahe {
+                    let mut clahe = imgproc::create_clahe(2.0, core::Size::new(8, 8))?;
+                    let mut enhanced = Mat::default();
+                    clahe.apply(&gray, &mut enhanced)?;
+                    enhanced
+                } else {
+                    gray
+                };
 
-                // Downsample enhanced image for faster feature detection
+                // Downsample image for faster feature detection
                 let mut small_img = Mat::default();
                 let scale = ALIGNMENT_SCALE;
                 imgproc::resize(
-                    &enhanced,
+                    &preprocessed,
                     &mut small_img,
                     core::Size::default(),
                     scale,
@@ -370,28 +520,9 @@ pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Re
                     imgproc::INTER_AREA,
                 )?;
 
-                // Use ORB with parameters optimized for challenging images
-                let mut orb = features2d::ORB::create(
-                    3000, // Increased from 1500 for better feature detection in difficult images
-                    1.2,  // scaleFactor
-                    8,    // nlevels - multi-scale detection
-                    15,   // edgeThreshold - reduced from 31 for more edge features
-                    0,    // firstLevel
-                    2,    // WTA_K
-                    features2d::ORB_ScoreType::HARRIS_SCORE,
-                    31, // patchSize
-                    10, // fastThreshold - reduced from 20 for more sensitive detection
-                )?;
-                let mut keypoints = opencv::core::Vector::new();
-                let mut descriptors = core::Mat::default();
-
-                orb.detect_and_compute(
-                    &small_img,
-                    &core::Mat::default(),
-                    &mut keypoints,
-                    &mut descriptors,
-                    false,
-                )?;
+                // Extract features using configured detector
+                let (keypoints, descriptors) = extract_features(&small_img, detector_type)?;
+                
                 Ok((keypoints.to_vec(), descriptors, scale))
             })
             .collect();
@@ -411,9 +542,14 @@ pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Re
             let t_step_2x3 = if curr_descriptors.empty() || prev_descriptors.empty() {
                 Mat::default()
             } else {
-                // Use BFMatcher with HAMMING distance for ORB binary descriptors
-                // This is faster and more appropriate for binary features
-                let mut matcher = features2d::BFMatcher::create(core::NORM_HAMMING, false)?;
+                // Choose matcher based on feature detector type
+                let norm_type = match config.feature_detector {
+                    FeatureDetectorType::ORB => core::NORM_HAMMING,      // Binary descriptors
+                    FeatureDetectorType::SIFT => core::NORM_L2,          // Float descriptors
+                    FeatureDetectorType::AKAZE => core::NORM_HAMMING,    // Binary descriptors
+                };
+
+                let mut matcher = features2d::BFMatcher::create(norm_type, false)?;
 
                 // Add training descriptors first
                 let mut train_descriptors = opencv::core::Vector::<core::Mat>::new();
@@ -427,7 +563,7 @@ pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Re
                 let mut matches_vec = matches.to_vec();
                 matches_vec.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
 
-                // Use top 40% of matches for ORB (increased from 30% for more robust alignment)
+                // Use top 40% of matches (increased from 30% for more robust alignment)
                 // This is especially important for dark images with fewer good features
                 let count = (matches_vec.len() as f32 * 0.4) as usize;
                 let count = count.max(15).min(matches_vec.len()); // Increased min from 10 to 15
@@ -515,14 +651,24 @@ pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Re
     let start_warping = std::time::Instant::now();
     let ref_size = ref_img.size()?;
 
-    const WARP_BATCH_SIZE: usize = 16; // Increased from 8 for better throughput
+    let warp_batch_size = config.warp_batch_size;
     let total_sharp_images = sharp_image_paths.len(); // Use sharp images count, not all images
     
+    report_progress("Warping images...", 50.0);
+
+    let total_warp_batches = (total_sharp_images + warp_batch_size - 1) / warp_batch_size;
+    let mut warp_batch_count = 0;
+
     // Note: We iterate over indices in sharp_image_paths (0 to total_sharp_images-1)
     // Each element contains (original_index, path) so we can save with the correct filename
 
-    for batch_start in (0..total_sharp_images).step_by(WARP_BATCH_SIZE) {
-        let batch_end = (batch_start + WARP_BATCH_SIZE).min(total_sharp_images);
+    for batch_start in (0..total_sharp_images).step_by(warp_batch_size) {
+        let batch_end = (batch_start + warp_batch_size).min(total_sharp_images);
+        
+        warp_batch_count += 1;
+        let progress_pct = 50.0 + (warp_batch_count as f32 / total_warp_batches as f32) * 30.0;
+        report_progress(&format!("Warping images: batch {}/{}", warp_batch_count, total_warp_batches), progress_pct);
+
         log::info!(
             "Warping batch {}-{} of {} in parallel",
             batch_start,
@@ -637,11 +783,26 @@ pub fn stack_images(
     image_paths: &[PathBuf],
     output_dir: &Path,
     crop_rect: Option<core::Rect>,
+    config: &ProcessingConfig,
+    progress_cb: Option<ProgressCallback>,
 ) -> Result<Mat> {
+    let report_progress = |msg: &str, pct: f32| {
+        if let Some(ref cb) = progress_cb {
+            if let Ok(mut cb_lock) = cb.lock() {
+                cb_lock(msg.to_string(), pct);
+            }
+        }
+    };
+
+    report_progress("Starting stacking...", 0.0);
+
     log::info!("Stacking {} images", image_paths.len());
     let mut reversed_paths: Vec<PathBuf> = image_paths.iter().cloned().collect();
     reversed_paths.reverse();
-    let result = stack_recursive(&reversed_paths, output_dir, 0)?;
+    
+    let result = stack_recursive(&reversed_paths, output_dir, 0, config, progress_cb.clone())?;
+
+    report_progress("Saving final result...", 95.0);
 
     let final_dir = output_dir.join("final");
     std::fs::create_dir_all(&final_dir)?;
@@ -674,7 +835,13 @@ pub fn stack_images(
     Ok(result)
 }
 
-fn stack_recursive(image_paths: &[PathBuf], output_dir: &Path, level: usize) -> Result<Mat> {
+fn stack_recursive(
+    image_paths: &[PathBuf], 
+    output_dir: &Path, 
+    level: usize,
+    config: &ProcessingConfig,
+    progress_cb: Option<ProgressCallback>,
+) -> Result<Mat> {
     if image_paths.is_empty() {
         return Err(anyhow::anyhow!("No images to stack"));
     }
@@ -682,11 +849,19 @@ fn stack_recursive(image_paths: &[PathBuf], output_dir: &Path, level: usize) -> 
         return load_image(&image_paths[0]);
     }
 
-    const BATCH_SIZE: usize = 12; // Increased from 10 for better efficiency
+    let batch_size = config.stacking_batch_size;
     const OVERLAP: usize = 2;
 
-    if image_paths.len() <= BATCH_SIZE {
+    if image_paths.len() <= batch_size {
         println!("Loading {} images for direct stacking...", image_paths.len());
+        
+        if let Some(ref cb) = progress_cb {
+            if let Ok(mut cb_lock) = cb.lock() {
+                let pct = 10.0 + (level as f32 * 10.0).min(80.0);
+                cb_lock(format!("Stacking {} images (level {})...", image_paths.len(), level), pct);
+            }
+        }
+
         // Load images in parallel for better performance
         let images: Vec<Result<Mat>> = image_paths
             .par_iter()
@@ -712,13 +887,16 @@ fn stack_recursive(image_paths: &[PathBuf], output_dir: &Path, level: usize) -> 
     std::fs::create_dir_all(&bunches_dir)?;
 
     let mut intermediate_files = Vec::new();
-    let step = BATCH_SIZE - OVERLAP;
+    let step = batch_size - OVERLAP;
     let mut i = 0;
     let mut batch_idx = 0;
     let mut overlapping_images: Vec<Mat> = Vec::new();
+    
+    // Calculate total batches for progress reporting
+    let total_batches = ((image_paths.len() as f32 - OVERLAP as f32) / step as f32).ceil() as usize;
 
     while i < image_paths.len() {
-        let end = (i + BATCH_SIZE).min(image_paths.len());
+        let end = (i + batch_size).min(image_paths.len());
         let batch_paths = &image_paths[i..end];
 
         log::info!(
@@ -729,6 +907,15 @@ fn stack_recursive(image_paths: &[PathBuf], output_dir: &Path, level: usize) -> 
             end - 1
         );
         println!("  Level {}: Batch {} (images {}-{})...", level, batch_idx, i, end - 1);
+        
+        // Report progress for this batch
+        if let Some(ref cb) = progress_cb {
+            if let Ok(mut cb_lock) = cb.lock() {
+                let batch_progress = (batch_idx as f32 / total_batches as f32) * 70.0; // 0-70%
+                let pct = 10.0 + batch_progress;
+                cb_lock(format!("Stacking batch {}/{} (level {})...", batch_idx + 1, total_batches, level), pct);
+            }
+        }
 
         let mut batch_images = overlapping_images;
         // Only load images that are not already in memory from the previous batch
@@ -770,8 +957,16 @@ fn stack_recursive(image_paths: &[PathBuf], output_dir: &Path, level: usize) -> 
         i += step;
     }
 
+    // Report progress before recursive stacking
+    if let Some(ref cb) = progress_cb {
+        if let Ok(mut cb_lock) = cb.lock() {
+            let pct = 80.0 + (level as f32 * 5.0).min(15.0);
+            cb_lock(format!("Combining {} bunches (level {})...", intermediate_files.len(), level + 1), pct);
+        }
+    }
+
     // Recursively stack the intermediate results
-    stack_recursive(&intermediate_files, output_dir, level + 1)
+    stack_recursive(&intermediate_files, output_dir, level + 1, config, progress_cb)
 }
 
 fn stack_images_direct(images: &[Mat]) -> Result<Mat> {

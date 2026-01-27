@@ -1,5 +1,6 @@
 mod gui;
 mod processing;
+mod system_info;
 
 use gui::ImageStacker;
 use iced::application;
