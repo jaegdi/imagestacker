@@ -5,13 +5,20 @@ use std::path::{Path, PathBuf};
 
 pub fn load_image(path: &PathBuf) -> Result<Mat> {
     use opencv::imgcodecs;
+    let start = std::time::Instant::now();
     let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_COLOR)?;
+    log::info!(
+        "[{:?}] load_image: imread took {:?} for {}",
+        std::time::SystemTime::now(),
+        start.elapsed(),
+        path.display()
+    );
     Ok(img)
 }
 
-pub fn align_images(images: &mut [Mat], output_dir: &std::path::Path) -> Result<()> {
+pub fn align_images(images: &mut [Mat], output_dir: &std::path::Path) -> Result<core::Rect> {
     if images.len() < 2 {
-        return Ok(());
+        return Ok(core::Rect::new(0, 0, images[0].cols(), images[0].rows()));
     }
 
     let aligned_dir = output_dir.join("aligned");
@@ -22,6 +29,13 @@ pub fn align_images(images: &mut [Mat], output_dir: &std::path::Path) -> Result<
         aligned_dir.join("0000.png").to_str().unwrap(),
         &images[0],
         &opencv::core::Vector::new(),
+    )?;
+
+    let mut common_mask = Mat::new_rows_cols_with_default(
+        images[0].rows(),
+        images[0].cols(),
+        core::CV_8U,
+        core::Scalar::all(255.0),
     )?;
 
     let mut sift = features2d::SIFT::create(0, 3, 0.04, 10.0, 1.6, false)?;
@@ -46,6 +60,7 @@ pub fn align_images(images: &mut [Mat], output_dir: &std::path::Path) -> Result<
     )?;
 
     for i in 1..images.len() {
+        log::info!("Aligning image {}/{}", i, images.len() - 1);
         let mut keypoints = opencv::core::Vector::new();
         let mut descriptors: core::UMat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
         let img_umat = images[i].get_umat(
@@ -155,27 +170,79 @@ pub fn align_images(images: &mut [Mat], output_dir: &std::path::Path) -> Result<
             .copy_to(&mut aligned_mat)?;
         images[i] = aligned_mat;
 
+        // Update common mask
+        let mut gray = Mat::default();
+        imgproc::cvt_color(
+            &images[i],
+            &mut gray,
+            imgproc::COLOR_BGR2GRAY,
+            0,
+            core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        )?;
+        let mut mask = Mat::default();
+        imgproc::threshold(&gray, &mut mask, 1.0, 255.0, imgproc::THRESH_BINARY)?;
+        let mut new_common = Mat::default();
+        core::bitwise_and(&common_mask, &mask, &mut new_common, &core::Mat::default())?;
+        common_mask = new_common;
+
         // Save aligned image
+        let aligned_path = aligned_dir.join(format!("{:04}.png", i));
         opencv::imgcodecs::imwrite(
-            aligned_dir.join(format!("{:04}.png", i)).to_str().unwrap(),
+            aligned_path.to_str().unwrap(),
             &images[i],
             &opencv::core::Vector::new(),
         )?;
+        log::info!("Saved aligned image to {}", aligned_path.display());
 
         // Update previous for next iteration
         prev_keypoints = keypoints;
         prev_descriptors = descriptors;
     }
-    Ok(())
+    log::info!("Alignment complete");
+
+    // Find bounding box of common area
+    let mut non_zero = Mat::default();
+    core::find_non_zero(&common_mask, &mut non_zero)?;
+    let crop_rect = imgproc::bounding_rect(&non_zero)?;
+    log::info!("Common area crop rect: {:?}", crop_rect);
+
+    Ok(crop_rect)
 }
 
-pub fn stack_images(images: &[Mat], output_dir: &Path) -> Result<Mat> {
-    let result = stack_recursive(images, output_dir, 0)?;
+pub fn stack_images(
+    image_paths: &[PathBuf],
+    output_dir: &Path,
+    crop_rect: Option<core::Rect>,
+) -> Result<Mat> {
+    log::info!("Stacking {} images", image_paths.len());
+    let mut reversed_paths: Vec<PathBuf> = image_paths.iter().cloned().collect();
+    reversed_paths.reverse();
+    let result = stack_recursive(&reversed_paths, output_dir, 0)?;
 
     let final_dir = output_dir.join("final");
     std::fs::create_dir_all(&final_dir)?;
+
+    let mut final_path = final_dir.join("result.png");
+    let mut counter = 1;
+    while final_path.exists() {
+        final_path = final_dir.join(format!("result_{}.png", counter));
+        counter += 1;
+    }
+
+    log::info!("Saving final result to {}", final_path.display());
+
+    let result = if let Some(rect) = crop_rect {
+        log::info!("Cropping final result to {:?}", rect);
+        let roi = Mat::roi(&result, rect)?;
+        let mut cropped = Mat::default();
+        roi.copy_to(&mut cropped)?;
+        cropped
+    } else {
+        result.clone()
+    };
+
     opencv::imgcodecs::imwrite(
-        final_dir.join("result.png").to_str().unwrap(),
+        final_path.to_str().unwrap(),
         &result,
         &opencv::core::Vector::new(),
     )?;
@@ -183,19 +250,23 @@ pub fn stack_images(images: &[Mat], output_dir: &Path) -> Result<Mat> {
     Ok(result)
 }
 
-fn stack_recursive(images: &[Mat], output_dir: &Path, level: usize) -> Result<Mat> {
-    if images.is_empty() {
+fn stack_recursive(image_paths: &[PathBuf], output_dir: &Path, level: usize) -> Result<Mat> {
+    if image_paths.is_empty() {
         return Err(anyhow::anyhow!("No images to stack"));
     }
-    if images.len() == 1 {
-        return Ok(images[0].clone());
+    if image_paths.len() == 1 {
+        return load_image(&image_paths[0]);
     }
 
     const BATCH_SIZE: usize = 10;
     const OVERLAP: usize = 2;
 
-    if images.len() <= BATCH_SIZE {
-        return stack_images_direct(images);
+    if image_paths.len() <= BATCH_SIZE {
+        let mut images = Vec::new();
+        for path in image_paths {
+            images.push(load_image(path)?);
+        }
+        return stack_images_direct(&images);
     }
 
     let bunches_dir = output_dir.join("bunches");
@@ -205,12 +276,28 @@ fn stack_recursive(images: &[Mat], output_dir: &Path, level: usize) -> Result<Ma
     let step = BATCH_SIZE - OVERLAP;
     let mut i = 0;
     let mut batch_idx = 0;
+    let mut overlapping_images: Vec<Mat> = Vec::new();
 
-    while i < images.len() {
-        let end = (i + BATCH_SIZE).min(images.len());
-        let batch = &images[i..end];
+    while i < image_paths.len() {
+        let end = (i + BATCH_SIZE).min(image_paths.len());
+        let batch_paths = &image_paths[i..end];
 
-        let result = stack_images_direct(batch)?;
+        log::info!(
+            "Level {}: Stacking batch {} (images {} to {})",
+            level,
+            batch_idx,
+            i,
+            end - 1
+        );
+
+        let mut batch_images = overlapping_images;
+        // Only load images that are not already in memory from the previous batch
+        let start_load = if batch_idx == 0 { 0 } else { OVERLAP };
+        for path in &batch_paths[start_load..] {
+            batch_images.push(load_image(path)?);
+        }
+
+        let result = stack_images_direct(&batch_images)?;
 
         let filename = format!("L{}_B{:04}.png", level, batch_idx);
         let path = bunches_dir.join(&filename);
@@ -224,24 +311,19 @@ fn stack_recursive(images: &[Mat], output_dir: &Path, level: usize) -> Result<Ma
         intermediate_files.push(path);
         batch_idx += 1;
 
-        // Explicitly drop the Mat to free memory
-        drop(result);
-
-        if end == images.len() {
+        if end == image_paths.len() {
             break;
         }
+
+        // Keep only the last OVERLAP images for the next batch
+        overlapping_images = batch_images.drain(batch_images.len() - OVERLAP..).collect();
+        // batch_images is now empty (or contains what's left after drain) and will be dropped
+
         i += step;
     }
 
-    // Load intermediate images from disk
-    let mut intermediate_images = Vec::new();
-    for path in intermediate_files {
-        let img = load_image(&path)?;
-        intermediate_images.push(img);
-    }
-
     // Recursively stack the intermediate results
-    stack_recursive(&intermediate_images, output_dir, level + 1)
+    stack_recursive(&intermediate_files, output_dir, level + 1)
 }
 
 fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
@@ -252,11 +334,12 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
         return Ok(images[0].clone());
     }
 
-    let levels = 4; // Number of pyramid levels
+    let levels = 6; // Increased pyramid levels for better detail
     let mut fused_pyramid: Vec<core::UMat> = Vec::new();
     let mut max_energies: Vec<core::UMat> = Vec::new();
 
     for (idx, img) in images.iter().enumerate() {
+        log::info!("Processing image {}/{} for stacking", idx + 1, images.len());
         let mut float_img = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
         img.get_umat(
             core::AccessFlag::ACCESS_READ,
@@ -274,7 +357,7 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             for l in 0..levels as usize {
                 let layer = &current_pyramid[l];
 
-                // Compute initial energy
+                // Compute initial energy using Laplacian for better focus detection
                 let mut gray = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
                 if layer.channels() == 3 {
                     imgproc::cvt_color(
@@ -288,13 +371,24 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                     gray = layer.clone();
                 }
 
-                let mut square = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-                core::multiply(&gray, &gray, &mut square, 1.0, -1)?;
+                let mut laplacian = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                imgproc::laplacian(
+                    &gray,
+                    &mut laplacian,
+                    core::CV_32F,
+                    3,
+                    1.0,
+                    0.0,
+                    core::BORDER_DEFAULT,
+                )?;
 
                 let mut energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                core::absdiff(&laplacian, &core::Scalar::all(0.0), &mut energy)?;
+
+                let mut blurred_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
                 imgproc::gaussian_blur(
-                    &square,
-                    &mut energy,
+                    &energy,
+                    &mut blurred_energy,
                     core::Size::new(5, 5),
                     0.0,
                     0.0,
@@ -302,12 +396,10 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                     core::AlgorithmHint::ALGO_HINT_DEFAULT,
                 )?;
 
-                max_energies.push(energy);
+                max_energies.push(blurred_energy);
             }
 
             // For the base level (Gaussian), we'll use it for averaging later
-            // The last element in fused_pyramid is the base level.
-            // We need to ensure it's float for accumulation.
             let base_idx = levels as usize;
             let mut float_base = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
             fused_pyramid[base_idx].convert_to(&mut float_base, core::CV_32F, 1.0, 0.0)?;
@@ -317,7 +409,7 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             for l in 0..levels as usize {
                 let layer = &current_pyramid[l];
 
-                // Compute energy
+                // Compute energy using Laplacian
                 let mut gray = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
                 if layer.channels() == 3 {
                     imgproc::cvt_color(
@@ -331,13 +423,24 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                     gray = layer.clone();
                 }
 
-                let mut square = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-                core::multiply(&gray, &gray, &mut square, 1.0, -1)?;
+                let mut laplacian = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                imgproc::laplacian(
+                    &gray,
+                    &mut laplacian,
+                    core::CV_32F,
+                    3,
+                    1.0,
+                    0.0,
+                    core::BORDER_DEFAULT,
+                )?;
 
                 let mut energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                core::absdiff(&laplacian, &core::Scalar::all(0.0), &mut energy)?;
+
+                let mut blurred_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
                 imgproc::gaussian_blur(
-                    &square,
-                    &mut energy,
+                    &energy,
+                    &mut blurred_energy,
                     core::Size::new(5, 5),
                     0.0,
                     0.0,
@@ -347,10 +450,10 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
 
                 // Update fused layer where energy is higher
                 let mut mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-                core::compare(&energy, &max_energies[l], &mut mask, core::CMP_GT)?;
+                core::compare(&blurred_energy, &max_energies[l], &mut mask, core::CMP_GT)?;
 
                 layer.copy_to_masked(&mut fused_pyramid[l], &mask)?;
-                energy.copy_to_masked(&mut max_energies[l], &mask)?;
+                blurred_energy.copy_to_masked(&mut max_energies[l], &mask)?;
             }
 
             // Accumulate base level for averaging
@@ -368,9 +471,9 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             )?;
             fused_pyramid[base_idx] = next_fused_base;
         }
-        // current_pyramid goes out of scope and its UMats are dropped
     }
 
+    log::info!("Collapsing pyramid...");
     // Finalize base level averaging
     let base_idx = levels as usize;
     let mut final_base = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
@@ -387,6 +490,7 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
     final_img_umat
         .get_mat(core::AccessFlag::ACCESS_READ)?
         .copy_to(&mut final_img)?;
+    log::info!("Stacking batch complete");
     Ok(final_img)
 }
 
@@ -542,10 +646,18 @@ mod tests {
             0,
         )?;
 
-        let images = vec![img1, img2];
         let temp_dir = std::env::temp_dir().join("imagestacker_test_synthetic");
         std::fs::create_dir_all(&temp_dir)?;
-        let result = stack_images(&images, &temp_dir)?;
+
+        let mut paths = Vec::new();
+        let p1 = temp_dir.join("img1.png");
+        let p2 = temp_dir.join("img2.png");
+        opencv::imgcodecs::imwrite(p1.to_str().unwrap(), &img1, &opencv::core::Vector::new())?;
+        opencv::imgcodecs::imwrite(p2.to_str().unwrap(), &img2, &opencv::core::Vector::new())?;
+        paths.push(p1);
+        paths.push(p2);
+
+        let result = stack_images(&paths, &temp_dir, None)?;
 
         assert!(!result.empty());
         assert_eq!(result.size()?, Size::new(100, 100));
@@ -585,7 +697,15 @@ mod tests {
 
         let temp_dir = std::env::temp_dir().join("imagestacker_test_batched");
         std::fs::create_dir_all(&temp_dir)?;
-        let result = stack_images(&images, &temp_dir)?;
+
+        let mut paths = Vec::new();
+        for (idx, img) in images.iter().enumerate() {
+            let p = temp_dir.join(format!("img_{:04}.png", idx));
+            opencv::imgcodecs::imwrite(p.to_str().unwrap(), img, &opencv::core::Vector::new())?;
+            paths.push(p);
+        }
+
+        let result = stack_images(&paths, &temp_dir, None)?;
 
         assert!(!result.empty());
         assert_eq!(result.size()?, Size::new(100, 100));
