@@ -1,204 +1,628 @@
 use anyhow::Result;
 use opencv::prelude::*;
 use opencv::{calib3d, core, features2d, imgproc};
+use rayon::prelude::*;
 use std::path::{Path, PathBuf};
 
 pub fn load_image(path: &PathBuf) -> Result<Mat> {
     use opencv::imgcodecs;
     let start = std::time::Instant::now();
+    let filename = path.file_name().unwrap_or_default().to_string_lossy();
+    println!("Loading image: {}", filename);
+    log::info!("Loading image: {}", path.display());
+    
     let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_COLOR)?;
+    
+    let elapsed = start.elapsed();
     log::info!(
-        "[{:?}] load_image: imread took {:?} for {}",
-        std::time::SystemTime::now(),
-        start.elapsed(),
-        path.display()
+        "Loaded {} in {:?} - Size: {}x{}, Channels: {}",
+        filename, elapsed, img.cols(), img.rows(), img.channels()
     );
+    println!(
+        "  ✓ Loaded in {:?} - Size: {}x{}, Channels: {}",
+        elapsed, img.cols(), img.rows(), img.channels()
+    );
+    
     Ok(img)
 }
 
-pub fn align_images(images: &mut [Mat], output_dir: &std::path::Path) -> Result<core::Rect> {
-    if images.len() < 2 {
-        return Ok(core::Rect::new(0, 0, images[0].cols(), images[0].rows()));
-    }
-
-    let aligned_dir = output_dir.join("aligned");
-    std::fs::create_dir_all(&aligned_dir)?;
-
-    // Save reference image (Image 0)
-    opencv::imgcodecs::imwrite(
-        aligned_dir.join("0000.png").to_str().unwrap(),
-        &images[0],
-        &opencv::core::Vector::new(),
-    )?;
-
-    let mut common_mask = Mat::new_rows_cols_with_default(
-        images[0].rows(),
-        images[0].cols(),
-        core::CV_8U,
-        core::Scalar::all(255.0),
-    )?;
-
-    let mut sift = features2d::SIFT::create(0, 3, 0.04, 10.0, 1.6, false)?;
-
-    // Total transformation from current image to Image 0
-    let mut t_total = Mat::eye(3, 3, core::CV_64F)?.to_mat()?;
-
-    // Pre-compute features for the first image
-    let mut prev_keypoints = opencv::core::Vector::new();
-    let mut prev_descriptors: core::UMat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-
-    let ref_umat = images[0].get_umat(
-        core::AccessFlag::ACCESS_READ,
-        core::UMatUsageFlags::USAGE_DEFAULT,
-    )?;
-    sift.detect_and_compute(
-        &ref_umat,
-        &core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT),
-        &mut prev_keypoints,
-        &mut prev_descriptors,
-        false,
-    )?;
-
-    for i in 1..images.len() {
-        log::info!("Aligning image {}/{}", i, images.len() - 1);
-        let mut keypoints = opencv::core::Vector::new();
-        let mut descriptors: core::UMat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-        let img_umat = images[i].get_umat(
-            core::AccessFlag::ACCESS_READ,
-            core::UMatUsageFlags::USAGE_DEFAULT,
-        )?;
-
-        sift.detect_and_compute(
-            &img_umat,
-            &core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT),
-            &mut keypoints,
-            &mut descriptors,
-            false,
-        )?;
-
-        if !descriptors.empty() && !prev_descriptors.empty() {
-            let mut matcher = features2d::BFMatcher::create(core::NORM_L2, false)?;
-            let mut matches = opencv::core::Vector::<core::DMatch>::new();
-
-            // Convert to Mat for matching to avoid Vector<UMat> / getMatVector issues
-            let desc_mat = descriptors.get_mat(core::AccessFlag::ACCESS_READ)?;
-            let prev_desc_mat = prev_descriptors.get_mat(core::AccessFlag::ACCESS_READ)?;
-
-            let mut train_descriptors = opencv::core::Vector::<core::Mat>::new();
-            train_descriptors.push(prev_desc_mat);
-            matcher.add(&train_descriptors)?;
-
-            matcher.match_(&desc_mat, &mut matches, &core::Mat::default())?;
-
-            let mut matches_vec = matches.to_vec();
-            matches_vec.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
-
-            // Keep top matches
-            let count = (matches_vec.len() as f32 * 0.2) as usize;
-            let count = count.max(10).min(matches_vec.len());
-            let good_matches = &matches_vec[..count];
-
-            let mut src_pts = opencv::core::Vector::<core::Point2f>::new();
-            let mut dst_pts = opencv::core::Vector::<core::Point2f>::new();
-
-            for m in good_matches {
-                src_pts.push(keypoints.get(m.query_idx as usize)?.pt());
-                dst_pts.push(prev_keypoints.get(m.train_idx as usize)?.pt());
-            }
-
-            if src_pts.len() >= 4 {
-                let mut inliers: core::UMat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-                let t_step_2x3 = calib3d::estimate_affine_partial_2d(
-                    &src_pts,
-                    &dst_pts,
-                    &mut inliers,
-                    calib3d::RANSAC,
-                    3.0,
-                    2000,
-                    0.99,
-                    10,
-                )?;
-
-                if !t_step_2x3.empty() {
-                    // Convert 2x3 to 3x3 for multiplication
-                    let mut t_step_3x3 = Mat::eye(3, 3, core::CV_64F)?.to_mat()?;
-                    for row in 0..2 {
-                        for col in 0..3 {
-                            *t_step_3x3.at_2d_mut::<f64>(row, col)? =
-                                *t_step_2x3.at_2d::<f64>(row, col)?;
-                        }
-                    }
-
-                    // Accumulate: T_total = T_total * T_step
-                    let mut next_t_total = Mat::default();
-                    core::gemm(
-                        &t_total,
-                        &t_step_3x3,
-                        1.0,
-                        &Mat::default(),
-                        0.0,
-                        &mut next_t_total,
-                        0,
-                    )?;
-                    t_total = next_t_total;
-                }
-            }
-        }
-
-        // Warp current image to Image 0 frame
-        let mut warped_umat: core::UMat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-        let mut t_warp_2x3: Mat = Mat::zeros(2, 3, core::CV_64F)?.to_mat()?;
-        for row in 0..2 {
-            for col in 0..3 {
-                *t_warp_2x3.at_2d_mut::<f64>(row, col)? = *t_total.at_2d::<f64>(row, col)?;
-            }
-        }
-
-        imgproc::warp_affine(
-            &img_umat,
-            &mut warped_umat,
-            &t_warp_2x3,
-            images[0].size()?,
-            imgproc::INTER_LINEAR,
-            core::BORDER_CONSTANT,
-            core::Scalar::default(),
-        )?;
-
-        let mut aligned_mat = Mat::default();
-        warped_umat
-            .get_mat(core::AccessFlag::ACCESS_READ)?
-            .copy_to(&mut aligned_mat)?;
-        images[i] = aligned_mat;
-
-        // Update common mask
-        let mut gray = Mat::default();
+/// Compute image sharpness using multiple methods for robust blur detection
+/// Returns a normalized sharpness score (0.0 = very blurry, higher = sharper)
+/// Combines Laplacian variance, Tenengrad (Sobel gradient), and Modified Laplacian
+fn compute_sharpness(img: &Mat) -> Result<f64> {
+    let mut gray = Mat::default();
+    if img.channels() == 3 {
         imgproc::cvt_color(
-            &images[i],
+            img,
             &mut gray,
             imgproc::COLOR_BGR2GRAY,
             0,
             core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
-        let mut mask = Mat::default();
-        imgproc::threshold(&gray, &mut mask, 1.0, 255.0, imgproc::THRESH_BINARY)?;
+    } else {
+        gray = img.clone();
+    }
+
+    // Convert to float32 for better precision
+    let mut gray_float = Mat::default();
+    gray.convert_to(&mut gray_float, core::CV_32F, 1.0, 0.0)?;
+
+    // Method 1: Laplacian Variance (with Gaussian blur to reduce noise sensitivity)
+    let mut blurred = Mat::default();
+    imgproc::gaussian_blur(
+        &gray_float,
+        &mut blurred,
+        core::Size::new(3, 3),
+        0.0,
+        0.0,
+        core::BORDER_DEFAULT,
+        core::AlgorithmHint::ALGO_HINT_DEFAULT,
+    )?;
+
+    let mut laplacian = Mat::default();
+    imgproc::laplacian(
+        &blurred,
+        &mut laplacian,
+        core::CV_32F,
+        5, // Larger kernel for better detection
+        1.0,
+        0.0,
+        core::BORDER_DEFAULT,
+    )?;
+
+    let mut lap_mean = Mat::default();
+    let mut lap_stddev = Mat::default();
+    core::mean_std_dev(&laplacian, &mut lap_mean, &mut lap_stddev, &core::Mat::default())?;
+    let laplacian_var = lap_stddev.at_2d::<f64>(0, 0)? * lap_stddev.at_2d::<f64>(0, 0)?;
+
+    // Method 2: Tenengrad (Sobel gradient magnitude)
+    let mut sobel_x = Mat::default();
+    let mut sobel_y = Mat::default();
+    imgproc::sobel(
+        &gray_float,
+        &mut sobel_x,
+        core::CV_32F,
+        1,
+        0,
+        3,
+        1.0,
+        0.0,
+        core::BORDER_DEFAULT,
+    )?;
+    imgproc::sobel(
+        &gray_float,
+        &mut sobel_y,
+        core::CV_32F,
+        0,
+        1,
+        3,
+        1.0,
+        0.0,
+        core::BORDER_DEFAULT,
+    )?;
+
+    // Compute gradient magnitude squared
+    let mut sobel_x_sq = Mat::default();
+    let mut sobel_y_sq = Mat::default();
+    core::multiply(&sobel_x, &sobel_x, &mut sobel_x_sq, 1.0, -1)?;
+    core::multiply(&sobel_y, &sobel_y, &mut sobel_y_sq, 1.0, -1)?;
+
+    let mut gradient_mag_sq = Mat::default();
+    core::add(&sobel_x_sq, &sobel_y_sq, &mut gradient_mag_sq, &core::Mat::default(), -1)?;
+
+    // Calculate mean of gradient magnitude squared (Tenengrad)
+    let tenengrad = core::mean(&gradient_mag_sq, &core::Mat::default())?[0];
+
+    // Method 3: Modified Laplacian (sum of absolute Sobel derivatives)
+    let mut abs_sobel_x = Mat::default();
+    let mut abs_sobel_y = Mat::default();
+    core::convert_scale_abs(&sobel_x, &mut abs_sobel_x, 1.0, 0.0)?;
+    core::convert_scale_abs(&sobel_y, &mut abs_sobel_y, 1.0, 0.0)?;
+
+    let mut mod_laplacian = Mat::default();
+    core::add(&abs_sobel_x, &abs_sobel_y, &mut mod_laplacian, &core::Mat::default(), -1)?;
+    let mod_lap_mean = core::mean(&mod_laplacian, &core::Mat::default())?[0];
+
+    // Combine metrics with weights
+    // Normalize by image dimensions to make threshold more consistent
+    let pixel_count = (gray.rows() * gray.cols()) as f64;
+    let size_factor = (pixel_count / 1_000_000.0).sqrt(); // Normalize to ~1MP image
+
+    let combined_score = (
+        laplacian_var * 0.4 +      // Laplacian variance is good but noise-sensitive
+        tenengrad * 0.3 +          // Tenengrad is robust
+        mod_lap_mean * 0.3         // Modified Laplacian is also robust
+    ) / size_factor.max(0.5);      // Prevent division issues with very small images
+
+    // Log individual components for debugging
+    log::debug!(
+        "Sharpness components: lap_var={:.2}, tenengrad={:.2}, mod_lap={:.2}, size_factor={:.2}, combined={:.2}",
+        laplacian_var, tenengrad, mod_lap_mean, size_factor, combined_score
+    );
+
+    Ok(combined_score)
+}
+
+pub fn align_images(image_paths: &[PathBuf], output_dir: &std::path::Path) -> Result<core::Rect> {
+    if image_paths.len() < 2 {
+        let first_img = load_image(&image_paths[0])?;
+        return Ok(core::Rect::new(0, 0, first_img.cols(), first_img.rows()));
+    }
+
+    let aligned_dir = output_dir.join("aligned");
+    std::fs::create_dir_all(&aligned_dir)?;
+
+    // Filter images by sharpness
+    log::info!("Checking image sharpness for {} images...", image_paths.len());
+    println!("\n=== BLUR DETECTION STARTING ===");
+    println!("Analyzing {} images for sharpness (parallel batches)...", image_paths.len());
+    
+    // Process images in batches to avoid excessive memory usage
+    const SHARPNESS_BATCH_SIZE: usize = 8;
+    let mut sharpness_scores: Vec<(usize, PathBuf, f64)> = Vec::new();
+    
+    for (batch_idx, batch) in image_paths.chunks(SHARPNESS_BATCH_SIZE).enumerate() {
+        let batch_start = batch_idx * SHARPNESS_BATCH_SIZE;
+        println!("  Processing batch {}/{} ({} images)...", 
+                 batch_idx + 1, 
+                 (image_paths.len() + SHARPNESS_BATCH_SIZE - 1) / SHARPNESS_BATCH_SIZE,
+                 batch.len());
+        
+        let batch_results: Vec<(usize, PathBuf, f64)> = batch
+            .par_iter()
+            .enumerate()
+            .filter_map(|(batch_idx, path)| {
+                let idx = batch_start + batch_idx;
+                let filename = path.file_name().unwrap_or_default().to_string_lossy();
+                match load_image(path) {
+                    Ok(img) => match compute_sharpness(&img) {
+                        Ok(sharpness) => {
+                            log::info!("Image {} ({}): sharpness = {:.2}", idx, filename, sharpness);
+                            println!("    [{}] {}: sharpness = {:.2}", idx, filename, sharpness);
+                            Some((idx, path.clone(), sharpness))
+                        }
+                        Err(e) => {
+                            log::warn!("Failed to compute sharpness for {}: {}", filename, e);
+                            println!("    [{}] {}: ERROR computing sharpness: {}", idx, filename, e);
+                            None
+                        }
+                    },
+                    Err(e) => {
+                        log::warn!("Failed to load image {}: {}", filename, e);
+                        println!("    [{}] {}: ERROR loading: {}", idx, filename, e);
+                        None
+                    }
+                }
+            })
+            .collect();
+        
+        sharpness_scores.extend(batch_results);
+    }
+
+    // Calculate statistics for adaptive thresholding
+    let scores: Vec<f64> = sharpness_scores.iter().map(|(_, _, s)| *s).collect();
+    let mean_sharpness: f64 = scores.iter().sum::<f64>() / scores.len() as f64;
+    
+    let variance: f64 = scores.iter()
+        .map(|s| (s - mean_sharpness).powi(2))
+        .sum::<f64>() / scores.len() as f64;
+    let stddev = variance.sqrt();
+    
+    // Sort scores to find median and quartiles
+    let mut sorted_scores = scores.clone();
+    sorted_scores.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    let median = sorted_scores[sorted_scores.len() / 2];
+    let q1 = sorted_scores[sorted_scores.len() / 4];
+    let q3 = sorted_scores[(3 * sorted_scores.len()) / 4];
+    
+    // Adaptive threshold: Use multiple criteria to detect outliers
+    // 1. Absolute threshold (for very blurry images) - lowered from 50 to 30
+    let absolute_threshold = 30.0;
+    // 2. Statistical threshold (mean - 1.0 * stddev) - more aggressive than before
+    let statistical_threshold = (mean_sharpness - 1.0 * stddev).max(absolute_threshold);
+    // 3. Quartile-based threshold (Q1 - 1.0 * IQR) for robust outlier detection - more aggressive
+    let iqr = q3 - q1;
+    let quartile_threshold = (q1 - 1.0 * iqr).max(absolute_threshold);
+    
+    // Use the most conservative (highest) threshold
+    let dynamic_threshold = absolute_threshold.max(statistical_threshold).max(quartile_threshold);
+    
+    let stats_msg = format!(
+        "Sharpness statistics:\n  Mean: {:.2}\n  Median: {:.2}\n  StdDev: {:.2}\n  Q1: {:.2}\n  Q3: {:.2}\n  IQR: {:.2}\n  Threshold: {:.2}",
+        mean_sharpness, median, stddev, q1, q3, iqr, dynamic_threshold
+    );
+    log::info!("{}", stats_msg);
+    println!("\n{}", stats_msg);
+
+    let mut sharp_image_paths = Vec::new();
+    let mut skipped_count = 0;
+
+    println!("\n=== FILTERING RESULTS ===");
+    for (idx, path, sharpness) in sharpness_scores {
+        let filename = path.file_name().unwrap_or_default().to_string_lossy();
+        if sharpness >= dynamic_threshold {
+            sharp_image_paths.push((idx, path.clone()));
+            let msg = format!("✓ Image {} ({}): {:.2} - INCLUDED", idx, filename, sharpness);
+            log::info!("{}", msg);
+            println!("{}", msg);
+        } else {
+            skipped_count += 1;
+            let msg = format!("✗ Image {} ({}): {:.2} - SKIPPED (below {:.2})", 
+                idx, filename, sharpness, dynamic_threshold);
+            log::warn!("{}", msg);
+            println!("{}", msg);
+        }
+    }
+
+    let summary = format!(
+        "\n=== FILTERING SUMMARY ===\n  Total images: {}\n  Sharp images: {}\n  Blurry images skipped: {}\n========================\n",
+        image_paths.len(),
+        sharp_image_paths.len(),
+        skipped_count
+    );
+    log::info!("{}", summary);
+    println!("{}", summary);
+
+    if sharp_image_paths.is_empty() {
+        let err_msg = "ERROR: No sharp images found for alignment! All images appear too blurry.";
+        log::error!("{}", err_msg);
+        println!("{}", err_msg);
+        return Err(anyhow::anyhow!(err_msg));
+    }
+
+    if sharp_image_paths.len() < 2 {
+        let first_img = load_image(&sharp_image_paths[0].1)?;
+        log::warn!("Only one sharp image found, skipping alignment");
+        println!("⚠ Only one sharp image found, skipping alignment");
+        return Ok(core::Rect::new(0, 0, first_img.cols(), first_img.rows()));
+    }
+
+    // Save reference image (first sharp image)
+    println!("\n=== STARTING ALIGNMENT ===");
+    println!("Using {} sharp images for alignment", sharp_image_paths.len());
+    println!("Reference image: {}", sharp_image_paths[0].1.file_name().unwrap_or_default().to_string_lossy());
+    
+    let ref_img = load_image(&sharp_image_paths[0].1)?;
+    opencv::imgcodecs::imwrite(
+        aligned_dir
+            .join(format!("{:04}.png", sharp_image_paths[0].0))
+            .to_str()
+            .unwrap(),
+        &ref_img,
+        &opencv::core::Vector::new(),
+    )?;
+
+    let mut common_mask = Mat::new_rows_cols_with_default(
+        ref_img.rows(),
+        ref_img.cols(),
+        core::CV_8U,
+        core::Scalar::all(255.0),
+    )?;
+
+    let start_total = std::time::Instant::now();
+
+    // 1. Batched Parallel Feature Extraction and Pairwise Matching
+    log::info!(
+        "Processing {} sharp image pairs in batches...",
+        sharp_image_paths.len() - 1
+    );
+    println!("\nExtracting features and matching {} image pairs...", sharp_image_paths.len() - 1);
+    
+    let start_matching = std::time::Instant::now();
+    use rayon::prelude::*;
+
+    // Alignment scale: less downsampling to preserve small sharp areas
+    const ALIGNMENT_SCALE: f64 = 0.7; // Increased from 0.5 to preserve more detail
+    const FEATURE_BATCH_SIZE: usize = 16; // Increased from 8 for better parallelism
+    let mut pairwise_transforms = Vec::new();
+
+    // Process sharp images in batches for memory efficiency with parallel processing within batches
+    for batch_start in (0..sharp_image_paths.len()).step_by(FEATURE_BATCH_SIZE) {
+        let batch_end = (batch_start + FEATURE_BATCH_SIZE + 1).min(sharp_image_paths.len());
+        let batch_paths: Vec<&PathBuf> = sharp_image_paths[batch_start..batch_end]
+            .iter()
+            .map(|(_, path)| path)
+            .collect();
+
+        log::info!(
+            "Extracting features for batch {}-{} of {} (batch size: {})",
+            batch_start,
+            batch_end - 1,
+            sharp_image_paths.len() - 1,
+            batch_paths.len()
+        );
+
+        // Extract features for this batch in parallel
+        let batch_features: Vec<Result<(Vec<core::KeyPoint>, core::Mat, f64)>> = batch_paths
+            .par_iter()
+            .map(|&path| {
+                let img = load_image(path)?;
+
+                // Convert to grayscale for preprocessing
+                let mut gray = Mat::default();
+                if img.channels() == 3 {
+                    imgproc::cvt_color(
+                        &img,
+                        &mut gray,
+                        imgproc::COLOR_BGR2GRAY,
+                        0,
+                        core::AlgorithmHint::ALGO_HINT_DEFAULT,
+                    )?;
+                } else {
+                    gray = img.clone();
+                }
+
+                // Apply CLAHE (Contrast Limited Adaptive Histogram Equalization) for dark images
+                // This dramatically improves feature detection in low-contrast/dark regions
+                let mut clahe = imgproc::create_clahe(2.0, core::Size::new(8, 8))?;
+                let mut enhanced = Mat::default();
+                clahe.apply(&gray, &mut enhanced)?;
+
+                // Downsample enhanced image for faster feature detection
+                let mut small_img = Mat::default();
+                let scale = ALIGNMENT_SCALE;
+                imgproc::resize(
+                    &enhanced,
+                    &mut small_img,
+                    core::Size::default(),
+                    scale,
+                    scale,
+                    imgproc::INTER_AREA,
+                )?;
+
+                // Use ORB with parameters optimized for challenging images
+                let mut orb = features2d::ORB::create(
+                    3000, // Increased from 1500 for better feature detection in difficult images
+                    1.2,  // scaleFactor
+                    8,    // nlevels - multi-scale detection
+                    15,   // edgeThreshold - reduced from 31 for more edge features
+                    0,    // firstLevel
+                    2,    // WTA_K
+                    features2d::ORB_ScoreType::HARRIS_SCORE,
+                    31, // patchSize
+                    10, // fastThreshold - reduced from 20 for more sensitive detection
+                )?;
+                let mut keypoints = opencv::core::Vector::new();
+                let mut descriptors = core::Mat::default();
+
+                orb.detect_and_compute(
+                    &small_img,
+                    &core::Mat::default(),
+                    &mut keypoints,
+                    &mut descriptors,
+                    false,
+                )?;
+                Ok((keypoints.to_vec(), descriptors, scale))
+            })
+            .collect();
+
+        // Convert to valid features
+        let mut valid_batch_features = Vec::new();
+        for f in batch_features {
+            valid_batch_features.push(f?);
+        }
+
+        // Compute pairwise transforms for consecutive pairs in this batch
+        for i in 0..valid_batch_features.len() - 1 {
+            let (ref prev_keypoints, ref prev_descriptors, prev_scale) = valid_batch_features[i];
+            let (ref curr_keypoints, ref curr_descriptors, curr_scale) =
+                valid_batch_features[i + 1];
+
+            let t_step_2x3 = if curr_descriptors.empty() || prev_descriptors.empty() {
+                Mat::default()
+            } else {
+                // Use BFMatcher with HAMMING distance for ORB binary descriptors
+                // This is faster and more appropriate for binary features
+                let mut matcher = features2d::BFMatcher::create(core::NORM_HAMMING, false)?;
+
+                // Add training descriptors first
+                let mut train_descriptors = opencv::core::Vector::<core::Mat>::new();
+                train_descriptors.push(prev_descriptors.clone());
+                matcher.add(&train_descriptors)?;
+
+                // Then match
+                let mut matches = opencv::core::Vector::<core::DMatch>::new();
+                matcher.match_(curr_descriptors, &mut matches, &core::Mat::default())?;
+
+                let mut matches_vec = matches.to_vec();
+                matches_vec.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
+
+                // Use top 40% of matches for ORB (increased from 30% for more robust alignment)
+                // This is especially important for dark images with fewer good features
+                let count = (matches_vec.len() as f32 * 0.4) as usize;
+                let count = count.max(15).min(matches_vec.len()); // Increased min from 10 to 15
+                let good_matches = &matches_vec[..count];
+
+                let mut src_pts = opencv::core::Vector::<core::Point2f>::new();
+                let mut dst_pts = opencv::core::Vector::<core::Point2f>::new();
+
+                // Scale keypoints back to original image coordinates
+                for m in good_matches {
+                    let curr_pt = curr_keypoints[m.query_idx as usize].pt();
+                    let prev_pt = prev_keypoints[m.train_idx as usize].pt();
+                    src_pts.push(core::Point2f::new(
+                        curr_pt.x / curr_scale as f32,
+                        curr_pt.y / curr_scale as f32,
+                    ));
+                    dst_pts.push(core::Point2f::new(
+                        prev_pt.x / prev_scale as f32,
+                        prev_pt.y / prev_scale as f32,
+                    ));
+                }
+
+                if src_pts.len() >= 4 {
+                    let mut inliers = Mat::default();
+                    // Improved RANSAC parameters for challenging alignments
+                    calib3d::estimate_affine_partial_2d(
+                        &src_pts,
+                        &dst_pts,
+                        &mut inliers,
+                        calib3d::RANSAC,
+                        5.0,  // Increased from 3.0 for more tolerance with small features
+                        5000, // Increased from 2000 for more thorough search
+                        0.995, // Increased confidence from 0.99
+                        10,
+                    )?
+                } else {
+                    Mat::default()
+                }
+            };
+
+            pairwise_transforms.push(t_step_2x3);
+        }
+
+        // Batch features are dropped here, freeing memory before next batch
+    }
+
+    log::info!(
+        "Batched parallel matching took {:?}",
+        start_matching.elapsed()
+    );
+
+    // 2. Sequential Transformation Accumulation
+    log::info!("Accumulating transformations...");
+    let mut total_transforms = Vec::new();
+    let mut t_total = Mat::eye(3, 3, core::CV_64F)?.to_mat()?;
+    total_transforms.push(t_total.clone());
+
+    for t_step_2x3 in pairwise_transforms {
+        if !t_step_2x3.empty() {
+            let mut t_step_3x3 = Mat::eye(3, 3, core::CV_64F)?.to_mat()?;
+            for row in 0..2 {
+                for col in 0..3 {
+                    *t_step_3x3.at_2d_mut::<f64>(row, col)? = *t_step_2x3.at_2d::<f64>(row, col)?;
+                }
+            }
+
+            let mut next_t_total = Mat::default();
+            core::gemm(
+                &t_total,
+                &t_step_3x3,
+                1.0,
+                &Mat::default(),
+                0.0,
+                &mut next_t_total,
+                0,
+            )?;
+            t_total = next_t_total;
+        }
+        total_transforms.push(t_total.clone());
+    }
+
+    // 3. Batched Parallel Warping
+    log::info!("Warping images in parallel batches...");
+    println!("\nWarping {} sharp images...", sharp_image_paths.len());
+    let start_warping = std::time::Instant::now();
+    let ref_size = ref_img.size()?;
+
+    const WARP_BATCH_SIZE: usize = 16; // Increased from 8 for better throughput
+    let total_sharp_images = sharp_image_paths.len(); // Use sharp images count, not all images
+    
+    // Note: We iterate over indices in sharp_image_paths (0 to total_sharp_images-1)
+    // Each element contains (original_index, path) so we can save with the correct filename
+
+    for batch_start in (0..total_sharp_images).step_by(WARP_BATCH_SIZE) {
+        let batch_end = (batch_start + WARP_BATCH_SIZE).min(total_sharp_images);
+        log::info!(
+            "Warping batch {}-{} of {} in parallel",
+            batch_start,
+            batch_end - 1,
+            total_sharp_images - 1
+        );
+        println!("  Warping batch {}-{} of {}...", batch_start, batch_end - 1, total_sharp_images - 1);
+
+        // Process this batch in parallel
+        let batch_results: Vec<Result<()>> = (batch_start..batch_end)
+            .into_par_iter()
+            .map(|i| {
+                let (orig_idx, path) = &sharp_image_paths[i];
+                let img = load_image(path)?;
+                let mut warped = Mat::default();
+                let mut t_warp_2x3 = Mat::zeros(2, 3, core::CV_64F)?.to_mat()?;
+
+                for row in 0..2 {
+                    for col in 0..3 {
+                        *t_warp_2x3.at_2d_mut::<f64>(row, col)? =
+                            *total_transforms[i].at_2d::<f64>(row, col)?;
+                    }
+                }
+
+                imgproc::warp_affine(
+                    &img,
+                    &mut warped,
+                    &t_warp_2x3,
+                    ref_size,
+                    imgproc::INTER_LINEAR,
+                    core::BORDER_CONSTANT,
+                    core::Scalar::default(),
+                )?;
+
+                // Save aligned image with original index
+                let aligned_path = aligned_dir.join(format!("{:04}.png", orig_idx));
+                opencv::imgcodecs::imwrite(
+                    aligned_path.to_str().unwrap(),
+                    &warped,
+                    &opencv::core::Vector::new(),
+                )?;
+
+                Ok(())
+            })
+            .collect();
+
+        // Check for errors
+        for res in batch_results {
+            res?;
+        }
+        // Batch is complete, all images in batch are now released
+    }
+
+    log::info!("Warping took {:?}", start_warping.elapsed());
+    println!("✓ Warping complete in {:?}", start_warping.elapsed());
+
+    // 4. Update Common Mask (Parallel)
+    log::info!("Updating common mask...");
+    println!("\nComputing common mask area...");
+    let start_mask = std::time::Instant::now();
+
+    // Compute all masks in parallel (only for sharp images)
+    let masks: Vec<Result<Mat>> = sharp_image_paths
+        .par_iter()
+        .map(|(orig_idx, _)| {
+            let aligned_path = aligned_dir.join(format!("{:04}.png", orig_idx));
+            let img = opencv::imgcodecs::imread(
+                aligned_path.to_str().unwrap(),
+                opencv::imgcodecs::IMREAD_COLOR,
+            )?;
+            let mut gray = Mat::default();
+            imgproc::cvt_color(
+                &img,
+                &mut gray,
+                imgproc::COLOR_BGR2GRAY,
+                0,
+                core::AlgorithmHint::ALGO_HINT_DEFAULT,
+            )?;
+            let mut mask = Mat::default();
+            imgproc::threshold(&gray, &mut mask, 1.0, 255.0, imgproc::THRESH_BINARY)?;
+            Ok(mask)
+        })
+        .collect();
+
+    // Combine masks sequentially
+    for mask_result in masks {
+        let mask = mask_result?;
         let mut new_common = Mat::default();
         core::bitwise_and(&common_mask, &mask, &mut new_common, &core::Mat::default())?;
         common_mask = new_common;
-
-        // Save aligned image
-        let aligned_path = aligned_dir.join(format!("{:04}.png", i));
-        opencv::imgcodecs::imwrite(
-            aligned_path.to_str().unwrap(),
-            &images[i],
-            &opencv::core::Vector::new(),
-        )?;
-        log::info!("Saved aligned image to {}", aligned_path.display());
-
-        // Update previous for next iteration
-        prev_keypoints = keypoints;
-        prev_descriptors = descriptors;
     }
+
+    log::info!("Mask computation took {:?}", start_mask.elapsed());
+    println!("✓ Mask computation complete in {:?}", start_mask.elapsed());
+
+    log::info!("Total alignment took {:?}", start_total.elapsed());
     log::info!("Alignment complete");
+    println!("\n=== ALIGNMENT COMPLETE ===");
+    println!("Total time: {:?}", start_total.elapsed());
+    println!("========================\n");
 
     // Find bounding box of common area
     let mut non_zero = Mat::default();
@@ -258,15 +682,30 @@ fn stack_recursive(image_paths: &[PathBuf], output_dir: &Path, level: usize) -> 
         return load_image(&image_paths[0]);
     }
 
-    const BATCH_SIZE: usize = 10;
+    const BATCH_SIZE: usize = 12; // Increased from 10 for better efficiency
     const OVERLAP: usize = 2;
 
     if image_paths.len() <= BATCH_SIZE {
-        let mut images = Vec::new();
-        for path in image_paths {
-            images.push(load_image(path)?);
+        println!("Loading {} images for direct stacking...", image_paths.len());
+        // Load images in parallel for better performance
+        let images: Vec<Result<Mat>> = image_paths
+            .par_iter()
+            .map(|path| load_image(path))
+            .collect();
+        
+        let mut valid_images = Vec::new();
+        for (idx, img_result) in images.into_iter().enumerate() {
+            match img_result {
+                Ok(img) => valid_images.push(img),
+                Err(e) => log::warn!("Failed to load image {}: {}", idx, e),
+            }
         }
-        return stack_images_direct(&images);
+        
+        if valid_images.is_empty() {
+            return Err(anyhow::anyhow!("No valid images to stack"));
+        }
+        
+        return stack_images_direct(&valid_images);
     }
 
     let bunches_dir = output_dir.join("bunches");
@@ -289,12 +728,20 @@ fn stack_recursive(image_paths: &[PathBuf], output_dir: &Path, level: usize) -> 
             i,
             end - 1
         );
+        println!("  Level {}: Batch {} (images {}-{})...", level, batch_idx, i, end - 1);
 
         let mut batch_images = overlapping_images;
         // Only load images that are not already in memory from the previous batch
         let start_load = if batch_idx == 0 { 0 } else { OVERLAP };
-        for path in &batch_paths[start_load..] {
-            batch_images.push(load_image(path)?);
+        
+        // Parallel load of new images
+        let new_images: Vec<Result<Mat>> = batch_paths[start_load..]
+            .par_iter()
+            .map(|path| load_image(path))
+            .collect();
+        
+        for img_result in new_images {
+            batch_images.push(img_result?);
         }
 
         let result = stack_images_direct(&batch_images)?;
@@ -307,6 +754,7 @@ fn stack_recursive(image_paths: &[PathBuf], output_dir: &Path, level: usize) -> 
             &result,
             &opencv::core::Vector::new(),
         )?;
+        println!("    ✓ Saved {}", filename);
 
         intermediate_files.push(path);
         batch_idx += 1;

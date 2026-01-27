@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-iced = { version = "0.13", features = ["image", "canvas"] }
+iced = { version = "0.13", features = ["image", "canvas", "tokio"] }
 opencv = "0.94"
 image = "0.25"
 rfd = "0.15"

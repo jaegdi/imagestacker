@@ -16,6 +16,7 @@ pub fn main() -> iced::Result {
         ImageStacker::update,
         ImageStacker::view,
     )
+    .subscription(ImageStacker::subscription)
     .theme(ImageStacker::theme)
     .run()
 }

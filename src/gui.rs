@@ -7,7 +7,8 @@ use iced::{Element, Task, Theme};
 use opencv::prelude::*;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, RwLock};
+use std::time::Duration;
 
 #[derive(Debug, Clone)]
 pub enum Message {
@@ -24,6 +25,7 @@ pub enum Message {
     SaveImage,
     OpenImage(PathBuf),
     RefreshPanes,
+    AutoRefreshTick,  // New: periodic refresh
     Exit,
     None,
 }
@@ -33,11 +35,12 @@ pub struct ImageStacker {
     aligned_images: Vec<PathBuf>,
     bunch_images: Vec<PathBuf>,
     final_images: Vec<PathBuf>,
-    thumbnail_cache: Arc<Mutex<HashMap<PathBuf, iced::widget::image::Handle>>>,
+    thumbnail_cache: Arc<RwLock<HashMap<PathBuf, iced::widget::image::Handle>>>,
     status: String,
     preview_handle: Option<iced::widget::image::Handle>,
     result_mat: Option<Mat>,
     crop_rect: Option<opencv::core::Rect>,
+    is_processing: bool,  // New: track if processing is active
 }
 
 impl Default for ImageStacker {
@@ -47,11 +50,12 @@ impl Default for ImageStacker {
             aligned_images: Vec::new(),
             bunch_images: Vec::new(),
             final_images: Vec::new(),
-            thumbnail_cache: Arc::new(Mutex::new(HashMap::new())),
+            thumbnail_cache: Arc::new(RwLock::new(HashMap::new())),
             status: "Ready".to_string(),
             preview_handle: None,
             result_mat: None,
             crop_rect: None,
+            is_processing: false,
         }
     }
 }
@@ -106,6 +110,22 @@ impl ImageStacker {
                 |msg| msg,
             ),
             Message::ImagesSelected(paths) => {
+                // Clear all existing image lists to start a new project
+                self.images.clear();
+                self.aligned_images.clear();
+                self.bunch_images.clear();
+                self.final_images.clear();
+                self.preview_handle = None;
+                self.result_mat = None;
+                self.crop_rect = None;
+
+                // Clear thumbnail cache
+                {
+                    let mut cache = self.thumbnail_cache.write().unwrap();
+                    cache.clear();
+                }
+
+                // Add new images
                 self.images.extend(paths.clone());
                 self.status = format!("Loaded {} images", self.images.len());
 
@@ -116,7 +136,7 @@ impl ImageStacker {
                     Task::perform(
                         async move {
                             if let Ok(handle) = generate_thumbnail(&path) {
-                                let mut locked = cache.lock().unwrap();
+                                let mut locked = cache.write().unwrap();
                                 locked.insert(path.clone(), handle.clone());
                                 Message::ThumbnailUpdated(path, handle)
                             } else {
@@ -142,7 +162,7 @@ impl ImageStacker {
                     Task::perform(
                         async move {
                             if let Ok(handle) = generate_thumbnail(&path) {
-                                let mut locked = cache.lock().unwrap();
+                                let mut locked = cache.write().unwrap();
                                 locked.insert(path.clone(), handle.clone());
                                 Message::ThumbnailUpdated(path, handle)
                             } else {
@@ -164,8 +184,18 @@ impl ImageStacker {
                     if aligned_dir.exists() && aligned_dir.is_dir() {
                         // Check if it contains images
                         let has_images = std::fs::read_dir(&aligned_dir)
-                            .map(|mut entries| {
-                                entries.any(|e| e.is_ok() && e.unwrap().path().is_file())
+                            .map(|entries| {
+                                entries.flatten().any(|e| {
+                                    let p = e.path();
+                                    p.is_file()
+                                        && p.extension()
+                                            .and_then(|ext| ext.to_str())
+                                            .map(|ext| {
+                                                ["jpg", "jpeg", "png", "tif", "tiff"]
+                                                    .contains(&ext.to_lowercase().as_str())
+                                            })
+                                            .unwrap_or(false)
+                                })
                             })
                             .unwrap_or(false);
 
@@ -210,18 +240,11 @@ impl ImageStacker {
                         self.status =
                             format!("Aligning images (saving to {})...", output_dir.display());
                         let images_paths = self.images.clone();
+                        self.is_processing = true;  // Mark as processing
 
                         Task::perform(
                             async move {
-                                // Load images on demand
-                                let mut mats = Vec::new();
-                                for path in &images_paths {
-                                    if let Ok(mat) = processing::load_image(path) {
-                                        mats.push(mat);
-                                    }
-                                }
-
-                                match processing::align_images(&mut mats, &output_dir) {
+                                match processing::align_images(&images_paths, &output_dir) {
                                     Ok(rect) => Message::AlignmentDone(Ok(rect)),
                                     Err(e) => Message::AlignmentDone(Err(e.to_string())),
                                 }
@@ -234,6 +257,7 @@ impl ImageStacker {
                 }
             }
             Message::AlignmentDone(result) => {
+                self.is_processing = false;  // Processing complete
                 match result {
                     Ok(rect) => {
                         self.status = "Aligned".to_string();
@@ -258,6 +282,8 @@ impl ImageStacker {
                     };
 
                     let crop_rect = self.crop_rect;
+                    self.is_processing = true;  // Mark as processing
+                    
                     Task::perform(
                         async move {
                             match processing::stack_images(&images_paths, &output_dir, crop_rect) {
@@ -290,6 +316,7 @@ impl ImageStacker {
                 }
             }
             Message::StackingDone(result) => {
+                self.is_processing = false;  // Processing complete
                 match result {
                     Ok((bytes, mat)) => {
                         self.status = "Stacking complete".to_string();
@@ -382,7 +409,7 @@ impl ImageStacker {
                             all_new_paths.extend(bunches.clone());
                             all_new_paths.extend(final_imgs.clone());
 
-                            let cache_locked = cache.lock().unwrap();
+                            let cache_locked = cache.read().unwrap();
                             let paths_to_process: Vec<_> = all_new_paths
                                 .into_iter()
                                 .filter(|p| !cache_locked.contains_key(p))
@@ -407,12 +434,29 @@ impl ImageStacker {
                 }
                 Task::none()
             }
+            Message::AutoRefreshTick => {
+                // Auto-refresh file lists when processing is active
+                if self.is_processing {
+                    Task::done(Message::RefreshPanes)
+                } else {
+                    Task::none()
+                }
+            }
             Message::Exit => {
                 std::process::exit(0);
             }
             Message::None => Task::none(),
         };
         task
+    }
+    
+    pub fn subscription(&self) -> iced::Subscription<Message> {
+        // Only refresh when processing is active
+        if self.is_processing {
+            iced::time::every(Duration::from_secs(2)).map(|_| Message::AutoRefreshTick)
+        } else {
+            iced::Subscription::none()
+        }
     }
 
     pub fn view(&self) -> Element<'_, Message> {
@@ -450,7 +494,7 @@ impl ImageStacker {
     }
 
     fn render_pane<'a>(&self, title: &'a str, images: &'a [PathBuf]) -> Element<'a, Message> {
-        let cache = self.thumbnail_cache.lock().unwrap();
+        let cache = self.thumbnail_cache.read().unwrap();
         let content = column(images.iter().map(|path| {
             let path_clone = path.clone();
             let handle = cache.get(path).cloned();
