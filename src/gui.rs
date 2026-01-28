@@ -1,5 +1,3 @@
-use crate::processing;
-use crate::system_info;
 use iced::widget::{
     button, checkbox, column, container, image as iced_image, row, scrollable, slider, text, text_input,
 };
@@ -11,70 +9,13 @@ use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 use std::time::Duration;
 
-#[derive(Debug, Clone)]
-pub enum Message {
-    AddImages,
-    AddFolder,
-    ImagesSelected(Vec<PathBuf>),
-    ThumbnailUpdated(PathBuf, iced::widget::image::Handle),
-    InternalPathsScanned(Vec<PathBuf>, Vec<PathBuf>, Vec<PathBuf>, Vec<PathBuf>),
-    AlignImages,
-    AlignImagesConfirmed(bool),
-    AlignmentDone(Result<opencv::core::Rect, String>),
-    StackImages,
-    StackingDone(Result<(Vec<u8>, Mat), String>),
-    SaveImage,
-    OpenImage(PathBuf),
-    RefreshPanes,
-    AutoRefreshTick,
-    // New: Configuration messages
-    ToggleSettings,
-    SharpnessThresholdChanged(f32),
-    UseAdaptiveBatchSizes(bool),
-    UseCLAHE(bool),
-    FeatureDetectorChanged(FeatureDetector),
-    ProgressUpdate(String, f32),
-    Exit,
-    None,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum FeatureDetector {
-    ORB,
-    SIFT,
-    AKAZE,
-}
-
-impl std::fmt::Display for FeatureDetector {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            FeatureDetector::ORB => write!(f, "ORB (Fast)"),
-            FeatureDetector::SIFT => write!(f, "SIFT (Best Quality)"),
-            FeatureDetector::AKAZE => write!(f, "AKAZE (Balanced)"),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ProcessingConfig {
-    pub sharpness_threshold: f32,
-    pub use_adaptive_batches: bool,
-    pub use_clahe: bool,
-    pub feature_detector: FeatureDetector,
-    pub batch_config: system_info::BatchSizeConfig,
-}
-
-impl Default for ProcessingConfig {
-    fn default() -> Self {
-        Self {
-            sharpness_threshold: 30.0,
-            use_adaptive_batches: true,
-            use_clahe: true,
-            feature_detector: FeatureDetector::ORB,
-            batch_config: system_info::BatchSizeConfig::default_config(),
-        }
-    }
-}
+use crate::alignment;
+use crate::config::{FeatureDetector, ProcessingConfig};
+use crate::messages::Message;
+use crate::settings::{load_settings, save_settings};
+use crate::stacking;
+use crate::thumbnail;
+use crate::system_info;
 
 pub struct ImageStacker {
     images: Vec<PathBuf>,
@@ -92,6 +33,15 @@ pub struct ImageStacker {
     show_settings: bool,
     progress_message: String,
     progress_value: f32,
+    // Image preview
+    preview_image_path: Option<PathBuf>,
+    preview_loading: bool,
+    preview_is_thumbnail: bool,
+    // Scroll position tracking
+    imported_scroll_offset: f32,
+    aligned_scroll_offset: f32,
+    bunches_scroll_offset: f32,
+    final_scroll_offset: f32,
 }
 
 impl Default for ImageStacker {
@@ -107,29 +57,24 @@ impl Default for ImageStacker {
             result_mat: None,
             crop_rect: None,
             is_processing: false,
-            config: ProcessingConfig::default(),
+            config: load_settings(),
             show_settings: false,
             progress_message: String::new(),
             progress_value: 0.0,
+            preview_image_path: None,
+            preview_loading: false,
+            preview_is_thumbnail: false,
+            imported_scroll_offset: 0.0,
+            aligned_scroll_offset: 0.0,
+            bunches_scroll_offset: 0.0,
+            final_scroll_offset: 0.0,
         }
     }
 }
 
 impl ImageStacker {
-    fn create_processing_config(&self) -> processing::ProcessingConfig {
-        processing::ProcessingConfig {
-            sharpness_threshold: self.config.sharpness_threshold,
-            use_clahe: self.config.use_clahe,
-            feature_detector: match self.config.feature_detector {
-                FeatureDetector::ORB => processing::FeatureDetectorType::ORB,
-                FeatureDetector::SIFT => processing::FeatureDetectorType::SIFT,
-                FeatureDetector::AKAZE => processing::FeatureDetectorType::AKAZE,
-            },
-            sharpness_batch_size: self.config.batch_config.sharpness_batch_size,
-            feature_batch_size: self.config.batch_config.feature_batch_size,
-            warp_batch_size: self.config.batch_config.warp_batch_size,
-            stacking_batch_size: self.config.batch_config.stacking_batch_size,
-        }
+    fn create_processing_config(&self) -> ProcessingConfig {
+        self.config.clone()
     }
 
     pub fn update(&mut self, message: Message) -> Task<Message> {
@@ -208,8 +153,8 @@ impl ImageStacker {
                             use rayon::prelude::*;
                             let sender = Arc::new(std::sync::Mutex::new(sender));
                             
-                            paths.par_iter().for_each(|path| {
-                                if let Ok(handle) = generate_thumbnail(path) {
+                            paths.par_iter().for_each(|path: &PathBuf| {
+                                if let Ok(handle) = thumbnail::generate_thumbnail(path) {
                                     let mut locked = cache.write().unwrap();
                                     locked.insert(path.clone(), handle.clone());
                                     drop(locked);
@@ -244,8 +189,8 @@ impl ImageStacker {
                             use rayon::prelude::*;
                             let sender = Arc::new(std::sync::Mutex::new(sender));
                             
-                            paths_to_process.par_iter().for_each(|path| {
-                                if let Ok(handle) = generate_thumbnail(path) {
+                            paths_to_process.par_iter().for_each(|path: &PathBuf| {
+                                if let Ok(handle) = thumbnail::generate_thumbnail(path) {
                                     let mut locked = cache.write().unwrap();
                                     locked.insert(path.clone(), handle.clone());
                                     drop(locked);
@@ -343,7 +288,7 @@ impl ImageStacker {
                                         }
                                     ));
 
-                                    let result = processing::align_images(
+                                    let result = alignment::align_images(
                                         &images_paths, 
                                         &output_dir,
                                         &proc_config,
@@ -426,7 +371,7 @@ impl ImageStacker {
                                 }
                             ));
 
-                            let result = processing::stack_images(
+                            let result = stacking::stack_images(
                                 &images_to_stack, 
                                 &output_dir, 
                                 crop_rect,
@@ -514,6 +459,104 @@ impl ImageStacker {
                 let _ = opener::open(path);
                 Task::none()
             }
+            Message::ShowImagePreview(path) => {
+                self.preview_image_path = Some(path.clone());
+                self.preview_loading = true;
+                self.preview_is_thumbnail = true; // Start with thumbnail
+                // Load a scaled-down preview image asynchronously
+                Task::perform(
+                    async move {
+                        // Load and scale down the image for faster preview
+                        match thumbnail::generate_thumbnail(&path) {
+                            Ok(thumb_handle) => (path, thumb_handle, true), // true = is thumbnail
+                            Err(_) => {
+                                // Fallback: load full image if thumbnail fails
+                                match tokio::fs::read(&path).await {
+                                    Ok(bytes) => {
+                                        let handle = iced::widget::image::Handle::from_bytes(bytes);
+                                        (path, handle, false) // false = full image
+                                    }
+                                    Err(_) => {
+                                        let handle = iced::widget::image::Handle::from_path(&path);
+                                        (path, handle, false)
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    |(path, handle, is_thumbnail)| Message::ImagePreviewLoaded(path, handle, is_thumbnail),
+                )
+            }
+            Message::ImagePreviewLoaded(path, handle, is_thumbnail) => {
+                // Only update if this is still the current preview path
+                if self.preview_image_path.as_ref() == Some(&path) {
+                    self.preview_handle = Some(handle);
+                    self.preview_loading = false;
+                    self.preview_is_thumbnail = is_thumbnail;
+                }
+                Task::none()
+            }
+            Message::LoadFullImage(path) => {
+                self.preview_loading = true;
+                // Load the full-resolution image
+                Task::perform(
+                    async move {
+                        match tokio::fs::read(&path).await {
+                            Ok(bytes) => {
+                                let handle = iced::widget::image::Handle::from_bytes(bytes);
+                                (path, handle, false) // false = full image
+                            }
+                            Err(_) => {
+                                let handle = iced::widget::image::Handle::from_path(&path);
+                                (path, handle, false)
+                            }
+                        }
+                    },
+                    |(path, handle, is_thumbnail)| Message::ImagePreviewLoaded(path, handle, is_thumbnail),
+                )
+            },
+            Message::CloseImagePreview => {
+                self.preview_image_path = None;
+                self.preview_handle = None;
+                self.preview_loading = false;
+                self.preview_is_thumbnail = false;
+                // Restore scroll positions after closing preview
+                Task::batch(vec![
+                    iced::widget::scrollable::scroll_to(
+                        iced::widget::scrollable::Id::new("imported"),
+                        iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.imported_scroll_offset },
+                    ),
+                    iced::widget::scrollable::scroll_to(
+                        iced::widget::scrollable::Id::new("aligned"),
+                        iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.aligned_scroll_offset },
+                    ),
+                    iced::widget::scrollable::scroll_to(
+                        iced::widget::scrollable::Id::new("bunches"),
+                        iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.bunches_scroll_offset },
+                    ),
+                    iced::widget::scrollable::scroll_to(
+                        iced::widget::scrollable::Id::new("final"),
+                        iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.final_scroll_offset },
+                    ),
+                ])
+            }
+            // Scroll position tracking
+            Message::ImportedScrollChanged(offset) => {
+                self.imported_scroll_offset = offset;
+                Task::none()
+            }
+            Message::AlignedScrollChanged(offset) => {
+                self.aligned_scroll_offset = offset;
+                Task::none()
+            }
+            Message::BunchesScrollChanged(offset) => {
+                self.bunches_scroll_offset = offset;
+                Task::none()
+            }
+            Message::FinalScrollChanged(offset) => {
+                self.final_scroll_offset = offset;
+                Task::none()
+            }
             Message::RefreshPanes => {
                 if let Some(first_path) = self.images.first() {
                     let base_dir = first_path
@@ -596,6 +639,7 @@ impl ImageStacker {
             }
             Message::SharpnessThresholdChanged(value) => {
                 self.config.sharpness_threshold = value;
+                let _ = save_settings(&self.config);
                 Task::none()
             }
             Message::UseAdaptiveBatchSizes(enabled) => {
@@ -608,19 +652,79 @@ impl ImageStacker {
                     self.config.batch_config = 
                         system_info::BatchSizeConfig::calculate_optimal(available_gb, avg_size_mb);
                 }
+                let _ = save_settings(&self.config);
                 Task::none()
             }
             Message::UseCLAHE(enabled) => {
                 self.config.use_clahe = enabled;
+                let _ = save_settings(&self.config);
                 Task::none()
             }
             Message::FeatureDetectorChanged(detector) => {
                 self.config.feature_detector = detector;
+                let _ = save_settings(&self.config);
                 Task::none()
             }
             Message::ProgressUpdate(msg, value) => {
                 self.progress_message = msg;
                 self.progress_value = value;
+                Task::none()
+            }
+            // Advanced processing message handlers
+            Message::EnableNoiseReduction(enabled) => {
+                self.config.enable_noise_reduction = enabled;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            Message::NoiseReductionStrengthChanged(value) => {
+                self.config.noise_reduction_strength = value;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            Message::EnableSharpening(enabled) => {
+                self.config.enable_sharpening = enabled;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            Message::SharpeningStrengthChanged(value) => {
+                self.config.sharpening_strength = value;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            Message::EnableColorCorrection(enabled) => {
+                self.config.enable_color_correction = enabled;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            Message::ContrastBoostChanged(value) => {
+                self.config.contrast_boost = value;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            Message::BrightnessBoostChanged(value) => {
+                self.config.brightness_boost = value;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            Message::SaturationBoostChanged(value) => {
+                self.config.saturation_boost = value;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            // Preview settings
+            Message::UseInternalPreview(enabled) => {
+                self.config.use_internal_preview = enabled;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            Message::PreviewMaxWidthChanged(width) => {
+                self.config.preview_max_width = width;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
+            Message::PreviewMaxHeightChanged(height) => {
+                self.config.preview_max_height = height;
+                let _ = save_settings(&self.config);
                 Task::none()
             }
             Message::Exit => {
@@ -641,6 +745,10 @@ impl ImageStacker {
     }
 
     pub fn view(&self) -> Element<'_, Message> {
+        self.render_image_preview()
+    }
+
+    fn render_main_view(&self) -> Element<'_, Message> {
         let buttons = row![
             button("Add Images").on_press(Message::AddImages),
             button("Add Folder").on_press(Message::AddFolder),
@@ -697,7 +805,22 @@ impl ImageStacker {
         main_column = main_column
             .push(panes)
             .push(
-                container(text_input("", &self.status).size(14))
+                container(
+                    text_input("", &self.status)
+                        .size(16)
+                        .style(|_theme, _status| text_input::Style {
+                            background: iced::Background::Color(iced::Color::from_rgb(0.1, 0.1, 0.1)),
+                            border: iced::Border {
+                                color: iced::Color::from_rgb(0.6, 0.6, 0.6),
+                                width: 1.0,
+                                radius: 4.0.into(),
+                            },
+                            icon: iced::Color::from_rgb(0.8, 0.8, 0.8),
+                            placeholder: iced::Color::from_rgb(0.5, 0.5, 0.5),
+                            value: iced::Color::from_rgb(0.9, 0.9, 0.9),
+                            selection: iced::Color::from_rgb(0.5, 0.7, 1.0),
+                        })
+                )
                     .padding(5)
                     .width(Length::Fill)
                     .style(|_| container::Style::default()
@@ -705,6 +828,124 @@ impl ImageStacker {
             );
 
         main_column.into()
+    }
+
+    fn render_image_preview(&self) -> Element<'_, Message> {
+        if let Some(path) = &self.preview_image_path {
+            // Dark overlay background
+            let background = container(
+                button("")
+                    .on_press(Message::CloseImagePreview)
+                    .style(|_theme, _status| button::Style {
+                        background: Some(iced::Background::Color(iced::Color::from_rgba(0.0, 0.0, 0.0, 0.7))),
+                        ..button::Style::default()
+                    })
+                    .width(Length::Fill)
+                    .height(Length::Fill)
+            )
+            .width(Length::Fill)
+            .height(Length::Fill);
+
+            // Create the image content element
+            let image_content: Element<'_, Message> = if self.preview_loading {
+                // Show loading indicator
+                container(text("Loading image...").size(18))
+                    .width(Length::Fill)
+                    .height(Length::Fill)
+                    .center_x(Length::Fill)
+                    .center_y(Length::Fill)
+                    .into()
+            } else if let Some(handle) = &self.preview_handle {
+                // Show the loaded image
+                container(
+                    iced_image(handle.clone())
+                        .width(Length::Fixed(self.config.preview_max_width - 40.0)) // Account for padding
+                        .height(Length::Fixed(self.config.preview_max_height - 140.0)) // Account for header/footer/padding
+                        .content_fit(iced::ContentFit::Contain)
+                )
+                .width(Length::Fixed(self.config.preview_max_width - 40.0))
+                .height(Length::Fixed(self.config.preview_max_height - 140.0))
+                .center_x(Length::Fill)
+                .center_y(Length::Fill)
+                .into()
+            } else {
+                // Fallback if no handle
+                container(text("Failed to load image").size(16))
+                    .width(Length::Fill)
+                    .height(Length::Fill)
+                    .center_x(Length::Fill)
+                    .center_y(Length::Fill)
+                    .into()
+            };
+
+            // Preview content
+            let preview_content = container(
+                column![
+                    // Header with filename and close button
+                    row![
+                        text(path.file_name().unwrap_or_default().to_string_lossy())
+                            .size(16)
+                            .width(Length::Fill),
+                        button("✕")
+                            .on_press(Message::CloseImagePreview)
+                            .style(button::secondary)
+                    ]
+                    .spacing(10)
+                    .align_y(iced::Alignment::Center),
+                    // Full-size image content
+                    image_content,
+                    // Footer with buttons
+                    if self.preview_is_thumbnail && !self.preview_loading {
+                        // Show full resolution button when displaying thumbnail
+                        row![
+                            button("Load Full Resolution")
+                                .on_press(Message::LoadFullImage(path.clone()))
+                                .style(button::primary),
+                            button("Open in External Viewer")
+                                .on_press(Message::OpenImage(path.clone()))
+                                .style(button::secondary),
+                            button("Close")
+                                .on_press(Message::CloseImagePreview)
+                                .style(button::secondary)
+                        ]
+                        .spacing(10)
+                    } else {
+                        // Normal buttons
+                        row![
+                            button("Open in External Viewer")
+                                .on_press(Message::OpenImage(path.clone()))
+                                .style(button::primary),
+                            button("Close")
+                                .on_press(Message::CloseImagePreview)
+                                .style(button::secondary)
+                        ]
+                        .spacing(10)
+                    }
+                ]
+                .spacing(10)
+                .padding(20)
+            )
+            .width(Length::Fixed(self.config.preview_max_width))
+            .height(Length::Fixed(self.config.preview_max_height))
+            .style(|_| container::Style::default()
+                .background(iced::Background::Color(iced::Color::from_rgb(0.15, 0.15, 0.15)))
+                .border(iced::Border::default()
+                    .width(2.0)
+                    .color(iced::Color::from_rgb(0.3, 0.3, 0.3))));
+
+            // Stack the preview on top of the background
+            iced::widget::stack![
+                background,
+                container(preview_content)
+                    .width(Length::Fill)
+                    .height(Length::Fill)
+                    .center_x(Length::Fill)
+                    .center_y(Length::Fill)
+            ].into()
+        } else {
+            // No preview, show main view
+            self.render_main_view()
+        }
     }
 
     fn render_settings_panel(&self) -> Element<'_, Message> {
@@ -829,6 +1070,96 @@ impl ImageStacker {
             text("Using default batch sizes").size(12)
         };
 
+        // Advanced processing controls
+        let advanced_section = column![
+            text("Advanced Processing").size(16).style(|_| text::Style { color: Some(iced::Color::from_rgb(0.8, 0.8, 1.0)) }),
+            
+            checkbox("Enable Noise Reduction", self.config.enable_noise_reduction)
+                .on_toggle(Message::EnableNoiseReduction),
+            
+            row![
+                text("Noise Strength:"),
+                slider(1.0..=10.0, self.config.noise_reduction_strength, Message::NoiseReductionStrengthChanged)
+                    .width(150),
+                text(format!("{:.1}", self.config.noise_reduction_strength)),
+            ]
+            .spacing(10)
+            .align_y(iced::Alignment::Center),
+            
+            checkbox("Enable Sharpening", self.config.enable_sharpening)
+                .on_toggle(Message::EnableSharpening),
+            
+            row![
+                text("Sharpen Strength:"),
+                slider(0.0..=5.0, self.config.sharpening_strength, Message::SharpeningStrengthChanged)
+                    .width(150),
+                text(format!("{:.1}", self.config.sharpening_strength)),
+            ]
+            .spacing(10)
+            .align_y(iced::Alignment::Center),
+            
+            checkbox("Enable Color Correction", self.config.enable_color_correction)
+                .on_toggle(Message::EnableColorCorrection),
+            
+            row![
+                text("Contrast:"),
+                slider(0.5..=3.0, self.config.contrast_boost, Message::ContrastBoostChanged)
+                    .width(120),
+                text(format!("{:.1}", self.config.contrast_boost)),
+            ]
+            .spacing(10)
+            .align_y(iced::Alignment::Center),
+            
+            row![
+                text("Brightness:"),
+                slider(-100.0..=100.0, self.config.brightness_boost, Message::BrightnessBoostChanged)
+                    .width(120),
+                text(format!("{:.0}", self.config.brightness_boost)),
+            ]
+            .spacing(10)
+            .align_y(iced::Alignment::Center),
+            
+            row![
+                text("Saturation:"),
+                slider(0.0..=3.0, self.config.saturation_boost, Message::SaturationBoostChanged)
+                    .width(120),
+                text(format!("{:.1}", self.config.saturation_boost)),
+            ]
+            .spacing(10)
+            .align_y(iced::Alignment::Center),
+        ]
+        .spacing(8);
+
+        // Preview settings
+        let preview_section = column![
+            text("Preview Settings").size(16).style(|_| text::Style { color: Some(iced::Color::from_rgb(0.8, 0.8, 1.0)) }),
+            
+            checkbox("Use Internal Preview (modal overlay)", self.config.use_internal_preview)
+                .on_toggle(Message::UseInternalPreview),
+            
+            text("When disabled, clicking thumbnails opens images in your system's default viewer").size(10)
+                .style(|_| text::Style { color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6)) }),
+            
+            row![
+                text("Preview Max Width:"),
+                slider(400.0..=2000.0, self.config.preview_max_width, Message::PreviewMaxWidthChanged)
+                    .width(150),
+                text(format!("{:.0}px", self.config.preview_max_width)),
+            ]
+            .spacing(10)
+            .align_y(iced::Alignment::Center),
+            
+            row![
+                text("Preview Max Height:"),
+                slider(300.0..=1500.0, self.config.preview_max_height, Message::PreviewMaxHeightChanged)
+                    .width(150),
+                text(format!("{:.0}px", self.config.preview_max_height)),
+            ]
+            .spacing(10)
+            .align_y(iced::Alignment::Center),
+        ]
+        .spacing(8);
+
         container(
             column![
                 text("Processing Settings").size(18),
@@ -837,6 +1168,8 @@ impl ImageStacker {
                 clahe_checkbox,
                 feature_row,
                 batch_info,
+                advanced_section,
+                preview_section,
             ]
             .spacing(10)
         )
@@ -848,21 +1181,30 @@ impl ImageStacker {
     }
 
     fn render_pane<'a>(&self, title: &'a str, images: &'a [PathBuf]) -> Element<'a, Message> {
-        let cache = self.thumbnail_cache.read().unwrap();
+        // Create scroll message closure
+        let scroll_message = match title {
+            "Imported" => |offset: f32| Message::ImportedScrollChanged(offset),
+            "Aligned" => |offset: f32| Message::AlignedScrollChanged(offset),
+            "Bunches" => |offset: f32| Message::BunchesScrollChanged(offset),
+            "Final" => |offset: f32| Message::FinalScrollChanged(offset),
+            _ => |_: f32| Message::None,
+        };
+
         let content = column(images.iter().map(|path| {
             let path_clone = path.clone();
+            let cache = self.thumbnail_cache.read().unwrap();
             let handle = cache.get(path).cloned();
 
             let image_widget: Element<Message> = if let Some(h) = handle {
                 iced_image(h)
-                    .width(100)
-                    .height(100)
-                    .content_fit(iced::ContentFit::Cover)
+                    .width(Length::Fixed(120.0))
+                    .height(Length::Fixed(90.0))
+                    .content_fit(iced::ContentFit::ScaleDown)
                     .into()
             } else {
                 container(text("Loading...").size(10))
-                    .width(100)
-                    .height(100)
+                    .width(Length::Fixed(120.0))
+                    .height(Length::Fixed(90.0))
                     .center_x(Length::Fill)
                     .center_y(Length::Fill)
                     .style(|_| {
@@ -871,20 +1213,52 @@ impl ImageStacker {
                     .into()
             };
 
-            button(
-                column![
-                    image_widget,
-                    text(path.file_name().unwrap_or_default().to_string_lossy()).size(10)
-                ]
-                .align_x(iced::Alignment::Center),
-            )
-            .on_press(Message::OpenImage(path_clone))
-            .style(button::secondary)
+            // Create a row for each image with filename
+            row![
+                button(
+                    column![
+                        image_widget,
+                        container(text(path.file_name().unwrap_or_default().to_string_lossy()).size(9))
+                            .width(Length::Fixed(120.0))
+                            .center_x(Length::Fill)
+                    ]
+                    .align_x(iced::Alignment::Center),
+                )
+                .on_press(if self.config.use_internal_preview {
+                    Message::ShowImagePreview(path_clone)
+                } else {
+                    Message::OpenImage(path_clone)
+                })
+                .style(button::secondary)
+                .width(Length::Fixed(120.0))
+            ]
             .into()
         }))
-        .spacing(10)
-        .height(Length::Shrink)
-        .align_x(iced::Alignment::Center);
+        .spacing(8) // Consistent spacing between image rows
+        .align_x(iced::Alignment::Center)
+        .height(Length::Shrink);
+
+        // Create scrollable ID based on pane title
+        let scrollable_id = match title {
+            "Imported" => Some(iced::widget::scrollable::Id::new("imported")),
+            "Aligned" => Some(iced::widget::scrollable::Id::new("aligned")),
+            "Bunches" => Some(iced::widget::scrollable::Id::new("bunches")),
+            "Final" => Some(iced::widget::scrollable::Id::new("final")),
+            _ => None,
+        };
+
+        let mut scrollable_widget = scrollable(content)
+            .width(Length::Fill)
+            .on_scroll(move |viewport| {
+                // Calculate scroll offset from viewport
+                let offset = viewport.absolute_offset().y;
+                scroll_message(offset)
+            });
+
+        // Set ID if available to preserve scroll position
+        if let Some(id) = scrollable_id {
+            scrollable_widget = scrollable_widget.id(id);
+        }
 
         container(
             column![
@@ -892,7 +1266,15 @@ impl ImageStacker {
                     .size(18)
                     .width(Length::Fill)
                     .align_x(iced::Alignment::Center),
-                scrollable(content).height(Length::Fill)
+                container(scrollable_widget)
+                    .width(Length::Fill)
+                    .height(Length::Fill)
+                    .style(|_| container::Style {
+                        background: Some(iced::Background::Color(iced::Color::TRANSPARENT)),
+                        border: iced::Border::default(),
+                        text_color: Some(iced::Color::TRANSPARENT),
+                        shadow: iced::Shadow::default(),
+                    })
             ]
             .spacing(10),
         )
@@ -912,61 +1294,8 @@ impl ImageStacker {
     pub fn theme(&self) -> Theme {
         Theme::Dark
     }
+
+
 }
 
-fn generate_thumbnail(path: &PathBuf) -> anyhow::Result<iced::widget::image::Handle> {
-    use opencv::core;
-    use opencv::imgcodecs;
-    use opencv::imgproc;
 
-    let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_COLOR)?;
-
-    if img.empty() {
-        return Err(anyhow::anyhow!("Failed to load image for thumbnail"));
-    }
-
-    let size = img.size()?;
-    let max_dim = 200.0;
-    let scale = (max_dim / size.width as f64).min(max_dim / size.height as f64);
-    let new_size = core::Size::new(
-        (size.width as f64 * scale) as i32,
-        (size.height as f64 * scale) as i32,
-    );
-
-    // Use UMat for GPU-accelerated resizing and color conversion
-    let img_umat = img.get_umat(
-        core::AccessFlag::ACCESS_READ,
-        core::UMatUsageFlags::USAGE_DEFAULT,
-    )?;
-    let mut small_umat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-
-    imgproc::resize(
-        &img_umat,
-        &mut small_umat,
-        new_size,
-        0.0,
-        0.0,
-        imgproc::INTER_AREA,
-    )?;
-
-    let mut rgba_umat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-    imgproc::cvt_color(
-        &small_umat,
-        &mut rgba_umat,
-        imgproc::COLOR_BGR2RGBA,
-        0,
-        core::AlgorithmHint::ALGO_HINT_DEFAULT,
-    )?;
-
-    // Get raw pixels from GPU
-    let rgba_mat = rgba_umat.get_mat(core::AccessFlag::ACCESS_READ)?;
-    let mut pixels = vec![0u8; (rgba_mat.total() * rgba_mat.elem_size()?) as usize];
-    let data = rgba_mat.data_bytes()?;
-    pixels.copy_from_slice(data);
-
-    Ok(iced::widget::image::Handle::from_rgba(
-        new_size.width as u32,
-        new_size.height as u32,
-        pixels,
-    ))
-}

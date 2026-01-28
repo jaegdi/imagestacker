@@ -1,0 +1,50 @@
+use std::path::PathBuf;
+
+#[derive(Debug, Clone)]
+pub enum Message {
+    AddImages,
+    AddFolder,
+    ImagesSelected(Vec<PathBuf>),
+    ThumbnailUpdated(PathBuf, iced::widget::image::Handle),
+    InternalPathsScanned(Vec<PathBuf>, Vec<PathBuf>, Vec<PathBuf>, Vec<PathBuf>),
+    AlignImages,
+    AlignImagesConfirmed(bool),
+    AlignmentDone(Result<opencv::core::Rect, String>),
+    StackImages,
+    StackingDone(Result<(Vec<u8>, opencv::core::Mat), String>),
+    SaveImage,
+    OpenImage(PathBuf),
+    ShowImagePreview(PathBuf),
+    ImagePreviewLoaded(PathBuf, iced::widget::image::Handle, bool),
+    LoadFullImage(PathBuf),
+    CloseImagePreview,
+    RefreshPanes,
+    AutoRefreshTick,
+    // New: Configuration messages
+    ToggleSettings,
+    SharpnessThresholdChanged(f32),
+    UseAdaptiveBatchSizes(bool),
+    UseCLAHE(bool),
+    FeatureDetectorChanged(crate::config::FeatureDetector),
+    ProgressUpdate(String, f32),
+    // Advanced processing options
+    EnableNoiseReduction(bool),
+    NoiseReductionStrengthChanged(f32),
+    EnableSharpening(bool),
+    SharpeningStrengthChanged(f32),
+    EnableColorCorrection(bool),
+    ContrastBoostChanged(f32),
+    BrightnessBoostChanged(f32),
+    SaturationBoostChanged(f32),
+    // Preview settings
+    UseInternalPreview(bool),
+    PreviewMaxWidthChanged(f32),
+    PreviewMaxHeightChanged(f32),
+    // Scroll position tracking
+    ImportedScrollChanged(f32),
+    AlignedScrollChanged(f32),
+    BunchesScrollChanged(f32),
+    FinalScrollChanged(f32),
+    Exit,
+    None,
+}

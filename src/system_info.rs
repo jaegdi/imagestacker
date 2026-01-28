@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::fs;
 
 /// Get available system memory in GB
@@ -44,7 +45,7 @@ pub fn get_available_memory_gb() -> f64 {
 }
 
 /// Calculate optimal batch sizes based on available RAM and image size
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BatchSizeConfig {
     pub sharpness_batch_size: usize,
     pub feature_batch_size: usize,
