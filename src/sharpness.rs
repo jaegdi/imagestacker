@@ -118,3 +118,74 @@ pub fn compute_sharpness(img: &Mat) -> Result<f64> {
 
     Ok(combined_score)
 }
+
+/// Compute regional sharpness by dividing image into grid and checking if ANY region is sharp
+/// This is better for focus stacking where images may be mostly blurry but have sharp regions
+/// Returns (max_regional_sharpness, global_sharpness, sharp_region_count)
+pub fn compute_regional_sharpness(img: &Mat, grid_size: i32) -> Result<(f64, f64, usize)> {
+    let height = img.rows();
+    let width = img.cols();
+    
+    // Ensure grid doesn't create too-small regions
+    let effective_grid = grid_size.max(2).min(height / 100).min(width / 100);
+    
+    let region_height = height / effective_grid;
+    let region_width = width / effective_grid;
+    
+    if region_height < 50 || region_width < 50 {
+        // Image too small for regional analysis, fallback to global
+        let global_sharpness = compute_sharpness(img)?;
+        return Ok((global_sharpness, global_sharpness, 1));
+    }
+    
+    let mut regional_scores = Vec::new();
+    
+    // Analyze each region
+    for row in 0..effective_grid {
+        for col in 0..effective_grid {
+            let y = row * region_height;
+            let x = col * region_width;
+            
+            // Clamp to image bounds
+            let h = region_height.min(height - y);
+            let w = region_width.min(width - x);
+            
+            if h > 0 && w > 0 {
+                let roi = core::Rect::new(x, y, w, h);
+                if let Ok(region) = Mat::roi(img, roi) {
+                    // Convert BoxedRef to Mat by cloning
+                    if let Ok(region_mat) = region.try_clone() {
+                        if let Ok(sharpness) = compute_sharpness(&region_mat) {
+                            regional_scores.push(sharpness);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    if regional_scores.is_empty() {
+        let global_sharpness = compute_sharpness(img)?;
+        return Ok((global_sharpness, global_sharpness, 0));
+    }
+    
+    // Find max regional sharpness (best sharp region)
+    let max_sharpness = regional_scores.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+    
+    // Compute global sharpness for comparison
+    let global_sharpness = compute_sharpness(img)?;
+    
+    // Count how many regions are "sharp" (above 70% of max)
+    let sharp_threshold = max_sharpness * 0.7;
+    let sharp_region_count = regional_scores.iter()
+        .filter(|&&s| s >= sharp_threshold)
+        .count();
+    
+    log::debug!(
+        "Regional analysis: max={:.2}, global={:.2}, sharp_regions={}/{}, grid={}x{}",
+        max_sharpness, global_sharpness, sharp_region_count, regional_scores.len(),
+        effective_grid, effective_grid
+    );
+    
+    Ok((max_sharpness, global_sharpness, sharp_region_count))
+}

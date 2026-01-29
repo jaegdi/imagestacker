@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 
 use crate::config::{FeatureDetector, ProcessingConfig};
 use crate::image_io::load_image;
-use crate::sharpness::compute_sharpness;
+use crate::sharpness;
 
 /// Progress callback: (message, percentage)
 pub type ProgressCallback = Arc<Mutex<dyn FnMut(String, f32) + Send>>;
@@ -108,10 +108,11 @@ pub fn align_images(
     let aligned_dir = output_dir.join("aligned");
     std::fs::create_dir_all(&aligned_dir)?;
 
-    // Filter images by sharpness
-    log::info!("Checking image sharpness for {} images...", image_paths.len());
-    println!("\n=== BLUR DETECTION STARTING ===");
-    println!("Analyzing {} images for sharpness (parallel batches)...", image_paths.len());
+    // Filter images by sharpness using regional analysis
+    log::info!("Checking image sharpness for {} images (regional analysis)...", image_paths.len());
+    println!("\n=== BLUR DETECTION STARTING (Regional Analysis) ===");
+    println!("Analyzing {} images for sharpness in grid regions (parallel batches)...", image_paths.len());
+    println!("Strategy: Accept image if ANY region is sharp (good for focus stacking)");
 
     report_progress("Analyzing image sharpness...", 5.0);
 
@@ -133,20 +134,30 @@ pub fn align_images(
             .enumerate()
             .filter_map(|(batch_idx, path)| {
                 let idx = batch_start + batch_idx;
-                let filename = path.file_name().unwrap_or_default().to_string_lossy();
+                let filename = path.file_name().unwrap_or_default().to_string_lossy().to_string();
                 match load_image(path) {
-                    Ok(img) => match compute_sharpness(&img) {
-                        Ok(sharpness) => {
-                            log::info!("Image {} ({}): sharpness = {:.2}", idx, filename, sharpness);
-                            println!("    [{}] {}: sharpness = {:.2}", idx, filename, sharpness);
-                            Some((idx, path.clone(), sharpness))
+                    Ok(img) => {
+                        // Use 4x4 grid for regional analysis
+                        match sharpness::compute_regional_sharpness(&img, 4) {
+                            Ok((max_regional, global, sharp_count)) => {
+                                log::info!(
+                                    "Image {} ({}): max_regional={:.2}, global={:.2}, sharp_regions={}",
+                                    idx, filename, max_regional, global, sharp_count
+                                );
+                                println!(
+                                    "    [{}] {}: max_region={:.2}, global={:.2}, sharp_areas={}",
+                                    idx, filename, max_regional, global, sharp_count
+                                );
+                                // Use max regional sharpness (best sharp region)
+                                Some((idx, path.clone(), max_regional))
+                            }
+                            Err(e) => {
+                                log::warn!("Failed to compute sharpness for {}: {}", filename, e);
+                                println!("    [{}] {}: ERROR computing sharpness: {}", idx, filename, e);
+                                None
+                            }
                         }
-                        Err(e) => {
-                            log::warn!("Failed to compute sharpness for {}: {}", filename, e);
-                            println!("    [{}] {}: ERROR computing sharpness: {}", idx, filename, e);
-                            None
-                        }
-                    },
+                    }
                     Err(e) => {
                         log::warn!("Failed to load image {}: {}", filename, e);
                         println!("    [{}] {}: ERROR loading: {}", idx, filename, e);
@@ -175,17 +186,17 @@ pub fn align_images(
     let q1 = sorted_scores[sorted_scores.len() / 4];
     let q3 = sorted_scores[(3 * sorted_scores.len()) / 4];
 
-    // Adaptive threshold: Use multiple criteria to detect outliers
-    // 1. Absolute threshold from config
+    // For focus stacking, use a very permissive threshold
+    // Each image contributes sharp details from its focus plane, even if overall blurry
+    // Only filter out truly defective images (very far below the rest)
     let absolute_threshold = config.sharpness_threshold as f64;
-    // 2. Statistical threshold (mean - 1.0 * stddev) - more aggressive than before
-    let statistical_threshold = (mean_sharpness - 1.0 * stddev).max(absolute_threshold);
-    // 3. Quartile-based threshold (Q1 - 1.0 * IQR) for robust outlier detection - more aggressive
     let iqr = q3 - q1;
-    let quartile_threshold = (q1 - 1.0 * iqr).max(absolute_threshold);
-
-    // Use the most conservative (highest) threshold
-    let dynamic_threshold = absolute_threshold.max(statistical_threshold).max(quartile_threshold);
+    
+    // Use Q1 - 3.0 * IQR (very permissive, only filters extreme outliers)
+    // This keeps images that might be "blurry" overall but have sharp regions
+    let permissive_threshold = (q1 - 3.0 * iqr).max(absolute_threshold * 0.3);
+    
+    let dynamic_threshold = permissive_threshold;
 
     let stats_msg = format!(
         "Sharpness statistics:\n  Mean: {:.2}\n  Median: {:.2}\n  StdDev: {:.2}\n  Q1: {:.2}\n  Q3: {:.2}\n  IQR: {:.2}\n  Threshold: {:.2}",
