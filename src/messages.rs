@@ -12,7 +12,6 @@ pub enum Message {
     AlignmentDone(Result<opencv::core::Rect, String>),
     StackImages,
     StackingDone(Result<(Vec<u8>, opencv::core::Mat), String>),
-    SaveImage,
     OpenImage(PathBuf),
     ShowImagePreview(PathBuf),
     ImagePreviewLoaded(PathBuf, iced::widget::image::Handle, bool),
@@ -23,6 +22,7 @@ pub enum Message {
     // New: Configuration messages
     ToggleSettings,
     SharpnessThresholdChanged(f32),
+    SharpnessGridSizeChanged(f32),
     UseAdaptiveBatchSizes(bool),
     UseCLAHE(bool),
     FeatureDetectorChanged(crate::config::FeatureDetector),

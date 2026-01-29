@@ -268,6 +268,19 @@ impl ImageStacker {
                         self.status = "Using existing aligned images".to_string();
                         Task::done(Message::RefreshPanes)
                     } else {
+                        // Clean up existing aligned images before starting new alignment
+                        let aligned_dir = output_dir.join("aligned");
+                        if aligned_dir.exists() {
+                            log::info!("Cleaning up existing aligned images in {}", aligned_dir.display());
+                            if let Err(e) = std::fs::remove_dir_all(&aligned_dir) {
+                                log::warn!("Failed to remove aligned directory: {}", e);
+                            }
+                            // Recreate the directory
+                            if let Err(e) = std::fs::create_dir_all(&aligned_dir) {
+                                log::warn!("Failed to recreate aligned directory: {}", e);
+                            }
+                        }
+                        
                         self.status = "Aligning images...".to_string();
                         self.progress_message = "Starting alignment...".to_string();
                         self.progress_value = 0.0;
@@ -389,6 +402,19 @@ impl ImageStacker {
                     return Task::none();
                 };
 
+                // Clean up existing bunches images before starting new stacking
+                let bunches_dir = output_dir.join("bunches");
+                if bunches_dir.exists() {
+                    log::info!("Cleaning up existing bunches images in {}", bunches_dir.display());
+                    if let Err(e) = std::fs::remove_dir_all(&bunches_dir) {
+                        log::warn!("Failed to remove bunches directory: {}", e);
+                    }
+                    // Recreate the directory
+                    if let Err(e) = std::fs::create_dir_all(&bunches_dir) {
+                        log::warn!("Failed to recreate bunches directory: {}", e);
+                    }
+                }
+
                 self.status = "Stacking images...".to_string();
                 self.progress_message = "Starting stacking...".to_string();
                 self.progress_value = 0.0;
@@ -458,41 +484,6 @@ impl ImageStacker {
                     Err(e) => self.status = format!("Stacking failed: {}", e),
                 }
                 Task::done(Message::RefreshPanes)
-            }
-            Message::SaveImage => {
-                if let Some(mat) = &self.result_mat {
-                    let mat = mat.clone();
-                    Task::perform(
-                        async move {
-                            let file = rfd::AsyncFileDialog::new()
-                                .add_filter("PNG", &["png"])
-                                .add_filter("JPEG", &["jpg", "jpeg"])
-                                .save_file()
-                                .await;
-
-                            if let Some(file) = file {
-                                let path = file.path();
-                                if opencv::imgcodecs::imwrite(
-                                    path.to_str().unwrap(),
-                                    &mat,
-                                    &opencv::core::Vector::new(),
-                                )
-                                .is_ok()
-                                {
-                                    Message::RefreshPanes
-                                } else {
-                                    Message::None
-                                }
-                            } else {
-                                Message::None
-                            }
-                        },
-                        |msg| msg,
-                    )
-                } else {
-                    self.status = "No image to save".to_string();
-                    Task::none()
-                }
             }
             Message::OpenImage(path) => {
                 let _ = opener::open(path);
@@ -681,6 +672,11 @@ impl ImageStacker {
                 let _ = save_settings(&self.config);
                 Task::none()
             }
+            Message::SharpnessGridSizeChanged(value) => {
+                self.config.sharpness_grid_size = value as i32;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
             Message::UseAdaptiveBatchSizes(enabled) => {
                 self.config.use_adaptive_batches = enabled;
                 if enabled {
@@ -788,12 +784,35 @@ impl ImageStacker {
     }
 
     fn render_main_view(&self) -> Element<'_, Message> {
+        // Align button: enabled when images are imported and not processing
+        let align_button = if !self.images.is_empty() && !self.is_processing {
+            button("Align").on_press(Message::AlignImages)
+        } else {
+            button("Align")
+                .style(|theme, _status| button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
+                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
+                    ..button::secondary(theme, button::Status::Disabled)
+                })
+        };
+
+        // Stack button: enabled when aligned images exist and not processing
+        let stack_button = if !self.aligned_images.is_empty() && !self.is_processing {
+            button("Stack").on_press(Message::StackImages)
+        } else {
+            button("Stack")
+                .style(|theme, _status| button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
+                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
+                    ..button::secondary(theme, button::Status::Disabled)
+                })
+        };
+
         let buttons = row![
             button("Add Images").on_press(Message::AddImages),
             button("Add Folder").on_press(Message::AddFolder),
-            button("Align").on_press(Message::AlignImages),
-            button("Stack").on_press(Message::StackImages),
-            button("Save").on_press(Message::SaveImage),
+            align_button,
+            stack_button,
             button(if self.show_settings { "Hide Settings" } else { "Settings" })
                 .on_press(Message::ToggleSettings),
             button("Exit").on_press(Message::Exit),
@@ -993,6 +1012,16 @@ impl ImageStacker {
             slider(10.0..=100.0, self.config.sharpness_threshold, Message::SharpnessThresholdChanged)
                 .width(200),
             text(format!("{:.1}", self.config.sharpness_threshold)),
+        ]
+        .spacing(10)
+        .align_y(iced::Alignment::Center);
+
+        let grid_size_slider = row![
+            text("Sharpness Grid:"),
+            slider(4.0..=16.0, self.config.sharpness_grid_size as f32, Message::SharpnessGridSizeChanged)
+                .step(1.0)
+                .width(200),
+            text(format!("{}x{}", self.config.sharpness_grid_size, self.config.sharpness_grid_size)),
         ]
         .spacing(10)
         .align_y(iced::Alignment::Center);
@@ -1203,6 +1232,7 @@ impl ImageStacker {
             column![
                 text("Processing Settings").size(18),
                 sharpness_slider,
+                grid_size_slider,
                 adaptive_batch_checkbox,
                 clahe_checkbox,
                 feature_row,
@@ -1220,6 +1250,14 @@ impl ImageStacker {
     }
 
     fn render_pane<'a>(&self, title: &'a str, images: &'a [PathBuf]) -> Element<'a, Message> {
+        // Fixed column count to prevent thumbnail squeezing
+        // With 4 panes, 2 columns works well for window widths 1400px+
+        // For narrower windows, thumbnails stay fixed size and pane gets horizontal scroll if needed
+        let thumbs_per_row = 2;
+        self.render_pane_with_columns(title, images, thumbs_per_row)
+    }
+
+    fn render_pane_with_columns<'a>(&self, title: &'a str, images: &'a [PathBuf], thumbs_per_row: usize) -> Element<'a, Message> {
         // Create scroll message closure
         let scroll_message = match title {
             "Imported" => |offset: f32| Message::ImportedScrollChanged(offset),
@@ -1229,36 +1267,48 @@ impl ImageStacker {
             _ => |_: f32| Message::None,
         };
 
-        let content = column(images.iter().map(|path| {
-            let path_clone = path.clone();
-            let cache = self.thumbnail_cache.read().unwrap();
-            let handle = cache.get(path).cloned();
+        // Constants for thumbnail sizing
+        const THUMB_WIDTH: f32 = 120.0;
+        const THUMB_HEIGHT: f32 = 90.0;
+        const THUMB_SPACING: f32 = 8.0;
+        
+        // Use fixed number of columns passed as parameter
+        // This prevents thumbnails from being squeezed when window resizes
+        
+        // Group images into rows based on fixed column count
+        let mut rows_vec: Vec<Element<Message>> = Vec::new();
+        
+        for chunk in images.chunks(thumbs_per_row) {
+            let mut row_elements: Vec<Element<Message>> = Vec::new();
+            
+            for path in chunk {
+                let path_clone = path.clone();
+                let cache = self.thumbnail_cache.read().unwrap();
+                let handle = cache.get(path).cloned();
 
-            let image_widget: Element<Message> = if let Some(h) = handle {
-                iced_image(h)
-                    .width(Length::Fixed(120.0))
-                    .height(Length::Fixed(90.0))
-                    .content_fit(iced::ContentFit::ScaleDown)
-                    .into()
-            } else {
-                container(text("Loading...").size(10))
-                    .width(Length::Fixed(120.0))
-                    .height(Length::Fixed(90.0))
-                    .center_x(Length::Fill)
-                    .center_y(Length::Fill)
-                    .style(|_| {
-                        container::Style::default().background(iced::Color::from_rgb(0.2, 0.2, 0.2))
-                    })
-                    .into()
-            };
+                let image_widget: Element<Message> = if let Some(h) = handle {
+                    iced_image(h)
+                        .width(Length::Fixed(THUMB_WIDTH))
+                        .height(Length::Fixed(THUMB_HEIGHT))
+                        .content_fit(iced::ContentFit::ScaleDown)
+                        .into()
+                } else {
+                    container(text("Loading...").size(10))
+                        .width(Length::Fixed(THUMB_WIDTH))
+                        .height(Length::Fixed(THUMB_HEIGHT))
+                        .center_x(Length::Fill)
+                        .center_y(Length::Fill)
+                        .style(|_| {
+                            container::Style::default().background(iced::Color::from_rgb(0.2, 0.2, 0.2))
+                        })
+                        .into()
+                };
 
-            // Create a row for each image with filename
-            row![
-                button(
+                let thumbnail_element = button(
                     column![
                         image_widget,
                         container(text(path.file_name().unwrap_or_default().to_string_lossy()).size(9))
-                            .width(Length::Fixed(120.0))
+                            .width(Length::Fixed(THUMB_WIDTH))
                             .center_x(Length::Fill)
                     ]
                     .align_x(iced::Alignment::Center),
@@ -1269,13 +1319,25 @@ impl ImageStacker {
                     Message::OpenImage(path_clone)
                 })
                 .style(button::secondary)
-                .width(Length::Fixed(120.0))
-            ]
-            .into()
-        }))
-        .spacing(8) // Consistent spacing between image rows
-        .align_x(iced::Alignment::Center)
-        .height(Length::Shrink);
+                .width(Length::Fixed(THUMB_WIDTH))
+                .into();
+                
+                row_elements.push(thumbnail_element);
+            }
+            
+            // Create a row with the thumbnails
+            let thumbnail_row = row(row_elements)
+                .spacing(THUMB_SPACING)
+                .align_y(iced::Alignment::Start)
+                .into();
+            
+            rows_vec.push(thumbnail_row);
+        }
+        
+        let content = column(rows_vec)
+            .spacing(THUMB_SPACING)
+            .align_x(iced::Alignment::Center)
+            .height(Length::Shrink);
 
         // Create scrollable ID based on pane title
         let scrollable_id = match title {

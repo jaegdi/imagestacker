@@ -21,6 +21,7 @@ impl std::fmt::Display for FeatureDetector {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProcessingConfig {
     pub sharpness_threshold: f32,
+    pub sharpness_grid_size: i32,  // Grid size for regional sharpness detection (4-16)
     pub use_adaptive_batches: bool,
     pub use_clahe: bool,
     pub feature_detector: FeatureDetector,
@@ -44,6 +45,7 @@ impl Default for ProcessingConfig {
     fn default() -> Self {
         Self {
             sharpness_threshold: 30.0,
+            sharpness_grid_size: 4,  // Default 4x4 grid
             use_adaptive_batches: true,
             use_clahe: true,
             feature_detector: FeatureDetector::ORB,

@@ -111,7 +111,8 @@ pub fn align_images(
     // Filter images by sharpness using regional analysis
     log::info!("Checking image sharpness for {} images (regional analysis)...", image_paths.len());
     println!("\n=== BLUR DETECTION STARTING (Regional Analysis) ===");
-    println!("Analyzing {} images for sharpness in grid regions (parallel batches)...", image_paths.len());
+    println!("Analyzing {} images for sharpness in {}x{} grid regions (parallel batches)...", 
+             image_paths.len(), config.sharpness_grid_size, config.sharpness_grid_size);
     println!("Strategy: Accept image if ANY region is sharp (good for focus stacking)");
 
     report_progress("Analyzing image sharpness...", 5.0);
@@ -137,8 +138,8 @@ pub fn align_images(
                 let filename = path.file_name().unwrap_or_default().to_string_lossy().to_string();
                 match load_image(path) {
                     Ok(img) => {
-                        // Use 4x4 grid for regional analysis
-                        match sharpness::compute_regional_sharpness(&img, 4) {
+                        // Use configured grid size for regional analysis
+                        match sharpness::compute_regional_sharpness(&img, config.sharpness_grid_size) {
                             Ok((max_regional, global, sharp_count)) => {
                                 log::info!(
                                     "Image {} ({}): max_regional={:.2}, global={:.2}, sharp_regions={}",

@@ -1,0 +1,1376 @@
+[2026-01-29T12:06:01Z INFO  imagestacker::settings] Settings loaded from: /home/dirk/.config/imagestacker/settings.json
+[2026-01-29T12:07:43Z INFO  imagestacker::gui] User confirmed reuse of existing aligned images in /home/dirk/devel/rust/imagestacker/testimages
+[2026-01-29T12:08:02Z INFO  imagestacker::gui] Cleaning up existing aligned images in /home/dirk/devel/rust/imagestacker/testimages/aligned
+[2026-01-29T12:08:02Z INFO  imagestacker::alignment] Checking image sharpness for 53 images (regional analysis)...
+
+=== BLUR DETECTION STARTING (Regional Analysis) ===
+Analyzing 53 images for sharpness in 10x10 grid regions (parallel batches)...
+Strategy: Accept image if ANY region is sharp (good for focus stacking)
+  Processing batch 1/7 (8 images)...
+Loading image: A7R03436.jpg
+[2026-01-29T12:08:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03436.jpg
+Loading image: A7R03438.jpg
+Loading image: A7R03439.jpg
+[2026-01-29T12:08:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03438.jpg
+Loading image: A7R03440.jpg
+[2026-01-29T12:08:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03439.jpg
+[2026-01-29T12:08:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03440.jpg
+Loading image: A7R03442.jpg
+Loading image: A7R03443.jpg
+[2026-01-29T12:08:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03442.jpg
+[2026-01-29T12:08:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03443.jpg
+Loading image: A7R03441.jpg
+[2026-01-29T12:08:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03441.jpg
+Loading image: A7R03437.jpg
+[2026-01-29T12:08:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03437.jpg
+[2026-01-29T12:08:03Z INFO  imagestacker::image_io] Loaded A7R03438.jpg in 308.646812ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 308.646812ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:03Z INFO  imagestacker::image_io] Loaded A7R03442.jpg in 309.736364ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 309.736364ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:03Z INFO  imagestacker::image_io] Loaded A7R03443.jpg in 313.907602ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 313.907602ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:03Z INFO  imagestacker::image_io] Loaded A7R03440.jpg in 313.975697ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 313.975697ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:03Z INFO  imagestacker::image_io] Loaded A7R03441.jpg in 316.507412ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 316.507412ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:03Z INFO  imagestacker::image_io] Loaded A7R03436.jpg in 321.220216ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 321.220216ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:03Z INFO  imagestacker::image_io] Loaded A7R03439.jpg in 322.388131ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 322.388131ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:03Z INFO  imagestacker::image_io] Loaded A7R03437.jpg in 322.861903ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 322.861903ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:08Z INFO  imagestacker::alignment] Image 2 (A7R03438.jpg): max_regional=7264.70, global=300.23, sharp_regions=10
+    [2] A7R03438.jpg: max_region=7264.70, global=300.23, sharp_areas=10
+[2026-01-29T12:08:09Z INFO  imagestacker::alignment] Image 7 (A7R03443.jpg): max_regional=38961.38, global=410.65, sharp_regions=3
+    [7] A7R03443.jpg: max_region=38961.38, global=410.65, sharp_areas=3
+[2026-01-29T12:08:09Z INFO  imagestacker::alignment] Image 0 (A7R03436.jpg): max_regional=7365.46, global=292.03, sharp_regions=9
+    [0] A7R03436.jpg: max_region=7365.46, global=292.03, sharp_areas=9
+[2026-01-29T12:08:09Z INFO  imagestacker::alignment] Image 5 (A7R03441.jpg): max_regional=30970.14, global=378.13, sharp_regions=2
+    [5] A7R03441.jpg: max_region=30970.14, global=378.13, sharp_areas=2
+[2026-01-29T12:08:09Z INFO  imagestacker::alignment] Image 6 (A7R03442.jpg): max_regional=32159.65, global=382.00, sharp_regions=2
+    [6] A7R03442.jpg: max_region=32159.65, global=382.00, sharp_areas=2
+[2026-01-29T12:08:09Z INFO  imagestacker::alignment] Image 3 (A7R03439.jpg): max_regional=8576.50, global=312.76, sharp_regions=10
+    [3] A7R03439.jpg: max_region=8576.50, global=312.76, sharp_areas=10
+[2026-01-29T12:08:09Z INFO  imagestacker::alignment] Image 4 (A7R03440.jpg): max_regional=18865.11, global=344.11, sharp_regions=2
+    [4] A7R03440.jpg: max_region=18865.11, global=344.11, sharp_areas=2
+[2026-01-29T12:08:09Z INFO  imagestacker::alignment] Image 1 (A7R03437.jpg): max_regional=7217.14, global=292.97, sharp_regions=9
+    [1] A7R03437.jpg: max_region=7217.14, global=292.97, sharp_areas=9
+  Processing batch 2/7 (8 images)...
+Loading image: A7R03448.jpg
+Loading image: A7R03449.jpg
+[2026-01-29T12:08:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03448.jpg
+[2026-01-29T12:08:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03449.jpg
+Loading image: A7R03446.jpg
+[2026-01-29T12:08:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03446.jpg
+Loading image: A7R03444.jpg
+[2026-01-29T12:08:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03444.jpg
+Loading image: A7R03450.jpg
+Loading image: A7R03451.jpg
+[2026-01-29T12:08:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03450.jpg
+Loading image: A7R03445.jpg
+[2026-01-29T12:08:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03451.jpg
+Loading image: A7R03447.jpg
+[2026-01-29T12:08:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03445.jpg
+[2026-01-29T12:08:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03447.jpg
+[2026-01-29T12:08:10Z INFO  imagestacker::image_io] Loaded A7R03446.jpg in 335.10146ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 335.10146ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:10Z INFO  imagestacker::image_io] Loaded A7R03450.jpg in 336.504963ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 336.504963ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:10Z INFO  imagestacker::image_io] Loaded A7R03449.jpg in 337.448008ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 337.448008ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:10Z INFO  imagestacker::image_io] Loaded A7R03444.jpg in 339.83423ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 339.83423ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:10Z INFO  imagestacker::image_io] Loaded A7R03445.jpg in 342.257067ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 342.257067ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:10Z INFO  imagestacker::image_io] Loaded A7R03451.jpg in 347.553052ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 347.553052ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:10Z INFO  imagestacker::image_io] Loaded A7R03448.jpg in 411.696595ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 411.696595ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:10Z INFO  imagestacker::image_io] Loaded A7R03447.jpg in 430.763271ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 430.763271ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:14Z INFO  imagestacker::alignment] Image 14 (A7R03450.jpg): max_regional=76615.40, global=577.43, sharp_regions=1
+    [14] A7R03450.jpg: max_region=76615.40, global=577.43, sharp_areas=1
+[2026-01-29T12:08:15Z INFO  imagestacker::alignment] Image 10 (A7R03446.jpg): max_regional=63326.33, global=522.80, sharp_regions=1
+    [10] A7R03446.jpg: max_region=63326.33, global=522.80, sharp_areas=1
+[2026-01-29T12:08:15Z INFO  imagestacker::alignment] Image 15 (A7R03451.jpg): max_regional=53472.72, global=535.53, sharp_regions=2
+    [15] A7R03451.jpg: max_region=53472.72, global=535.53, sharp_areas=2
+[2026-01-29T12:08:15Z INFO  imagestacker::alignment] Image 11 (A7R03447.jpg): max_regional=65810.70, global=549.53, sharp_regions=2
+    [11] A7R03447.jpg: max_region=65810.70, global=549.53, sharp_areas=2
+[2026-01-29T12:08:15Z INFO  imagestacker::alignment] Image 12 (A7R03448.jpg): max_regional=76955.48, global=558.33, sharp_regions=2
+    [12] A7R03448.jpg: max_region=76955.48, global=558.33, sharp_areas=2
+[2026-01-29T12:08:15Z INFO  imagestacker::alignment] Image 8 (A7R03444.jpg): max_regional=45048.30, global=432.58, sharp_regions=2
+    [8] A7R03444.jpg: max_region=45048.30, global=432.58, sharp_areas=2
+[2026-01-29T12:08:15Z INFO  imagestacker::alignment] Image 13 (A7R03449.jpg): max_regional=78865.38, global=555.90, sharp_regions=1
+    [13] A7R03449.jpg: max_region=78865.38, global=555.90, sharp_areas=1
+[2026-01-29T12:08:15Z INFO  imagestacker::alignment] Image 9 (A7R03445.jpg): max_regional=40906.60, global=478.76, sharp_regions=3
+    [9] A7R03445.jpg: max_region=40906.60, global=478.76, sharp_areas=3
+  Processing batch 3/7 (8 images)...
+Loading image: A7R03452.jpg
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03452.jpg
+Loading image: A7R03457.jpg
+Loading image: A7R03454.jpg
+Loading image: A7R03458.jpg
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03457.jpg
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03458.jpg
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03454.jpg
+Loading image: A7R03459.jpg
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03459.jpg
+Loading image: A7R03453.jpg
+Loading image: A7R03455.jpg
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03453.jpg
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03455.jpg
+Loading image: A7R03456.jpg
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03456.jpg
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loaded A7R03455.jpg in 312.402715ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 312.402715ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loaded A7R03458.jpg in 313.589875ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 313.589875ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loaded A7R03457.jpg in 317.689433ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 317.689433ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loaded A7R03454.jpg in 323.010203ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 323.010203ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loaded A7R03452.jpg in 324.414527ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 324.414527ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loaded A7R03456.jpg in 325.901192ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 325.901192ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loaded A7R03453.jpg in 328.757347ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 328.757347ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:15Z INFO  imagestacker::image_io] Loaded A7R03459.jpg in 330.551943ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 330.551943ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:20Z INFO  imagestacker::alignment] Image 17 (A7R03453.jpg): max_regional=42191.98, global=480.83, sharp_regions=3
+    [17] A7R03453.jpg: max_region=42191.98, global=480.83, sharp_areas=3
+[2026-01-29T12:08:20Z INFO  imagestacker::alignment] Image 22 (A7R03458.jpg): max_regional=83887.40, global=729.08, sharp_regions=1
+    [22] A7R03458.jpg: max_region=83887.40, global=729.08, sharp_areas=1
+[2026-01-29T12:08:21Z INFO  imagestacker::alignment] Image 20 (A7R03456.jpg): max_regional=33648.79, global=460.10, sharp_regions=3
+    [20] A7R03456.jpg: max_region=33648.79, global=460.10, sharp_areas=3
+[2026-01-29T12:08:21Z INFO  imagestacker::alignment] Image 16 (A7R03452.jpg): max_regional=51876.76, global=520.25, sharp_regions=2
+    [16] A7R03452.jpg: max_region=51876.76, global=520.25, sharp_areas=2
+[2026-01-29T12:08:21Z INFO  imagestacker::alignment] Image 21 (A7R03457.jpg): max_regional=32778.18, global=511.53, sharp_regions=4
+    [21] A7R03457.jpg: max_region=32778.18, global=511.53, sharp_areas=4
+[2026-01-29T12:08:21Z INFO  imagestacker::alignment] Image 18 (A7R03454.jpg): max_regional=38221.56, global=482.34, sharp_regions=2
+    [18] A7R03454.jpg: max_region=38221.56, global=482.34, sharp_areas=2
+[2026-01-29T12:08:21Z INFO  imagestacker::alignment] Image 23 (A7R03459.jpg): max_regional=91331.61, global=757.95, sharp_regions=2
+    [23] A7R03459.jpg: max_region=91331.61, global=757.95, sharp_areas=2
+[2026-01-29T12:08:21Z INFO  imagestacker::alignment] Image 19 (A7R03455.jpg): max_regional=37117.72, global=471.38, sharp_regions=3
+    [19] A7R03455.jpg: max_region=37117.72, global=471.38, sharp_areas=3
+  Processing batch 4/7 (8 images)...
+Loading image: A7R03460.jpg
+Loading image: A7R03462.jpg
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03460.jpg
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03462.jpg
+Loading image: A7R03463.jpg
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03463.jpg
+Loading image: A7R03461.jpg
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03461.jpg
+Loading image: A7R03464.jpg
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03464.jpg
+Loading image: A7R03465.jpg
+Loading image: A7R03467.jpg
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03465.jpg
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03467.jpg
+Loading image: A7R03466.jpg
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03466.jpg
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loaded A7R03460.jpg in 322.928664ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 322.928664ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loaded A7R03467.jpg in 323.248896ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 323.248896ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loaded A7R03465.jpg in 323.744258ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 323.744258ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loaded A7R03462.jpg in 325.657458ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 325.657458ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loaded A7R03466.jpg in 325.589435ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 325.589435ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loaded A7R03464.jpg in 326.564699ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 326.564699ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loaded A7R03463.jpg in 327.123265ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 327.123265ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:21Z INFO  imagestacker::image_io] Loaded A7R03461.jpg in 333.06801ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 333.06801ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:26Z INFO  imagestacker::alignment] Image 29 (A7R03465.jpg): max_regional=71857.12, global=591.92, sharp_regions=1
+    [29] A7R03465.jpg: max_region=71857.12, global=591.92, sharp_areas=1
+[2026-01-29T12:08:26Z INFO  imagestacker::alignment] Image 25 (A7R03461.jpg): max_regional=70407.85, global=618.31, sharp_regions=1
+    [25] A7R03461.jpg: max_region=70407.85, global=618.31, sharp_areas=1
+[2026-01-29T12:08:26Z INFO  imagestacker::alignment] Image 28 (A7R03464.jpg): max_regional=56800.04, global=560.39, sharp_regions=2
+    [28] A7R03464.jpg: max_region=56800.04, global=560.39, sharp_areas=2
+[2026-01-29T12:08:26Z INFO  imagestacker::alignment] Image 31 (A7R03467.jpg): max_regional=58139.92, global=555.54, sharp_regions=1
+    [31] A7R03467.jpg: max_region=58139.92, global=555.54, sharp_areas=1
+[2026-01-29T12:08:26Z INFO  imagestacker::alignment] Image 26 (A7R03462.jpg): max_regional=33642.04, global=521.85, sharp_regions=2
+    [26] A7R03462.jpg: max_region=33642.04, global=521.85, sharp_areas=2
+[2026-01-29T12:08:26Z INFO  imagestacker::alignment] Image 27 (A7R03463.jpg): max_regional=35120.47, global=560.38, sharp_regions=4
+    [27] A7R03463.jpg: max_region=35120.47, global=560.38, sharp_areas=4
+[2026-01-29T12:08:26Z INFO  imagestacker::alignment] Image 30 (A7R03466.jpg): max_regional=33439.74, global=557.52, sharp_regions=3
+    [30] A7R03466.jpg: max_region=33439.74, global=557.52, sharp_areas=3
+[2026-01-29T12:08:26Z INFO  imagestacker::alignment] Image 24 (A7R03460.jpg): max_regional=66333.35, global=680.65, sharp_regions=1
+    [24] A7R03460.jpg: max_region=66333.35, global=680.65, sharp_areas=1
+  Processing batch 5/7 (8 images)...
+Loading image: A7R03468.jpg
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03468.jpg
+Loading image: A7R03469.jpg
+Loading image: A7R03472.jpg
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03469.jpg
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03472.jpg
+Loading image: A7R03474.jpg
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03474.jpg
+Loading image: A7R03470.jpg
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03470.jpg
+Loading image: A7R03471.jpg
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03471.jpg
+Loading image: A7R03475.jpg
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03475.jpg
+Loading image: A7R03473.jpg
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03473.jpg
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loaded A7R03472.jpg in 285.326767ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 285.326767ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loaded A7R03475.jpg in 288.049701ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 288.049701ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loaded A7R03474.jpg in 289.845157ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 289.845157ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loaded A7R03473.jpg in 293.041172ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 293.041172ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loaded A7R03470.jpg in 296.352466ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 296.352466ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loaded A7R03468.jpg in 299.885784ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 299.885784ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loaded A7R03469.jpg in 301.773247ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 301.773247ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:26Z INFO  imagestacker::image_io] Loaded A7R03471.jpg in 319.71058ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 319.71058ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:31Z INFO  imagestacker::alignment] Image 36 (A7R03472.jpg): max_regional=36517.32, global=399.60, sharp_regions=1
+    [36] A7R03472.jpg: max_region=36517.32, global=399.60, sharp_areas=1
+[2026-01-29T12:08:31Z INFO  imagestacker::alignment] Image 38 (A7R03474.jpg): max_regional=36793.63, global=385.06, sharp_regions=1
+    [38] A7R03474.jpg: max_region=36793.63, global=385.06, sharp_areas=1
+[2026-01-29T12:08:31Z INFO  imagestacker::alignment] Image 39 (A7R03475.jpg): max_regional=50071.37, global=405.38, sharp_regions=1
+    [39] A7R03475.jpg: max_region=50071.37, global=405.38, sharp_areas=1
+[2026-01-29T12:08:31Z INFO  imagestacker::alignment] Image 32 (A7R03468.jpg): max_regional=67430.41, global=540.65, sharp_regions=1
+    [32] A7R03468.jpg: max_region=67430.41, global=540.65, sharp_areas=1
+[2026-01-29T12:08:31Z INFO  imagestacker::alignment] Image 33 (A7R03469.jpg): max_regional=37655.55, global=444.07, sharp_regions=2
+    [33] A7R03469.jpg: max_region=37655.55, global=444.07, sharp_areas=2
+[2026-01-29T12:08:31Z INFO  imagestacker::alignment] Image 37 (A7R03473.jpg): max_regional=27313.33, global=402.68, sharp_regions=1
+    [37] A7R03473.jpg: max_region=27313.33, global=402.68, sharp_areas=1
+[2026-01-29T12:08:32Z INFO  imagestacker::alignment] Image 35 (A7R03471.jpg): max_regional=28365.77, global=396.76, sharp_regions=2
+    [35] A7R03471.jpg: max_region=28365.77, global=396.76, sharp_areas=2
+[2026-01-29T12:08:32Z INFO  imagestacker::alignment] Image 34 (A7R03470.jpg): max_regional=30253.32, global=405.48, sharp_regions=2
+    [34] A7R03470.jpg: max_region=30253.32, global=405.48, sharp_areas=2
+  Processing batch 6/7 (8 images)...
+Loading image: A7R03476.jpg
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03476.jpg
+Loading image: A7R03480.jpg
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03480.jpg
+Loading image: A7R03482.jpg
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03482.jpg
+Loading image: A7R03478.jpg
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03478.jpg
+Loading image: A7R03479.jpg
+Loading image: A7R03483.jpg
+Loading image: A7R03477.jpg
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03479.jpg
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03483.jpg
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03477.jpg
+Loading image: A7R03481.jpg
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03481.jpg
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loaded A7R03479.jpg in 297.801943ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 297.801943ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loaded A7R03476.jpg in 298.967604ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 298.967604ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loaded A7R03481.jpg in 301.066622ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 301.066622ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loaded A7R03482.jpg in 301.518464ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 301.518464ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loaded A7R03477.jpg in 303.207267ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 303.207267ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loaded A7R03478.jpg in 303.693761ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 303.693761ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loaded A7R03480.jpg in 308.286747ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 308.286747ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:32Z INFO  imagestacker::image_io] Loaded A7R03483.jpg in 317.707426ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 317.707426ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:36Z INFO  imagestacker::alignment] Image 44 (A7R03480.jpg): max_regional=13497.73, global=351.56, sharp_regions=3
+    [44] A7R03480.jpg: max_region=13497.73, global=351.56, sharp_areas=3
+[2026-01-29T12:08:37Z INFO  imagestacker::alignment] Image 40 (A7R03476.jpg): max_regional=43321.26, global=405.35, sharp_regions=2
+    [40] A7R03476.jpg: max_region=43321.26, global=405.35, sharp_areas=2
+[2026-01-29T12:08:37Z INFO  imagestacker::alignment] Image 41 (A7R03477.jpg): max_regional=49875.72, global=421.25, sharp_regions=1
+    [41] A7R03477.jpg: max_region=49875.72, global=421.25, sharp_areas=1
+[2026-01-29T12:08:37Z INFO  imagestacker::alignment] Image 45 (A7R03481.jpg): max_regional=13652.85, global=357.29, sharp_regions=1
+    [45] A7R03481.jpg: max_region=13652.85, global=357.29, sharp_areas=1
+[2026-01-29T12:08:37Z INFO  imagestacker::alignment] Image 43 (A7R03479.jpg): max_regional=31798.82, global=358.84, sharp_regions=1
+    [43] A7R03479.jpg: max_region=31798.82, global=358.84, sharp_areas=1
+[2026-01-29T12:08:37Z INFO  imagestacker::alignment] Image 42 (A7R03478.jpg): max_regional=66528.77, global=419.68, sharp_regions=1
+    [42] A7R03478.jpg: max_region=66528.77, global=419.68, sharp_areas=1
+[2026-01-29T12:08:37Z INFO  imagestacker::alignment] Image 46 (A7R03482.jpg): max_regional=20906.73, global=397.34, sharp_regions=2
+    [46] A7R03482.jpg: max_region=20906.73, global=397.34, sharp_areas=2
+[2026-01-29T12:08:37Z INFO  imagestacker::alignment] Image 47 (A7R03483.jpg): max_regional=25181.45, global=423.67, sharp_regions=3
+    [47] A7R03483.jpg: max_region=25181.45, global=423.67, sharp_areas=3
+  Processing batch 7/7 (5 images)...
+Loading image: A7R03484.jpg
+Loading image: A7R03486.jpg
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03484.jpg
+Loading image: A7R03487.jpg
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03486.jpg
+Loading image: A7R03485.jpg
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03487.jpg
+Loading image: A7R03488.jpg
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03485.jpg
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03488.jpg
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loaded A7R03488.jpg in 264.746978ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 264.746978ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loaded A7R03487.jpg in 266.828655ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 266.828655ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loaded A7R03484.jpg in 267.784173ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 267.784173ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loaded A7R03485.jpg in 269.823623ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 269.823623ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:37Z INFO  imagestacker::image_io] Loaded A7R03486.jpg in 270.386267ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 270.386267ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] Image 51 (A7R03487.jpg): max_regional=8124.88, global=327.70, sharp_regions=12
+    [51] A7R03487.jpg: max_region=8124.88, global=327.70, sharp_areas=12
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] Image 48 (A7R03484.jpg): max_regional=21750.71, global=414.01, sharp_regions=3
+    [48] A7R03484.jpg: max_region=21750.71, global=414.01, sharp_areas=3
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] Image 49 (A7R03485.jpg): max_regional=26037.67, global=393.29, sharp_regions=2
+    [49] A7R03485.jpg: max_region=26037.67, global=393.29, sharp_areas=2
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] Image 52 (A7R03488.jpg): max_regional=7823.07, global=326.02, sharp_regions=12
+    [52] A7R03488.jpg: max_region=7823.07, global=326.02, sharp_areas=12
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] Image 50 (A7R03486.jpg): max_regional=15499.17, global=360.57, sharp_regions=3
+    [50] A7R03486.jpg: max_region=15499.17, global=360.57, sharp_areas=3
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] Sharpness statistics:
+      Mean: 40520.28
+      Median: 36793.63
+      StdDev: 22099.96
+      Q1: 26037.67
+      Q3: 56800.04
+      IQR: 30762.37
+      Threshold: 22.20
+
+Sharpness statistics:
+  Mean: 40520.28
+  Median: 36793.63
+  StdDev: 22099.96
+  Q1: 26037.67
+  Q3: 56800.04
+  IQR: 30762.37
+  Threshold: 22.20
+
+=== FILTERING RESULTS ===
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 0 (A7R03436.jpg): 7365.46 - INCLUDED
+✓ Image 0 (A7R03436.jpg): 7365.46 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 1 (A7R03437.jpg): 7217.14 - INCLUDED
+✓ Image 1 (A7R03437.jpg): 7217.14 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 2 (A7R03438.jpg): 7264.70 - INCLUDED
+✓ Image 2 (A7R03438.jpg): 7264.70 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 3 (A7R03439.jpg): 8576.50 - INCLUDED
+✓ Image 3 (A7R03439.jpg): 8576.50 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 4 (A7R03440.jpg): 18865.11 - INCLUDED
+✓ Image 4 (A7R03440.jpg): 18865.11 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 5 (A7R03441.jpg): 30970.14 - INCLUDED
+✓ Image 5 (A7R03441.jpg): 30970.14 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 6 (A7R03442.jpg): 32159.65 - INCLUDED
+✓ Image 6 (A7R03442.jpg): 32159.65 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 7 (A7R03443.jpg): 38961.38 - INCLUDED
+✓ Image 7 (A7R03443.jpg): 38961.38 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 8 (A7R03444.jpg): 45048.30 - INCLUDED
+✓ Image 8 (A7R03444.jpg): 45048.30 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 9 (A7R03445.jpg): 40906.60 - INCLUDED
+✓ Image 9 (A7R03445.jpg): 40906.60 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 10 (A7R03446.jpg): 63326.33 - INCLUDED
+✓ Image 10 (A7R03446.jpg): 63326.33 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 11 (A7R03447.jpg): 65810.70 - INCLUDED
+✓ Image 11 (A7R03447.jpg): 65810.70 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 12 (A7R03448.jpg): 76955.48 - INCLUDED
+✓ Image 12 (A7R03448.jpg): 76955.48 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 13 (A7R03449.jpg): 78865.38 - INCLUDED
+✓ Image 13 (A7R03449.jpg): 78865.38 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 14 (A7R03450.jpg): 76615.40 - INCLUDED
+✓ Image 14 (A7R03450.jpg): 76615.40 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 15 (A7R03451.jpg): 53472.72 - INCLUDED
+✓ Image 15 (A7R03451.jpg): 53472.72 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 16 (A7R03452.jpg): 51876.76 - INCLUDED
+✓ Image 16 (A7R03452.jpg): 51876.76 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 17 (A7R03453.jpg): 42191.98 - INCLUDED
+✓ Image 17 (A7R03453.jpg): 42191.98 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 18 (A7R03454.jpg): 38221.56 - INCLUDED
+✓ Image 18 (A7R03454.jpg): 38221.56 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 19 (A7R03455.jpg): 37117.72 - INCLUDED
+✓ Image 19 (A7R03455.jpg): 37117.72 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 20 (A7R03456.jpg): 33648.79 - INCLUDED
+✓ Image 20 (A7R03456.jpg): 33648.79 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 21 (A7R03457.jpg): 32778.18 - INCLUDED
+✓ Image 21 (A7R03457.jpg): 32778.18 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 22 (A7R03458.jpg): 83887.40 - INCLUDED
+✓ Image 22 (A7R03458.jpg): 83887.40 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 23 (A7R03459.jpg): 91331.61 - INCLUDED
+✓ Image 23 (A7R03459.jpg): 91331.61 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 24 (A7R03460.jpg): 66333.35 - INCLUDED
+✓ Image 24 (A7R03460.jpg): 66333.35 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 25 (A7R03461.jpg): 70407.85 - INCLUDED
+✓ Image 25 (A7R03461.jpg): 70407.85 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 26 (A7R03462.jpg): 33642.04 - INCLUDED
+✓ Image 26 (A7R03462.jpg): 33642.04 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 27 (A7R03463.jpg): 35120.47 - INCLUDED
+✓ Image 27 (A7R03463.jpg): 35120.47 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 28 (A7R03464.jpg): 56800.04 - INCLUDED
+✓ Image 28 (A7R03464.jpg): 56800.04 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 29 (A7R03465.jpg): 71857.12 - INCLUDED
+✓ Image 29 (A7R03465.jpg): 71857.12 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 30 (A7R03466.jpg): 33439.74 - INCLUDED
+✓ Image 30 (A7R03466.jpg): 33439.74 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 31 (A7R03467.jpg): 58139.92 - INCLUDED
+✓ Image 31 (A7R03467.jpg): 58139.92 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 32 (A7R03468.jpg): 67430.41 - INCLUDED
+✓ Image 32 (A7R03468.jpg): 67430.41 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 33 (A7R03469.jpg): 37655.55 - INCLUDED
+✓ Image 33 (A7R03469.jpg): 37655.55 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 34 (A7R03470.jpg): 30253.32 - INCLUDED
+✓ Image 34 (A7R03470.jpg): 30253.32 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 35 (A7R03471.jpg): 28365.77 - INCLUDED
+✓ Image 35 (A7R03471.jpg): 28365.77 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 36 (A7R03472.jpg): 36517.32 - INCLUDED
+✓ Image 36 (A7R03472.jpg): 36517.32 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 37 (A7R03473.jpg): 27313.33 - INCLUDED
+✓ Image 37 (A7R03473.jpg): 27313.33 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 38 (A7R03474.jpg): 36793.63 - INCLUDED
+✓ Image 38 (A7R03474.jpg): 36793.63 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 39 (A7R03475.jpg): 50071.37 - INCLUDED
+✓ Image 39 (A7R03475.jpg): 50071.37 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 40 (A7R03476.jpg): 43321.26 - INCLUDED
+✓ Image 40 (A7R03476.jpg): 43321.26 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 41 (A7R03477.jpg): 49875.72 - INCLUDED
+✓ Image 41 (A7R03477.jpg): 49875.72 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 42 (A7R03478.jpg): 66528.77 - INCLUDED
+✓ Image 42 (A7R03478.jpg): 66528.77 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 43 (A7R03479.jpg): 31798.82 - INCLUDED
+✓ Image 43 (A7R03479.jpg): 31798.82 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 44 (A7R03480.jpg): 13497.73 - INCLUDED
+✓ Image 44 (A7R03480.jpg): 13497.73 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 45 (A7R03481.jpg): 13652.85 - INCLUDED
+✓ Image 45 (A7R03481.jpg): 13652.85 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 46 (A7R03482.jpg): 20906.73 - INCLUDED
+✓ Image 46 (A7R03482.jpg): 20906.73 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 47 (A7R03483.jpg): 25181.45 - INCLUDED
+✓ Image 47 (A7R03483.jpg): 25181.45 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 48 (A7R03484.jpg): 21750.71 - INCLUDED
+✓ Image 48 (A7R03484.jpg): 21750.71 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 49 (A7R03485.jpg): 26037.67 - INCLUDED
+✓ Image 49 (A7R03485.jpg): 26037.67 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 50 (A7R03486.jpg): 15499.17 - INCLUDED
+✓ Image 50 (A7R03486.jpg): 15499.17 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 51 (A7R03487.jpg): 8124.88 - INCLUDED
+✓ Image 51 (A7R03487.jpg): 8124.88 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] ✓ Image 52 (A7R03488.jpg): 7823.07 - INCLUDED
+✓ Image 52 (A7R03488.jpg): 7823.07 - INCLUDED
+[2026-01-29T12:08:41Z INFO  imagestacker::alignment] 
+    === FILTERING SUMMARY ===
+      Total images: 53
+      Sharp images: 53
+      Blurry images skipped: 0
+    ========================
+    
+
+=== FILTERING SUMMARY ===
+  Total images: 53
+  Sharp images: 53
+  Blurry images skipped: 0
+========================
+
+
+=== STARTING ALIGNMENT ===
+Using 53 sharp images for alignment
+Reference image: A7R03436.jpg
+Loading image: A7R03436.jpg
+[2026-01-29T12:08:41Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03436.jpg
+[2026-01-29T12:08:41Z INFO  imagestacker::image_io] Loaded A7R03436.jpg in 253.90272ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 253.90272ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::alignment] Processing 52 sharp image pairs in batches...
+
+Extracting features and matching 52 image pairs...
+Using ORB (Fast) feature detector
+[2026-01-29T12:08:43Z INFO  imagestacker::alignment] DEBUG: batch_start=0, is_first_batch=true, load_start=0, load_count=17, batch_end=17
+[2026-01-29T12:08:43Z INFO  imagestacker::alignment] Extracting features for batch 0-16 of 52 (batch size: 17)
+Loading image: A7R03436.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03436.jpg
+Loading image: A7R03437.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03437.jpg
+Loading image: A7R03446.jpg
+Loading image: A7R03444.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03446.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03444.jpg
+Loading image: A7R03447.jpg
+Loading image: A7R03445.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03447.jpg
+Loading image: A7R03438.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03445.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03438.jpg
+Loading image: A7R03439.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03439.jpg
+Loading image: A7R03448.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03448.jpg
+Loading image: A7R03449.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03449.jpg
+Loading image: A7R03451.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03451.jpg
+Loading image: A7R03450.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03450.jpg
+Loading image: A7R03440.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03440.jpg
+Loading image: A7R03452.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03452.jpg
+Loading image: A7R03442.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03442.jpg
+Loading image: A7R03441.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03441.jpg
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03438.jpg in 401.200779ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 401.200779ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03450.jpg in 416.623738ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 416.623738ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03445.jpg in 424.377694ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 424.377694ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03440.jpg in 430.046287ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 430.046287ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03452.jpg in 425.055738ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 425.055738ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03449.jpg in 426.05742ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 426.05742ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03444.jpg in 434.165811ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 434.165811ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03436.jpg in 460.7205ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 460.7205ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03442.jpg in 470.512505ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 470.512505ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03448.jpg in 478.067489ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 478.067489ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03439.jpg in 488.385921ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 488.385921ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03447.jpg in 488.391401ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03437.jpg in 489.908019ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 488.391401ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 489.908019ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03451.jpg in 521.122436ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 521.122436ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03441.jpg in 546.307524ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 546.307524ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:43Z INFO  imagestacker::image_io] Loaded A7R03446.jpg in 550.54376ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 550.54376ms - Size: 7952x5304, Channels: 3
+Loading image: A7R03443.jpg
+[2026-01-29T12:08:45Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03443.jpg
+[2026-01-29T12:08:45Z INFO  imagestacker::image_io] Loaded A7R03443.jpg in 507.868584ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 507.868584ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[0]: sharp_img[1] -> sharp_img[0]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[1]: sharp_img[2] -> sharp_img[1]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[2]: sharp_img[3] -> sharp_img[2]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[3]: sharp_img[4] -> sharp_img[3]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[4]: sharp_img[5] -> sharp_img[4]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[5]: sharp_img[6] -> sharp_img[5]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[6]: sharp_img[7] -> sharp_img[6]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[7]: sharp_img[8] -> sharp_img[7]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[8]: sharp_img[9] -> sharp_img[8]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[9]: sharp_img[10] -> sharp_img[9]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[10]: sharp_img[11] -> sharp_img[10]
+[2026-01-29T12:08:46Z INFO  imagestacker::alignment]   Pairwise[11]: sharp_img[12] -> sharp_img[11]
+[2026-01-29T12:08:47Z INFO  imagestacker::alignment]   Pairwise[12]: sharp_img[13] -> sharp_img[12]
+[2026-01-29T12:08:47Z INFO  imagestacker::alignment]   Pairwise[13]: sharp_img[14] -> sharp_img[13]
+[2026-01-29T12:08:47Z INFO  imagestacker::alignment]   Pairwise[14]: sharp_img[15] -> sharp_img[14]
+[2026-01-29T12:08:47Z INFO  imagestacker::alignment]   Pairwise[15]: sharp_img[16] -> sharp_img[15]
+[2026-01-29T12:08:47Z INFO  imagestacker::alignment] DEBUG: batch_start=16, is_first_batch=false, load_start=17, load_count=16, batch_end=33
+[2026-01-29T12:08:47Z INFO  imagestacker::alignment] Extracting features for batch 17-32 of 52 (batch size: 16)
+Loading image: A7R03453.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03453.jpg
+Loading image: A7R03457.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03457.jpg
+Loading image: A7R03461.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03461.jpg
+Loading image: A7R03459.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03459.jpg
+Loading image: A7R03465.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03465.jpg
+Loading image: A7R03463.jpg
+Loading image: A7R03462.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03463.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03462.jpg
+Loading image: A7R03458.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03458.jpg
+Loading image: A7R03464.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03464.jpg
+Loading image: A7R03460.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03460.jpg
+Loading image: A7R03467.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03467.jpg
+Loading image: A7R03466.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03466.jpg
+Loading image: A7R03468.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03468.jpg
+Loading image: A7R03454.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03454.jpg
+Loading image: A7R03455.jpg
+Loading image: A7R03456.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03455.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03456.jpg
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03464.jpg in 417.153612ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 417.153612ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03455.jpg in 418.29558ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 418.29558ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03468.jpg in 432.149873ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 432.149873ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03465.jpg in 433.518103ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 433.518103ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03460.jpg in 433.550291ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 433.550291ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03458.jpg in 439.384264ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 439.384264ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03461.jpg in 447.171792ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 447.171792ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03462.jpg in 462.096845ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 462.096845ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03467.jpg in 473.694303ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 473.694303ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03456.jpg in 516.248348ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 516.248348ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03463.jpg in 533.422052ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 533.422052ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03466.jpg in 549.470879ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 549.470879ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03453.jpg in 605.572882ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 605.572882ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03459.jpg in 670.804834ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 670.804834ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03454.jpg in 707.993419ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 707.993419ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:47Z INFO  imagestacker::image_io] Loaded A7R03457.jpg in 720.843406ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 720.843406ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:49Z INFO  imagestacker::alignment]   Pairwise[16]: sharp_img[17] -> sharp_img[16]
+[2026-01-29T12:08:49Z INFO  imagestacker::alignment]   Pairwise[17]: sharp_img[18] -> sharp_img[17]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[18]: sharp_img[19] -> sharp_img[18]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[19]: sharp_img[20] -> sharp_img[19]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[20]: sharp_img[21] -> sharp_img[20]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[21]: sharp_img[22] -> sharp_img[21]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[22]: sharp_img[23] -> sharp_img[22]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[23]: sharp_img[24] -> sharp_img[23]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[24]: sharp_img[25] -> sharp_img[24]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[25]: sharp_img[26] -> sharp_img[25]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[26]: sharp_img[27] -> sharp_img[26]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[27]: sharp_img[28] -> sharp_img[27]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[28]: sharp_img[29] -> sharp_img[28]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[29]: sharp_img[30] -> sharp_img[29]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[30]: sharp_img[31] -> sharp_img[30]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment]   Pairwise[31]: sharp_img[32] -> sharp_img[31]
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment] DEBUG: batch_start=32, is_first_batch=false, load_start=33, load_count=16, batch_end=49
+[2026-01-29T12:08:50Z INFO  imagestacker::alignment] Extracting features for batch 33-48 of 52 (batch size: 16)
+Loading image: A7R03470.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03470.jpg
+Loading image: A7R03478.jpg
+Loading image: A7R03481.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03478.jpg
+Loading image: A7R03474.jpg
+Loading image: A7R03484.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03481.jpg
+Loading image: A7R03476.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03474.jpg
+Loading image: A7R03472.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03484.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03476.jpg
+Loading image: A7R03479.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03479.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03472.jpg
+Loading image: A7R03469.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03469.jpg
+Loading image: A7R03483.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03483.jpg
+Loading image: A7R03482.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03482.jpg
+Loading image: A7R03475.jpg
+Loading image: A7R03471.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03475.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03471.jpg
+Loading image: A7R03473.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03473.jpg
+Loading image: A7R03477.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03477.jpg
+Loading image: A7R03480.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03480.jpg
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03481.jpg in 408.491573ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 408.491573ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03478.jpg in 408.56684ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 408.56684ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03480.jpg in 408.376063ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 408.376063ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03479.jpg in 412.566646ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 412.566646ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03482.jpg in 416.056666ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 416.056666ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03484.jpg in 421.564155ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 421.564155ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03469.jpg in 423.33667ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 423.33667ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03483.jpg in 423.881301ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 423.881301ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03470.jpg in 431.81866ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 431.81866ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03472.jpg in 435.663305ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 435.663305ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03477.jpg in 449.715509ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 449.715509ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03474.jpg in 460.61086ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 460.61086ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03475.jpg in 466.974598ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:50Z INFO  imagestacker::image_io] Loaded A7R03471.jpg in 467.068709ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 466.974598ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 467.068709ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:51Z INFO  imagestacker::image_io] Loaded A7R03476.jpg in 520.457005ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 520.457005ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:51Z INFO  imagestacker::image_io] Loaded A7R03473.jpg in 547.870086ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 547.870086ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[32]: sharp_img[33] -> sharp_img[32]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[33]: sharp_img[34] -> sharp_img[33]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[34]: sharp_img[35] -> sharp_img[34]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[35]: sharp_img[36] -> sharp_img[35]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[36]: sharp_img[37] -> sharp_img[36]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[37]: sharp_img[38] -> sharp_img[37]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[38]: sharp_img[39] -> sharp_img[38]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[39]: sharp_img[40] -> sharp_img[39]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[40]: sharp_img[41] -> sharp_img[40]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[41]: sharp_img[42] -> sharp_img[41]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[42]: sharp_img[43] -> sharp_img[42]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[43]: sharp_img[44] -> sharp_img[43]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[44]: sharp_img[45] -> sharp_img[44]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[45]: sharp_img[46] -> sharp_img[45]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[46]: sharp_img[47] -> sharp_img[46]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment]   Pairwise[47]: sharp_img[48] -> sharp_img[47]
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment] DEBUG: batch_start=48, is_first_batch=false, load_start=49, load_count=16, batch_end=53
+[2026-01-29T12:08:53Z INFO  imagestacker::alignment] Extracting features for batch 49-52 of 52 (batch size: 4)
+Loading image: A7R03485.jpg
+Loading image: A7R03487.jpg
+[2026-01-29T12:08:53Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03485.jpg
+[2026-01-29T12:08:53Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03487.jpg
+Loading image: A7R03488.jpg
+[2026-01-29T12:08:53Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03488.jpg
+Loading image: A7R03486.jpg
+[2026-01-29T12:08:53Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03486.jpg
+[2026-01-29T12:08:54Z INFO  imagestacker::image_io] Loaded A7R03488.jpg in 254.875128ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 254.875128ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:54Z INFO  imagestacker::image_io] Loaded A7R03486.jpg in 255.855131ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 255.855131ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:54Z INFO  imagestacker::image_io] Loaded A7R03485.jpg in 261.478992ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 261.478992ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:54Z INFO  imagestacker::image_io] Loaded A7R03487.jpg in 262.417129ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 262.417129ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Pairwise[48]: sharp_img[49] -> sharp_img[48]
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Pairwise[49]: sharp_img[50] -> sharp_img[49]
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Pairwise[50]: sharp_img[51] -> sharp_img[50]
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Pairwise[51]: sharp_img[52] -> sharp_img[51]
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment] Accumulating 52 pairwise transforms to reference frame
+
+Accumulating transforms to reference frame...
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Compose[0]: current=[[1.0000,0.0000,0.00],[0.0000,1.0000,0.00]] * step=[[1.0041,-0.0001,-11.36],[0.0001,1.0041,-12.76]] = [[1.0041,-0.0001,-11.36],[0.0001,1.0041,-12.76]]
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Compose[1]: current=[[1.0041,-0.0001,-11.36],[0.0001,1.0041,-12.76]] * step=[[1.0040,-0.0001,-13.52],[0.0001,1.0040,-12.73]] = [[1.0081,-0.0003,-24.94],[0.0003,1.0081,-25.54]]
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Compose[2]: current=[[1.0081,-0.0003,-24.94],[0.0003,1.0081,-25.54]] * step=[[1.0033,-0.0001,-11.55],[0.0001,1.0033,-9.10]] = [[1.0114,-0.0004,-36.58],[0.0004,1.0114,-34.72]]
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment] Warping 52 images with accumulated transforms
+Warping 52 images to reference frame...
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0011.png (sharp[11]): transform[10] = [[1.0384, 0.0003, -143.04], [-0.0003, 1.0384, -100.13]] 
+Loading image: A7R03447.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0005.png (sharp[5]): transform[4] = [[1.0177, -0.0004, -60.77], [0.0004, 1.0177, -52.04]] 
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03447.jpg
+Loading image: A7R03441.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0006.png (sharp[6]): transform[5] = [[1.0204, -0.0003, -72.18], [0.0003, 1.0204, -57.30]] 
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03441.jpg
+Loading image: A7R03442.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03442.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0007.png (sharp[7]): transform[6] = [[1.0236, -0.0016, -82.71], [0.0016, 1.0236, -74.40]] 
+Loading image: A7R03443.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03443.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0016.png (sharp[16]): transform[15] = [[1.0530, 0.0011, -197.23], [-0.0011, 1.0530, -134.26]] 
+Loading image: A7R03452.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0014.png (sharp[14]): transform[13] = [[1.0470, 0.0005, -174.17], [-0.0005, 1.0470, -121.05]] 
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03452.jpg
+Loading image: A7R03450.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0003.png (sharp[3]): transform[2] = [[1.0114, -0.0004, -36.58], [0.0004, 1.0114, -34.72]] 
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03450.jpg
+Loading image: A7R03439.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0001.png (sharp[1]): transform[0] = [[1.0041, -0.0001, -11.36], [0.0001, 1.0041, -12.76]] 
+Loading image: A7R03437.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03439.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03437.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0009.png (sharp[9]): transform[8] = [[1.0303, -0.0008, -107.65], [0.0008, 1.0303, -87.18]] 
+Loading image: A7R03445.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03445.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0013.png (sharp[13]): transform[12] = [[1.0448, 0.0009, -167.58], [-0.0009, 1.0448, -112.77]] 
+Loading image: A7R03449.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03449.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0012.png (sharp[12]): transform[11] = [[1.0417, 0.0006, -155.95], [-0.0006, 1.0417, -106.70]] 
+Loading image: A7R03448.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03448.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0002.png (sharp[2]): transform[1] = [[1.0081, -0.0003, -24.94], [0.0003, 1.0081, -25.54]] 
+Loading image: A7R03438.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03438.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0015.png (sharp[15]): transform[14] = [[1.0499, 0.0009, -185.44], [-0.0009, 1.0499, -127.08]] 
+Loading image: A7R03451.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03451.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0008.png (sharp[8]): transform[7] = [[1.0262, -0.0004, -92.83], [0.0004, 1.0262, -73.38]] 
+Loading image: A7R03444.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03444.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0010.png (sharp[10]): transform[9] = [[1.0349, -0.0006, -127.86], [0.0006, 1.0349, -97.54]] 
+Loading image: A7R03446.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03446.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::alignment]   Warp 0004.png (sharp[4]): transform[3] = [[1.0146, -0.0007, -48.98], [0.0007, 1.0146, -46.24]] 
+Loading image: A7R03440.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03440.jpg
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03439.jpg in 416.107037ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 416.107037ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03438.jpg in 419.275037ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 419.275037ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03449.jpg in 424.297367ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 424.297367ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03443.jpg in 424.447553ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 424.447553ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03450.jpg in 426.286433ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 426.286433ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03452.jpg in 426.529112ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 426.529112ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03441.jpg in 429.555151ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 429.555151ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03442.jpg in 445.555468ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 445.555468ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03451.jpg in 460.305013ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 460.305013ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03445.jpg in 467.145023ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 467.145023ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03447.jpg in 471.651047ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 471.651047ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03437.jpg in 485.721895ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 485.721895ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03448.jpg in 500.122343ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 500.122343ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03444.jpg in 548.411805ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 548.411805ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03440.jpg in 586.223134ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 586.223134ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:08:55Z INFO  imagestacker::image_io] Loaded A7R03446.jpg in 721.695911ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 721.695911ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0019.png (sharp[19]): transform[18] = [[1.0656, 0.0012, -246.26], [-0.0012, 1.0656, -164.64]] 
+Loading image: A7R03455.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0018.png (sharp[18]): transform[17] = [[1.0610, 0.0015, -227.98], [-0.0015, 1.0610, -152.45]] 
+Loading image: A7R03454.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03455.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0017.png (sharp[17]): transform[16] = [[1.0572, 0.0012, -213.71], [-0.0012, 1.0572, -144.27]] 
+Loading image: A7R03453.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03454.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03453.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0021.png (sharp[21]): transform[20] = [[1.0725, 0.0012, -273.91], [-0.0012, 1.0725, -182.55]] 
+Loading image: A7R03457.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03457.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0022.png (sharp[22]): transform[21] = [[1.0756, 0.0012, -284.84], [-0.0012, 1.0756, -190.71]] 
+Loading image: A7R03458.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0020.png (sharp[20]): transform[19] = [[1.0692, 0.0013, -259.85], [-0.0013, 1.0692, -173.71]] 
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03458.jpg
+Loading image: A7R03456.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03456.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0024.png (sharp[24]): transform[23] = [[1.0817, 0.0006, -309.38], [-0.0006, 1.0817, -209.91]] 
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0029.png (sharp[29]): transform[28] = [[1.1009, 0.0007, -382.91], [-0.0007, 1.1009, -259.59]] 
+Loading image: A7R03465.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0030.png (sharp[30]): transform[29] = [[1.1040, 0.0007, -394.78], [-0.0007, 1.1040, -267.74]] 
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0023.png (sharp[23]): transform[22] = [[1.0784, 0.0006, -295.93], [-0.0006, 1.0784, -199.99]] 
+Loading image: A7R03466.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03466.jpg
+Loading image: A7R03459.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0032.png (sharp[32]): transform[31] = [[1.1103, 0.0009, -420.39], [-0.0009, 1.1103, -283.88]] 
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03459.jpg
+Loading image: A7R03468.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03468.jpg
+Loading image: A7R03460.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03460.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0031.png (sharp[31]): transform[30] = [[1.1073, 0.0010, -408.64], [-0.0010, 1.1073, -275.37]] 
+Loading image: A7R03467.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03467.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03465.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0026.png (sharp[26]): transform[25] = [[1.0896, 0.0006, -339.34], [-0.0006, 1.0896, -229.34]] 
+Loading image: A7R03462.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03462.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0025.png (sharp[25]): transform[24] = [[1.0855, 0.0005, -323.40], [-0.0005, 1.0855, -218.45]] 
+Loading image: A7R03461.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03461.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0027.png (sharp[27]): transform[26] = [[1.0939, 0.0006, -356.39], [-0.0006, 1.0939, -240.72]] 
+Loading image: A7R03463.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03463.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::alignment]   Warp 0028.png (sharp[28]): transform[27] = [[1.0976, 0.0005, -369.59], [-0.0005, 1.0976, -251.48]] 
+Loading image: A7R03464.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03464.jpg
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03455.jpg in 408.293772ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 408.293772ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03456.jpg in 409.744088ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 409.744088ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03458.jpg in 421.713609ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 421.713609ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03466.jpg in 434.45554ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 434.45554ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03467.jpg in 437.147481ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 437.147481ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03468.jpg in 443.422328ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 443.422328ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03459.jpg in 454.491195ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 454.491195ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03460.jpg in 455.237024ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 455.237024ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03463.jpg in 456.25078ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 456.25078ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03457.jpg in 463.001253ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 463.001253ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03462.jpg in 464.016703ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 464.016703ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03453.jpg in 469.053321ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 469.053321ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03461.jpg in 520.636259ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 520.636259ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03454.jpg in 524.261328ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 524.261328ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:06Z INFO  imagestacker::image_io] Loaded A7R03465.jpg in 773.717032ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 773.717032ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:07Z INFO  imagestacker::image_io] Loaded A7R03464.jpg in 984.394813ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 984.394813ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0033.png (sharp[33]): transform[32] = [[1.1139, 0.0009, -434.63], [-0.0009, 1.1139, -293.89]] 
+Loading image: A7R03469.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0034.png (sharp[34]): transform[33] = [[1.1177, 0.0009, -449.65], [-0.0009, 1.1177, -304.17]] 
+Loading image: A7R03470.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03470.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03469.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0035.png (sharp[35]): transform[34] = [[1.1221, 0.0012, -468.21], [-0.0012, 1.1221, -314.40]] 
+Loading image: A7R03471.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03471.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0041.png (sharp[41]): transform[40] = [[1.1429, 0.0011, -546.38], [-0.0011, 1.1429, -372.04]] 
+Loading image: A7R03477.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03477.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0042.png (sharp[42]): transform[41] = [[1.1469, 0.0006, -558.60], [-0.0006, 1.1469, -385.46]] 
+Loading image: A7R03478.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03478.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0043.png (sharp[43]): transform[42] = [[1.1505, 0.0014, -574.40], [-0.0014, 1.1505, -390.86]] 
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0045.png (sharp[45]): transform[44] = [[1.1589, 0.0016, -607.47], [-0.0016, 1.1589, -412.29]] 
+Loading image: A7R03479.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0047.png (sharp[47]): transform[46] = [[1.1661, 0.0020, -637.32], [-0.0020, 1.1661, -430.56]] 
+Loading image: A7R03481.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03479.jpg
+Loading image: A7R03483.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0048.png (sharp[48]): transform[47] = [[1.1690, 0.0027, -651.35], [-0.0027, 1.1690, -435.09]] 
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03481.jpg
+Loading image: A7R03484.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03484.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0044.png (sharp[44]): transform[43] = [[1.1548, 0.0017, -591.17], [-0.0017, 1.1548, -400.97]] 
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0046.png (sharp[46]): transform[45] = [[1.1627, 0.0019, -623.52], [-0.0019, 1.1627, -421.79]] 
+Loading image: A7R03480.jpg
+Loading image: A7R03482.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03480.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03482.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0037.png (sharp[37]): transform[36] = [[1.1298, 0.0017, -501.23], [-0.0017, 1.1298, -332.09]] 
+Loading image: A7R03473.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03473.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0039.png (sharp[39]): transform[38] = [[1.1364, 0.0020, -526.33], [-0.0020, 1.1364, -349.42]] 
+Loading image: A7R03475.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03475.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0040.png (sharp[40]): transform[39] = [[1.1397, 0.0015, -538.11], [-0.0015, 1.1397, -360.79]] 
+Loading image: A7R03476.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03476.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03483.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0038.png (sharp[38]): transform[37] = [[1.1331, 0.0014, -512.08], [-0.0014, 1.1331, -343.05]] 
+Loading image: A7R03474.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03474.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::alignment]   Warp 0036.png (sharp[36]): transform[35] = [[1.1262, 0.0014, -485.06], [-0.0014, 1.1262, -324.19]] 
+Loading image: A7R03472.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03472.jpg
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03480.jpg in 404.767548ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 404.767548ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03475.jpg in 425.316123ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 425.316123ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03476.jpg in 427.169352ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 427.169352ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03484.jpg in 429.724253ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 429.724253ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03473.jpg in 429.894488ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 429.894488ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03469.jpg in 436.569603ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03477.jpg in 439.95006ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 436.569603ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 439.95006ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03470.jpg in 440.231344ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 440.231344ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03478.jpg in 496.516932ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 496.516932ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03481.jpg in 501.321715ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 501.321715ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03474.jpg in 503.251334ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 503.251334ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03471.jpg in 533.043532ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 533.043532ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03472.jpg in 553.869001ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 553.869001ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03479.jpg in 584.543727ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 584.543727ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:17Z INFO  imagestacker::image_io] Loaded A7R03482.jpg in 734.0559ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 734.0559ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:18Z INFO  imagestacker::image_io] Loaded A7R03483.jpg in 993.380328ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 993.380328ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:28Z INFO  imagestacker::alignment]   Warp 0049.png (sharp[49]): transform[48] = [[1.1721, 0.0027, -663.32], [-0.0027, 1.1721, -443.10]] 
+Loading image: A7R03485.jpg
+[2026-01-29T12:09:28Z INFO  imagestacker::alignment]   Warp 0051.png (sharp[51]): transform[50] = [[1.1810, 0.0030, -697.25], [-0.0030, 1.1810, -467.66]] 
+Loading image: A7R03487.jpg
+[2026-01-29T12:09:28Z INFO  imagestacker::alignment]   Warp 0050.png (sharp[50]): transform[49] = [[1.1761, 0.0027, -677.12], [-0.0027, 1.1761, -454.01]] 
+Loading image: A7R03486.jpg
+[2026-01-29T12:09:28Z INFO  imagestacker::alignment]   Warp 0052.png (sharp[52]): transform[51] = [[1.1861, 0.0048, -726.29], [-0.0048, 1.1861, -473.45]] 
+Loading image: A7R03488.jpg
+[2026-01-29T12:09:28Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03488.jpg
+[2026-01-29T12:09:28Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03485.jpg
+[2026-01-29T12:09:28Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03486.jpg
+[2026-01-29T12:09:28Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/A7R03487.jpg
+[2026-01-29T12:09:28Z INFO  imagestacker::image_io] Loaded A7R03487.jpg in 249.678533ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 249.678533ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:28Z INFO  imagestacker::image_io] Loaded A7R03485.jpg in 252.713129ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 252.713129ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:28Z INFO  imagestacker::image_io] Loaded A7R03488.jpg in 255.779207ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 255.779207ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:28Z INFO  imagestacker::image_io] Loaded A7R03486.jpg in 261.670959ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 261.670959ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:34Z INFO  imagestacker::alignment] Finding common crop rectangle from mask
+
+Finding optimal crop rectangle...
+[2026-01-29T12:09:35Z INFO  imagestacker::alignment] Common crop rectangle: 7952x5304 at (0, 0)
+Crop rectangle: 7952x5304 at (0, 0)
+[2026-01-29T12:09:35Z INFO  imagestacker::alignment] Alignment completed in 52.152609097s (matching: 52.152577079s)
+
+✓ Alignment completed in 52.152609097s
+  Matching time: 52.152577079s
+[2026-01-29T12:09:42Z INFO  imagestacker::gui] Using 53 aligned images from /home/dirk/devel/rust/imagestacker/testimages/aligned
+[2026-01-29T12:09:42Z INFO  imagestacker::stacking] Stacking 53 images
+[2026-01-29T12:09:42Z INFO  imagestacker::stacking] Level 0: Stacking batch 0 (images 0 to 11)
+  Level 0: Batch 0 (images 0-11)...
+Loading image: 0052.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0052.png
+Loading image: 0051.png
+Loading image: 0046.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0051.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0046.png
+Loading image: 0049.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0049.png
+Loading image: 0048.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0048.png
+Loading image: 0047.png
+Loading image: 0041.png
+Loading image: 0050.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0047.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0041.png
+Loading image: 0042.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0050.png
+Loading image: 0044.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0042.png
+Loading image: 0045.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0044.png
+Loading image: 0043.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0045.png
+[2026-01-29T12:09:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0043.png
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0045.png in 722.568368ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 722.568368ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0047.png in 725.916081ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 725.916081ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0041.png in 736.709195ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 736.709195ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0051.png in 794.34884ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 794.34884ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0042.png in 806.362418ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 806.362418ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0046.png in 859.566669ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 859.566669ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0050.png in 860.507843ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 860.507843ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0052.png in 860.756352ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 860.756352ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0048.png in 868.447187ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 868.447187ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0043.png in 869.288434ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 869.288434ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0044.png in 874.956455ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 874.956455ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::image_io] Loaded 0049.png in 908.716937ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 908.716937ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:43Z INFO  imagestacker::stacking] Processing image 1/12 for stacking
+[2026-01-29T12:09:44Z INFO  imagestacker::stacking] Processing image 2/12 for stacking
+[2026-01-29T12:09:44Z INFO  imagestacker::stacking] Processing image 3/12 for stacking
+[2026-01-29T12:09:45Z INFO  imagestacker::stacking] Processing image 4/12 for stacking
+[2026-01-29T12:09:45Z INFO  imagestacker::stacking] Processing image 5/12 for stacking
+[2026-01-29T12:09:46Z INFO  imagestacker::stacking] Processing image 6/12 for stacking
+[2026-01-29T12:09:46Z INFO  imagestacker::stacking] Processing image 7/12 for stacking
+[2026-01-29T12:09:46Z INFO  imagestacker::stacking] Processing image 8/12 for stacking
+[2026-01-29T12:09:47Z INFO  imagestacker::stacking] Processing image 9/12 for stacking
+[2026-01-29T12:09:47Z INFO  imagestacker::stacking] Processing image 10/12 for stacking
+[2026-01-29T12:09:48Z INFO  imagestacker::stacking] Processing image 11/12 for stacking
+[2026-01-29T12:09:48Z INFO  imagestacker::stacking] Processing image 12/12 for stacking
+[2026-01-29T12:09:48Z INFO  imagestacker::stacking] Collapsing pyramid...
+[2026-01-29T12:09:49Z INFO  imagestacker::stacking] Stacking batch complete
+    ✓ Saved L0_B0000.png
+[2026-01-29T12:09:51Z INFO  imagestacker::stacking] Level 0: Stacking batch 1 (images 10 to 21)
+  Level 0: Batch 1 (images 10-21)...
+Loading image: 0040.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0040.png
+Loading image: 0035.png
+Loading image: 0038.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0035.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0038.png
+Loading image: 0039.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0039.png
+Loading image: 0037.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0037.png
+Loading image: 0034.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0034.png
+Loading image: 0036.png
+Loading image: 0033.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0036.png
+Loading image: 0031.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0033.png
+Loading image: 0032.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0031.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0032.png
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0036.png in 717.157444ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 717.157444ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0032.png in 719.603911ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 719.603911ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0033.png in 724.44296ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 724.44296ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0037.png in 724.887486ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 724.887486ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0034.png in 725.328684ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 725.328684ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0039.png in 742.194607ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 742.194607ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0031.png in 852.77258ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 852.77258ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0035.png in 855.262132ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 855.262132ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0040.png in 856.233755ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 856.233755ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::image_io] Loaded 0038.png in 859.75475ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 859.75475ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:51Z INFO  imagestacker::stacking] Processing image 1/12 for stacking
+[2026-01-29T12:09:52Z INFO  imagestacker::stacking] Processing image 2/12 for stacking
+[2026-01-29T12:09:52Z INFO  imagestacker::stacking] Processing image 3/12 for stacking
+[2026-01-29T12:09:53Z INFO  imagestacker::stacking] Processing image 4/12 for stacking
+[2026-01-29T12:09:53Z INFO  imagestacker::stacking] Processing image 5/12 for stacking
+[2026-01-29T12:09:54Z INFO  imagestacker::stacking] Processing image 6/12 for stacking
+[2026-01-29T12:09:54Z INFO  imagestacker::stacking] Processing image 7/12 for stacking
+[2026-01-29T12:09:54Z INFO  imagestacker::stacking] Processing image 8/12 for stacking
+[2026-01-29T12:09:55Z INFO  imagestacker::stacking] Processing image 9/12 for stacking
+[2026-01-29T12:09:55Z INFO  imagestacker::stacking] Processing image 10/12 for stacking
+[2026-01-29T12:09:56Z INFO  imagestacker::stacking] Processing image 11/12 for stacking
+[2026-01-29T12:09:56Z INFO  imagestacker::stacking] Processing image 12/12 for stacking
+[2026-01-29T12:09:56Z INFO  imagestacker::stacking] Collapsing pyramid...
+[2026-01-29T12:09:57Z INFO  imagestacker::stacking] Stacking batch complete
+    ✓ Saved L0_B0001.png
+[2026-01-29T12:09:59Z INFO  imagestacker::stacking] Level 0: Stacking batch 2 (images 20 to 31)
+  Level 0: Batch 2 (images 20-31)...
+Loading image: 0030.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0030.png
+Loading image: 0025.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0025.png
+Loading image: 0028.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0028.png
+Loading image: 0023.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0023.png
+Loading image: 0022.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0022.png
+Loading image: 0029.png
+Loading image: 0026.png
+Loading image: 0021.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0026.png
+Loading image: 0027.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0029.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0021.png
+Loading image: 0024.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0027.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0024.png
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0021.png in 726.914136ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 726.914136ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0028.png in 729.249102ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 729.249102ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0023.png in 740.223871ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 740.223871ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0029.png in 740.728959ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 740.728959ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0026.png in 755.056515ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 755.056515ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0024.png in 792.453239ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 792.453239ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0030.png in 863.603601ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 863.603601ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0022.png in 868.797034ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 868.797034ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0027.png in 872.848905ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 872.848905ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::image_io] Loaded 0025.png in 873.724124ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 873.724124ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:09:59Z INFO  imagestacker::stacking] Processing image 1/12 for stacking
+[2026-01-29T12:10:00Z INFO  imagestacker::stacking] Processing image 2/12 for stacking
+[2026-01-29T12:10:00Z INFO  imagestacker::stacking] Processing image 3/12 for stacking
+[2026-01-29T12:10:01Z INFO  imagestacker::stacking] Processing image 4/12 for stacking
+[2026-01-29T12:10:01Z INFO  imagestacker::stacking] Processing image 5/12 for stacking
+[2026-01-29T12:10:02Z INFO  imagestacker::stacking] Processing image 6/12 for stacking
+[2026-01-29T12:10:02Z INFO  imagestacker::stacking] Processing image 7/12 for stacking
+[2026-01-29T12:10:02Z INFO  imagestacker::stacking] Processing image 8/12 for stacking
+[2026-01-29T12:10:03Z INFO  imagestacker::stacking] Processing image 9/12 for stacking
+[2026-01-29T12:10:03Z INFO  imagestacker::stacking] Processing image 10/12 for stacking
+[2026-01-29T12:10:04Z INFO  imagestacker::stacking] Processing image 11/12 for stacking
+[2026-01-29T12:10:04Z INFO  imagestacker::stacking] Processing image 12/12 for stacking
+[2026-01-29T12:10:05Z INFO  imagestacker::stacking] Collapsing pyramid...
+[2026-01-29T12:10:05Z INFO  imagestacker::stacking] Stacking batch complete
+    ✓ Saved L0_B0002.png
+[2026-01-29T12:10:07Z INFO  imagestacker::stacking] Level 0: Stacking batch 3 (images 30 to 41)
+  Level 0: Batch 3 (images 30-41)...
+Loading image: 0020.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0020.png
+Loading image: 0019.png
+Loading image: 0014.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0019.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0014.png
+Loading image: 0013.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0013.png
+Loading image: 0018.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0018.png
+Loading image: 0017.png
+Loading image: 0016.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0017.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0016.png
+Loading image: 0012.png
+Loading image: 0011.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0012.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0011.png
+Loading image: 0015.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0015.png
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loaded 0020.png in 706.565637ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 706.565637ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loaded 0017.png in 708.741374ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 708.741374ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loaded 0013.png in 710.048848ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 710.048848ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loaded 0011.png in 711.050719ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 711.050719ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:07Z INFO  imagestacker::image_io] Loaded 0015.png in 712.610592ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 712.610592ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:08Z INFO  imagestacker::image_io] Loaded 0016.png in 725.845071ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 725.845071ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:08Z INFO  imagestacker::image_io] Loaded 0019.png in 852.557739ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 852.557739ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:08Z INFO  imagestacker::image_io] Loaded 0018.png in 853.398117ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 853.398117ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:08Z INFO  imagestacker::image_io] Loaded 0012.png in 853.935739ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 853.935739ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:08Z INFO  imagestacker::image_io] Loaded 0014.png in 864.026204ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 864.026204ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:08Z INFO  imagestacker::stacking] Processing image 1/12 for stacking
+[2026-01-29T12:10:08Z INFO  imagestacker::stacking] Processing image 2/12 for stacking
+[2026-01-29T12:10:08Z INFO  imagestacker::stacking] Processing image 3/12 for stacking
+[2026-01-29T12:10:09Z INFO  imagestacker::stacking] Processing image 4/12 for stacking
+[2026-01-29T12:10:09Z INFO  imagestacker::stacking] Processing image 5/12 for stacking
+[2026-01-29T12:10:10Z INFO  imagestacker::stacking] Processing image 6/12 for stacking
+[2026-01-29T12:10:10Z INFO  imagestacker::stacking] Processing image 7/12 for stacking
+[2026-01-29T12:10:11Z INFO  imagestacker::stacking] Processing image 8/12 for stacking
+[2026-01-29T12:10:11Z INFO  imagestacker::stacking] Processing image 9/12 for stacking
+[2026-01-29T12:10:11Z INFO  imagestacker::stacking] Processing image 10/12 for stacking
+[2026-01-29T12:10:12Z INFO  imagestacker::stacking] Processing image 11/12 for stacking
+[2026-01-29T12:10:12Z INFO  imagestacker::stacking] Processing image 12/12 for stacking
+[2026-01-29T12:10:13Z INFO  imagestacker::stacking] Collapsing pyramid...
+[2026-01-29T12:10:13Z INFO  imagestacker::stacking] Stacking batch complete
+    ✓ Saved L0_B0003.png
+[2026-01-29T12:10:15Z INFO  imagestacker::stacking] Level 0: Stacking batch 4 (images 40 to 51)
+  Level 0: Batch 4 (images 40-51)...
+Loading image: 0010.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0010.png
+Loading image: 0008.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0008.png
+Loading image: 0007.png
+Loading image: 0005.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0007.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0005.png
+Loading image: 0009.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0009.png
+Loading image: 0003.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0003.png
+Loading image: 0004.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0004.png
+Loading image: 0006.png
+Loading image: 0002.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0006.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0002.png
+Loading image: 0001.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0001.png
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loaded 0005.png in 707.349937ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 707.349937ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loaded 0003.png in 709.078717ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 709.078717ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loaded 0009.png in 712.133818ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 712.133818ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loaded 0004.png in 712.668955ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 712.668955ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loaded 0010.png in 713.318544ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 713.318544ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:15Z INFO  imagestacker::image_io] Loaded 0007.png in 719.027297ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 719.027297ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:16Z INFO  imagestacker::image_io] Loaded 0002.png in 837.890233ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 837.890233ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:16Z INFO  imagestacker::image_io] Loaded 0001.png in 839.698377ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 839.698377ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:16Z INFO  imagestacker::image_io] Loaded 0006.png in 841.523053ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 841.523053ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:16Z INFO  imagestacker::image_io] Loaded 0008.png in 843.007641ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 843.007641ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:16Z INFO  imagestacker::stacking] Processing image 1/12 for stacking
+[2026-01-29T12:10:16Z INFO  imagestacker::stacking] Processing image 2/12 for stacking
+[2026-01-29T12:10:16Z INFO  imagestacker::stacking] Processing image 3/12 for stacking
+[2026-01-29T12:10:17Z INFO  imagestacker::stacking] Processing image 4/12 for stacking
+[2026-01-29T12:10:17Z INFO  imagestacker::stacking] Processing image 5/12 for stacking
+[2026-01-29T12:10:18Z INFO  imagestacker::stacking] Processing image 6/12 for stacking
+[2026-01-29T12:10:18Z INFO  imagestacker::stacking] Processing image 7/12 for stacking
+[2026-01-29T12:10:18Z INFO  imagestacker::stacking] Processing image 8/12 for stacking
+[2026-01-29T12:10:19Z INFO  imagestacker::stacking] Processing image 9/12 for stacking
+[2026-01-29T12:10:19Z INFO  imagestacker::stacking] Processing image 10/12 for stacking
+[2026-01-29T12:10:20Z INFO  imagestacker::stacking] Processing image 11/12 for stacking
+[2026-01-29T12:10:20Z INFO  imagestacker::stacking] Processing image 12/12 for stacking
+[2026-01-29T12:10:20Z INFO  imagestacker::stacking] Collapsing pyramid...
+[2026-01-29T12:10:21Z INFO  imagestacker::stacking] Stacking batch complete
+    ✓ Saved L0_B0004.png
+[2026-01-29T12:10:23Z INFO  imagestacker::stacking] Level 0: Stacking batch 5 (images 50 to 52)
+  Level 0: Batch 5 (images 50-52)...
+Loading image: 0000.png
+[2026-01-29T12:10:23Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/aligned/0000.png
+[2026-01-29T12:10:23Z INFO  imagestacker::image_io] Loaded 0000.png in 676.374467ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 676.374467ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:23Z INFO  imagestacker::stacking] Processing image 1/3 for stacking
+[2026-01-29T12:10:24Z INFO  imagestacker::stacking] Processing image 2/3 for stacking
+[2026-01-29T12:10:24Z INFO  imagestacker::stacking] Processing image 3/3 for stacking
+[2026-01-29T12:10:24Z INFO  imagestacker::stacking] Collapsing pyramid...
+[2026-01-29T12:10:24Z INFO  imagestacker::stacking] Stacking batch complete
+    ✓ Saved L0_B0005.png
+Loading 6 images for direct stacking...
+Loading image: L0_B0000.png
+Loading image: L0_B0003.png
+[2026-01-29T12:10:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0000.png
+[2026-01-29T12:10:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0003.png
+Loading image: L0_B0001.png
+[2026-01-29T12:10:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0001.png
+Loading image: L0_B0004.png
+[2026-01-29T12:10:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0004.png
+Loading image: L0_B0005.png
+[2026-01-29T12:10:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0005.png
+Loading image: L0_B0002.png
+[2026-01-29T12:10:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0002.png
+[2026-01-29T12:10:27Z INFO  imagestacker::image_io] Loaded L0_B0005.png in 702.936113ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 702.936113ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:27Z INFO  imagestacker::image_io] Loaded L0_B0000.png in 704.834642ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 704.834642ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:27Z INFO  imagestacker::image_io] Loaded L0_B0004.png in 705.330523ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 705.330523ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:27Z INFO  imagestacker::image_io] Loaded L0_B0001.png in 708.989815ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 708.989815ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:27Z INFO  imagestacker::image_io] Loaded L0_B0003.png in 725.164792ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 725.164792ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:27Z INFO  imagestacker::image_io] Loaded L0_B0002.png in 740.960484ms - Size: 7952x5304, Channels: 3
+  ✓ Loaded in 740.960484ms - Size: 7952x5304, Channels: 3
+[2026-01-29T12:10:27Z INFO  imagestacker::stacking] Processing image 1/6 for stacking
+[2026-01-29T12:10:27Z INFO  imagestacker::stacking] Processing image 2/6 for stacking
+[2026-01-29T12:10:28Z INFO  imagestacker::stacking] Processing image 3/6 for stacking
+[2026-01-29T12:10:28Z INFO  imagestacker::stacking] Processing image 4/6 for stacking
+[2026-01-29T12:10:29Z INFO  imagestacker::stacking] Processing image 5/6 for stacking
+[2026-01-29T12:10:29Z INFO  imagestacker::stacking] Processing image 6/6 for stacking
+[2026-01-29T12:10:29Z INFO  imagestacker::stacking] Collapsing pyramid...
+[2026-01-29T12:10:30Z INFO  imagestacker::stacking] Stacking batch complete
+[2026-01-29T12:10:30Z INFO  imagestacker::stacking] Saving final result to /home/dirk/devel/rust/imagestacker/testimages/final/result_2.png
+[2026-01-29T12:10:30Z INFO  imagestacker::stacking] Cropping final result to Rect_ { x: 0, y: 0, width: 7952, height: 5304 }
+libpng error: Read Error
