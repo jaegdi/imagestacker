@@ -326,24 +326,63 @@ impl ImageStacker {
             }
             Message::StackImages => {
                 // Determine which images to stack and get output directory
-                let (images_to_stack, output_dir) = if !self.aligned_images.is_empty() {
-                    // Use aligned images if available
-                    let first_path = &self.aligned_images[0];
-                    // Go up one level from aligned directory to the base directory
-                    let out_dir = first_path
-                        .parent()  // aligned/
-                        .and_then(|p| p.parent())  // base/
-                        .unwrap_or(std::path::Path::new("."))
-                        .to_path_buf();
-                    (self.aligned_images.clone(), out_dir)
-                } else if !self.images.is_empty() {
-                    // Fall back to original images
+                // First, try to find aligned images in the aligned directory
+                let (images_to_stack, output_dir) = if !self.images.is_empty() {
                     let first_path = &self.images[0];
-                    let out_dir = first_path
+                    let base_dir = first_path
                         .parent()
-                        .unwrap_or(std::path::Path::new("."))
-                        .to_path_buf();
-                    (self.images.clone(), out_dir)
+                        .unwrap_or(std::path::Path::new("."));
+                    let aligned_dir = base_dir.join("aligned");
+                    
+                    // Check if aligned directory exists and has images
+                    if aligned_dir.exists() {
+                        if let Ok(entries) = std::fs::read_dir(&aligned_dir) {
+                            let mut aligned_paths: Vec<PathBuf> = entries
+                                .flatten()
+                                .map(|e| e.path())
+                                .filter(|p| {
+                                    p.is_file()
+                                        && p.extension()
+                                            .and_then(|ext| ext.to_str())
+                                            .map(|ext| {
+                                                ["jpg", "jpeg", "png", "tif", "tiff"]
+                                                    .contains(&ext.to_lowercase().as_str())
+                                            })
+                                            .unwrap_or(false)
+                                })
+                                .collect();
+                            
+                            if !aligned_paths.is_empty() {
+                                aligned_paths.sort();
+                                log::info!("Using {} aligned images from {}", aligned_paths.len(), aligned_dir.display());
+                                (aligned_paths, base_dir.to_path_buf())
+                            } else if !self.aligned_images.is_empty() {
+                                (self.aligned_images.clone(), base_dir.to_path_buf())
+                            } else {
+                                (self.images.clone(), base_dir.to_path_buf())
+                            }
+                        } else if !self.aligned_images.is_empty() {
+                            let first_aligned = &self.aligned_images[0];
+                            let out_dir = first_aligned
+                                .parent()
+                                .and_then(|p| p.parent())
+                                .unwrap_or(std::path::Path::new("."))
+                                .to_path_buf();
+                            (self.aligned_images.clone(), out_dir)
+                        } else {
+                            (self.images.clone(), base_dir.to_path_buf())
+                        }
+                    } else if !self.aligned_images.is_empty() {
+                        let first_aligned = &self.aligned_images[0];
+                        let out_dir = first_aligned
+                            .parent()
+                            .and_then(|p| p.parent())
+                            .unwrap_or(std::path::Path::new("."))
+                            .to_path_buf();
+                        (self.aligned_images.clone(), out_dir)
+                    } else {
+                        (self.images.clone(), base_dir.to_path_buf())
+                    }
                 } else {
                     // No images at all
                     self.status = "No images loaded".to_string();

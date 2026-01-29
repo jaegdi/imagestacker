@@ -23,15 +23,15 @@ pub fn extract_features(
     match detector_type {
         FeatureDetector::ORB => {
             let mut orb = features2d::ORB::create(
-                3000, // Increased from 1500 for better feature detection in difficult images
+                5000, // Increased from 3000 for more features and better alignment
                 1.2,  // scaleFactor
                 8,    // nlevels - multi-scale detection
-                15,   // edgeThreshold - reduced from 31 for more edge features
+                10,   // edgeThreshold - reduced from 15 for more edge features
                 0,    // firstLevel
                 2,    // WTA_K
                 features2d::ORB_ScoreType::HARRIS_SCORE,
                 31, // patchSize
-                10, // fastThreshold - reduced from 20 for more sensitive detection
+                5,  // fastThreshold - reduced from 10 for more sensitive detection
             )?;
             orb.detect_and_compute(
                 img,
@@ -277,18 +277,36 @@ pub fn align_images(
 
     let start_matching = std::time::Instant::now();
 
-    // Alignment scale: less downsampling to preserve small sharp areas
-    const ALIGNMENT_SCALE: f64 = 0.7; // Increased from 0.5 to preserve more detail
+    // Alignment scale: higher resolution for more accurate alignment
+    const ALIGNMENT_SCALE: f64 = 0.85; // Increased from 0.7 to reduce ghosting
     let feature_batch_size = config.batch_config.feature_batch_size;
     let mut pairwise_transforms = Vec::new();
+    let mut last_batch_features: Option<(Vec<core::KeyPoint>, core::Mat, f64)> = None;
 
     let total_feature_batches = (sharp_image_paths.len() + feature_batch_size) / feature_batch_size;
     let mut feature_batch_count = 0;
 
     // Process sharp images in batches for memory efficiency with parallel processing within batches
     for batch_start in (0..sharp_image_paths.len()).step_by(feature_batch_size) {
-        let batch_end = (batch_start + feature_batch_size + 1).min(sharp_image_paths.len());
-        let batch_paths: Vec<&PathBuf> = sharp_image_paths[batch_start..batch_end]
+        let is_first_batch = batch_start == 0;
+        
+        // First batch loads batch_size+1 images to create overlap
+        // Non-first batches load batch_size images starting from batch_start+1
+        // (because batch_start is the overlapping image from previous batch)
+        let load_start = if is_first_batch { batch_start } else { batch_start + 1 };
+        let load_count = if is_first_batch { 
+            feature_batch_size + 1 
+        } else { 
+            feature_batch_size 
+        };
+        let batch_end = (load_start + load_count).min(sharp_image_paths.len());
+        
+        log::info!(
+            "DEBUG: batch_start={}, is_first_batch={}, load_start={}, load_count={}, batch_end={}",
+            batch_start, is_first_batch, load_start, load_count, batch_end
+        );
+        
+        let batch_paths: Vec<&PathBuf> = sharp_image_paths[load_start..batch_end]
             .iter()
             .map(|(_, path)| path)
             .collect();
@@ -299,7 +317,7 @@ pub fn align_images(
 
         log::info!(
             "Extracting features for batch {}-{} of {} (batch size: {})",
-            batch_start,
+            load_start,
             batch_end - 1,
             sharp_image_paths.len() - 1,
             batch_paths.len()
@@ -359,8 +377,20 @@ pub fn align_images(
 
         // Convert to valid features
         let mut valid_batch_features = Vec::new();
+        
+        // For non-first batches, prepend the last image's features from previous batch
+        // to maintain feature consistency across batch boundaries
+        if let Some(prev_features) = last_batch_features.take() {
+            valid_batch_features.push(prev_features);
+        }
+        
         for f in batch_features {
             valid_batch_features.push(f?);
+        }
+        
+        // Save the last image's features for the next batch (if not the last batch)
+        if batch_end < sharp_image_paths.len() {
+            last_batch_features = Some(valid_batch_features.last().unwrap().clone());
         }
 
         // Compute pairwise transforms for consecutive pairs in this batch
@@ -368,6 +398,21 @@ pub fn align_images(
             let (ref prev_keypoints, ref prev_descriptors, prev_scale) = valid_batch_features[i];
             let (ref curr_keypoints, ref curr_descriptors, curr_scale) =
                 valid_batch_features[i + 1];
+
+            // Calculate actual sharp image indices for logging
+            let actual_prev_idx = if i == 0 && !is_first_batch {
+                // First feature in non-first batch is the saved feature from previous batch
+                load_start - 1
+            } else if is_first_batch {
+                i
+            } else {
+                load_start + i - 1
+            };
+            let actual_curr_idx = if is_first_batch {
+                i + 1
+            } else {
+                load_start + i
+            };
 
             let t_step_2x3 = if curr_descriptors.empty() || prev_descriptors.empty() {
                 Mat::default()
@@ -393,10 +438,10 @@ pub fn align_images(
                 let mut matches_vec = matches.to_vec();
                 matches_vec.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
 
-                // Use top 40% of matches (increased from 30% for more robust alignment)
-                // This is especially important for dark images with fewer good features
-                let count = (matches_vec.len() as f32 * 0.4) as usize;
-                let count = count.max(15).min(matches_vec.len()); // Increased min from 10 to 15
+                // Use top 50% of matches (increased from 40% for better alignment precision)
+                // More matches = more accurate transform estimation
+                let count = (matches_vec.len() as f32 * 0.5) as usize;
+                let count = count.max(20).min(matches_vec.len()); // Increased min from 15 to 20
                 let good_matches = &matches_vec[..count];
 
                 let mut src_pts = opencv::core::Vector::<core::Point2f>::new();
@@ -417,29 +462,23 @@ pub fn align_images(
                 }
 
                 if src_pts.len() >= 4 {
-                    // Use RANSAC for robust homography estimation
+                    // Use estimateAffinePartial2D for rigid transform (rotation + translation + uniform scale)
+                    // This is more robust than homography for image alignment
                     let mut inliers = core::Mat::default();
-                    let homography = calib3d::find_homography(
+                    let transform = calib3d::estimate_affine_partial_2d(
                         &src_pts,
                         &dst_pts,
                         &mut inliers,
                         calib3d::RANSAC,
-                        3.0, // ransacReprojThreshold
+                        1.5, // ransacReprojThreshold - reduced from 3.0 for tighter alignment
+                        5000, // maxIters - increased from 2000 for better convergence
+                        0.995, // confidence - increased from 0.99 for more reliable estimates
+                        20, // refineIters - increased from 10 for subpixel accuracy
                     )?;
 
-                    if !homography.empty() {
-                        // Convert 3x3 homography to 2x3 affine transform
-                        let h_data = homography.data_typed::<f64>()?;
-                        let t_2x3_data = [
-                            h_data[0], h_data[1], h_data[2],
-                            h_data[3], h_data[4], h_data[5],
-                        ];
-
-                        let t_step_2x3 = Mat::from_slice_2d::<f64>(
-                            &t_2x3_data.chunks(3).collect::<Vec<_>>()
-                        )?;
+                    if !transform.empty() {
                         let mut t_step_2x3_f32 = Mat::default();
-                        t_step_2x3.convert_to(
+                        transform.convert_to(
                             &mut t_step_2x3_f32,
                             core::CV_32F,
                             1.0,
@@ -455,7 +494,12 @@ pub fn align_images(
             };
 
             if !t_step_2x3.empty() {
+                let pair_idx = pairwise_transforms.len();
+                log::info!("  Pairwise[{}]: sharp_img[{}] -> sharp_img[{}]", 
+                    pair_idx, actual_curr_idx, actual_prev_idx);
                 pairwise_transforms.push(t_step_2x3);
+            } else {
+                log::warn!("  FAILED: sharp_img[{}] -> sharp_img[{}]", actual_curr_idx, actual_prev_idx);
             }
         }
     }
@@ -465,22 +509,60 @@ pub fn align_images(
     println!("\nAccumulating transforms to reference frame...");
 
     let mut accumulated_transforms = Vec::new();
-    let mut current_transform = Mat::eye(2, 3, core::CV_32F)?.to_mat()?;
+    
+    // Start with identity transform (3x3 for proper composition)
+    let mut current_transform_3x3 = Mat::eye(3, 3, core::CV_32F)?.to_mat()?;
 
     for (_i, t_step) in pairwise_transforms.iter().enumerate() {
-        // Compose transforms: current = previous * step
-        let mut new_transform = Mat::default();
+        // Convert 2x3 affine to 3x3 homogeneous matrix
+        let t_data = t_step.data_typed::<f32>()?;
+        let t_3x3_data = [
+            t_data[0], t_data[1], t_data[2],
+            t_data[3], t_data[4], t_data[5],
+            0.0, 0.0, 1.0,
+        ];
+        let t_step_3x3 = Mat::from_slice_2d::<f32>(&t_3x3_data.chunks(3).collect::<Vec<_>>())?;
+
+        // Compose transforms: new = current * step  
+        // Each accumulated transform maps image[i+1] to reference
+        let mut new_transform_3x3 = Mat::default();
+        let no_array = Mat::default();
         core::gemm(
-            &current_transform,
-            t_step,
+            &current_transform_3x3,
+            &t_step_3x3,
             1.0,
-            &Mat::default(),
+            &no_array,
             0.0,
-            &mut new_transform,
+            &mut new_transform_3x3,
             0,
         )?;
-        accumulated_transforms.push(new_transform.clone());
-        current_transform = new_transform;
+
+        // DEBUG: Log composition
+        if _i < 3 {
+            let curr_data = current_transform_3x3.data_typed::<f32>()?;
+            let step_data = t_step_3x3.data_typed::<f32>()?;
+            let new_data_3x3 = new_transform_3x3.data_typed::<f32>()?;
+            log::info!("  Compose[{}]: current=[[{:.4},{:.4},{:.2}],[{:.4},{:.4},{:.2}]] * step=[[{:.4},{:.4},{:.2}],[{:.4},{:.4},{:.2}]] = [[{:.4},{:.4},{:.2}],[{:.4},{:.4},{:.2}]]",
+                _i,
+                curr_data[0], curr_data[1], curr_data[2],
+                curr_data[3], curr_data[4], curr_data[5],
+                step_data[0], step_data[1], step_data[2],
+                step_data[3], step_data[4], step_data[5],
+                new_data_3x3[0], new_data_3x3[1], new_data_3x3[2],
+                new_data_3x3[3], new_data_3x3[4], new_data_3x3[5],
+            );
+        }
+
+        // Convert back to 2x3 for storage
+        let new_data = new_transform_3x3.data_typed::<f32>()?;
+        let affine_2x3_data = [
+            new_data[0], new_data[1], new_data[2],
+            new_data[3], new_data[4], new_data[5],
+        ];
+        let affine_2x3 = Mat::from_slice_2d::<f32>(&affine_2x3_data.chunks(3).collect::<Vec<_>>())?;
+        
+        accumulated_transforms.push(affine_2x3);
+        current_transform_3x3 = new_transform_3x3;
     }
 
     // 3. Parallel Warp and Crop with Batched Processing
@@ -503,17 +585,37 @@ pub fn align_images(
                 let img_idx = i + 1; // +1 because we skip the reference image
                 let img_path = &sharp_image_paths[img_idx].1;
                 let transform = &accumulated_transforms[i];
+                
+                // Debug: log which image is being warped with which transform
+                let orig_idx = sharp_image_paths[img_idx].0;
+                
+                // Log transform matrix for debugging
+                let t_data = transform.data_typed::<f32>()?;
+                let is_near_identity = (t_data[0] - 1.0).abs() < 0.01 && 
+                                      (t_data[1]).abs() < 0.01 &&
+                                      (t_data[2]).abs() < 1.0 &&
+                                      (t_data[3]).abs() < 0.01 &&
+                                      (t_data[4] - 1.0).abs() < 0.01 &&
+                                      (t_data[5]).abs() < 1.0;
+                                      
+                log::info!("  Warp {:04}.png (sharp[{}]): transform[{}] = [[{:.4}, {:.4}, {:.2}], [{:.4}, {:.4}, {:.2}]] {}",
+                    orig_idx, img_idx, i,
+                    t_data[0], t_data[1], t_data[2],
+                    t_data[3], t_data[4], t_data[5],
+                    if is_near_identity { "⚠ NEAR-IDENTITY" } else { "" }
+                );
 
                 let img = load_image(img_path)?;
 
                 // Warp image to reference frame
+                // Use INTER_LANCZOS4 for highest quality interpolation
                 let mut warped = Mat::default();
                 imgproc::warp_affine(
                     &img,
                     &mut warped,
                     transform,
                     core::Size::new(ref_img.cols(), ref_img.rows()),
-                    imgproc::INTER_CUBIC, // Changed from INTER_LINEAR for better quality
+                    imgproc::INTER_LANCZOS4, // Best quality interpolation for alignment
                     core::BORDER_CONSTANT,
                     core::Scalar::all(0.0),
                 )?;

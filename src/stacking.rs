@@ -213,7 +213,7 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
         return Ok(images[0].clone());
     }
 
-    let levels = 6; // Increased pyramid levels for better detail
+    let levels = 7; // Increased from 6 for finer detail preservation
     let mut fused_pyramid: Vec<core::UMat> = Vec::new();
     let mut max_energies: Vec<core::UMat> = Vec::new();
 
@@ -255,7 +255,7 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                     &gray,
                     &mut laplacian,
                     core::CV_32F,
-                    3,
+                    5, // Increased from 3 for better sharpness detection
                     1.0,
                     0.0,
                     core::BORDER_DEFAULT,
@@ -264,11 +264,12 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                 let mut energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
                 core::absdiff(&laplacian, &core::Scalar::all(0.0), &mut energy)?;
 
+                // Apply smaller blur to preserve sharp regions better
                 let mut blurred_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
                 imgproc::gaussian_blur(
                     &energy,
                     &mut blurred_energy,
-                    core::Size::new(5, 5),
+                    core::Size::new(3, 3), // Reduced from 5x5 to preserve local sharpness
                     0.0,
                     0.0,
                     core::BORDER_DEFAULT,
@@ -278,8 +279,51 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                 max_energies.push(blurred_energy);
             }
 
-            // For the base level (Gaussian), we'll use it for averaging later
+            // For the base level (Gaussian), also use winner-take-all based on sharpness
             let base_idx = levels as usize;
+            let base_layer = &current_pyramid[base_idx];
+            
+            // Compute energy for base level
+            let mut gray = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            if base_layer.channels() == 3 {
+                imgproc::cvt_color(
+                    base_layer,
+                    &mut gray,
+                    imgproc::COLOR_BGR2GRAY,
+                    0,
+                    core::AlgorithmHint::ALGO_HINT_DEFAULT,
+                )?;
+            } else {
+                gray = base_layer.clone();
+            }
+
+            let mut laplacian = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            imgproc::laplacian(
+                &gray,
+                &mut laplacian,
+                core::CV_32F,
+                5,
+                1.0,
+                0.0,
+                core::BORDER_DEFAULT,
+            )?;
+
+            let mut base_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            core::absdiff(&laplacian, &core::Scalar::all(0.0), &mut base_energy)?;
+
+            let mut blurred_base_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            imgproc::gaussian_blur(
+                &base_energy,
+                &mut blurred_base_energy,
+                core::Size::new(3, 3),
+                0.0,
+                0.0,
+                core::BORDER_DEFAULT,
+                core::AlgorithmHint::ALGO_HINT_DEFAULT,
+            )?;
+
+            max_energies.push(blurred_base_energy);
+            
             let mut float_base = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
             fused_pyramid[base_idx].convert_to(&mut float_base, core::CV_32F, 1.0, 0.0)?;
             fused_pyramid[base_idx] = float_base;
@@ -307,7 +351,7 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                     &gray,
                     &mut laplacian,
                     core::CV_32F,
-                    3,
+                    5, // Increased from 3 for better sharpness detection
                     1.0,
                     0.0,
                     core::BORDER_DEFAULT,
@@ -316,11 +360,12 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                 let mut energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
                 core::absdiff(&laplacian, &core::Scalar::all(0.0), &mut energy)?;
 
+                // Apply smaller blur to preserve sharp regions better
                 let mut blurred_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
                 imgproc::gaussian_blur(
                     &energy,
                     &mut blurred_energy,
-                    core::Size::new(5, 5),
+                    core::Size::new(3, 3), // Reduced from 5x5 to preserve local sharpness
                     0.0,
                     0.0,
                     core::BORDER_DEFAULT,
@@ -335,29 +380,60 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                 blurred_energy.copy_to_masked(&mut max_energies[l], &mask)?;
             }
 
-            // Accumulate base level for averaging
+            // Also use winner-take-all for base level instead of averaging
             let base_idx = levels as usize;
-            let mut float_base = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-            current_pyramid[base_idx].convert_to(&mut float_base, core::CV_32F, 1.0, 0.0)?;
+            let base_layer = &current_pyramid[base_idx];
+            
+            // Compute energy for base level
+            let mut gray = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            if base_layer.channels() == 3 {
+                imgproc::cvt_color(
+                    base_layer,
+                    &mut gray,
+                    imgproc::COLOR_BGR2GRAY,
+                    0,
+                    core::AlgorithmHint::ALGO_HINT_DEFAULT,
+                )?;
+            } else {
+                gray = base_layer.clone();
+            }
 
-            let mut next_fused_base = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-            core::add(
-                &fused_pyramid[base_idx],
-                &float_base,
-                &mut next_fused_base,
-                &core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT),
-                -1,
+            let mut laplacian = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            imgproc::laplacian(
+                &gray,
+                &mut laplacian,
+                core::CV_32F,
+                5,
+                1.0,
+                0.0,
+                core::BORDER_DEFAULT,
             )?;
-            fused_pyramid[base_idx] = next_fused_base;
+
+            let mut base_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            core::absdiff(&laplacian, &core::Scalar::all(0.0), &mut base_energy)?;
+
+            let mut blurred_base_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            imgproc::gaussian_blur(
+                &base_energy,
+                &mut blurred_base_energy,
+                core::Size::new(3, 3),
+                0.0,
+                0.0,
+                core::BORDER_DEFAULT,
+                core::AlgorithmHint::ALGO_HINT_DEFAULT,
+            )?;
+
+            // Update base level where energy is higher
+            let mut base_mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            core::compare(&blurred_base_energy, &max_energies[base_idx], &mut base_mask, core::CMP_GT)?;
+
+            base_layer.copy_to_masked(&mut fused_pyramid[base_idx], &base_mask)?;
+            blurred_base_energy.copy_to_masked(&mut max_energies[base_idx], &base_mask)?;
         }
     }
 
     log::info!("Collapsing pyramid...");
-    // Finalize base level averaging
-    let base_idx = levels as usize;
-    let mut final_base = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-    fused_pyramid[base_idx].convert_to(&mut final_base, -1, 1.0 / images.len() as f64, 0.0)?;
-    fused_pyramid[base_idx] = final_base;
+    // Base level now uses winner-take-all, no averaging needed
 
     // 3. Collapse Pyramid
     let result_umat = collapse_pyramid(&fused_pyramid)?;
