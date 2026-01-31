@@ -39,6 +39,9 @@ pub struct ProcessingConfig {
     pub use_internal_preview: bool,
     pub preview_max_width: f32,
     pub preview_max_height: f32,
+    // External applications
+    pub external_viewer_path: String,  // For left-click when use_internal_preview is false
+    pub external_editor_path: String,  // For right-click
 }
 
 impl Default for ProcessingConfig {
@@ -63,6 +66,9 @@ impl Default for ProcessingConfig {
             use_internal_preview: true,
             preview_max_width: 900.0,
             preview_max_height: 700.0,
+            // External applications (empty = use system default)
+            external_viewer_path: String::new(),
+            external_editor_path: String::new(),
         }
     }
 }

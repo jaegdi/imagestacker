@@ -43,8 +43,9 @@ pub fn extract_features(
         }
         FeatureDetector::SIFT => {
             // SIFT: Scale-Invariant Feature Transform - best quality, slower
+            // Limit to 3000 features to prevent memory issues on very large images
             let mut sift = features2d::SIFT::create(
-                0,     // nfeatures (0 = unlimited)
+                3000,  // nfeatures - limit to 3000 to prevent out-of-memory (128-dim float descriptors = 512 bytes each)
                 3,     // nOctaveLayers
                 0.04,  // contrastThreshold
                 10.0,  // edgeThreshold
@@ -61,15 +62,16 @@ pub fn extract_features(
         }
         FeatureDetector::AKAZE => {
             // AKAZE: Accelerated-KAZE - good balance of speed and quality
+            // Very conservative settings for large images to prevent OOM
             let mut akaze = features2d::AKAZE::create(
                 features2d::AKAZE_DescriptorType::DESCRIPTOR_MLDB,
                 0,      // descriptor_size
                 3,      // descriptor_channels
-                0.001,  // threshold
-                4,      // nOctaves
+                0.003,  // threshold - increased to reduce number of keypoints
+                3,      // nOctaves - reduced from 4 to save memory
                 4,      // nOctaveLayers
                 features2d::KAZE_DiffusivityType::DIFF_PM_G2,
-                512,    // max_points
+                64,     // max_points - reduced from 128 to prevent OOM on very large images
             )?;
             akaze.detect_and_compute(
                 img,
@@ -78,6 +80,36 @@ pub fn extract_features(
                 &mut descriptors,
                 false,
             )?;
+            
+            // AKAZE can detect many more keypoints than we need, especially on large images
+            // Limit to top 3000 keypoints by response to prevent memory issues
+            if keypoints.len() > 3000 {
+                use opencv::core::KeyPointTraitConst;
+                
+                // Sort keypoints by response (strength) in descending order
+                let mut kp_vec: Vec<_> = keypoints.to_vec();
+                kp_vec.sort_by(|a, b| b.response().partial_cmp(&a.response()).unwrap_or(std::cmp::Ordering::Equal));
+                
+                // Keep only top 3000
+                kp_vec.truncate(3000);
+                
+                // Rebuild keypoints and descriptors
+                keypoints = opencv::core::Vector::from_iter(kp_vec.iter().cloned());
+                
+                // Extract corresponding descriptor rows
+                let mut new_descriptors = core::Mat::default();
+                for (i, _) in kp_vec.iter().enumerate() {
+                    let row = descriptors.row(i as i32)?;
+                    if new_descriptors.empty() {
+                        new_descriptors = row.try_clone()?;
+                    } else {
+                        let mut combined = core::Mat::default();
+                        core::vconcat2(&new_descriptors, &row, &mut combined)?;
+                        new_descriptors = combined;
+                    }
+                }
+                descriptors = new_descriptors;
+            }
         }
     }
 
@@ -291,8 +323,30 @@ pub fn align_images(
 
     // Alignment scale: higher resolution for more accurate alignment
     const ALIGNMENT_SCALE: f64 = 0.85; // Increased from 0.7 to reduce ghosting
-    let feature_batch_size = config.batch_config.feature_batch_size;
+    
+    // Adjust batch size based on feature detector type to prevent out-of-memory
+    // SIFT and AKAZE use much more memory per image than ORB
+    // For very large images (>40MP), both need very small batches
+    let base_feature_batch_size = config.batch_config.feature_batch_size;
+    let feature_batch_size = match config.feature_detector {
+        FeatureDetector::ORB => base_feature_batch_size,
+        FeatureDetector::SIFT => (base_feature_batch_size / 4).max(3), // SIFT uses ~4x memory (128-dim float descriptors)
+        FeatureDetector::AKAZE => (base_feature_batch_size / 4).max(3), // AKAZE uses ~4x memory with very large images
+    };
+    
+    log::info!(
+        "Using {} detector with batch size {} (base: {})",
+        match config.feature_detector {
+            FeatureDetector::ORB => "ORB",
+            FeatureDetector::SIFT => "SIFT",
+            FeatureDetector::AKAZE => "AKAZE",
+        },
+        feature_batch_size,
+        base_feature_batch_size
+    );
+    
     let mut pairwise_transforms = Vec::new();
+    let mut pairwise_image_indices = Vec::new(); // Track which image each transform corresponds to
     let mut last_batch_features: Option<(Vec<core::KeyPoint>, core::Mat, f64)> = None;
 
     let total_feature_batches = (sharp_image_paths.len() + feature_batch_size) / feature_batch_size;
@@ -306,6 +360,12 @@ pub fn align_images(
         // Non-first batches load batch_size images starting from batch_start+1
         // (because batch_start is the overlapping image from previous batch)
         let load_start = if is_first_batch { batch_start } else { batch_start + 1 };
+        
+        // Stop if we've already processed all images
+        if load_start >= sharp_image_paths.len() {
+            break;
+        }
+        
         let load_count = if is_first_batch { 
             feature_batch_size + 1 
         } else { 
@@ -506,10 +566,28 @@ pub fn align_images(
             };
 
             if !t_step_2x3.empty() {
-                let pair_idx = pairwise_transforms.len();
-                log::info!("  Pairwise[{}]: sharp_img[{}] -> sharp_img[{}]", 
-                    pair_idx, actual_curr_idx, actual_prev_idx);
-                pairwise_transforms.push(t_step_2x3);
+                // Validate the transform: check if it's degenerate
+                // A valid affine transform should have non-zero determinant
+                // For 2x3 affine: [[a, b, tx], [c, d, ty]], determinant = a*d - b*c
+                let t_data = t_step_2x3.data_typed::<f32>()?;
+                let a = t_data[0];
+                let b = t_data[1];
+                let c = t_data[3];
+                let d = t_data[4];
+                let determinant = a * d - b * c;
+                
+                // Check if transform is valid (determinant should be close to 1.0 for rigid/similarity transforms)
+                // Allow some tolerance but reject degenerate transforms (det near 0)
+                if determinant.abs() > 0.1 && determinant.abs() < 10.0 {
+                    let pair_idx = pairwise_transforms.len();
+                    log::info!("  Pairwise[{}]: sharp_img[{}] -> sharp_img[{}] (det={:.4})", 
+                        pair_idx, actual_curr_idx, actual_prev_idx, determinant);
+                    pairwise_transforms.push(t_step_2x3);
+                    pairwise_image_indices.push(actual_curr_idx);
+                } else {
+                    log::warn!("  REJECTED (degenerate): sharp_img[{}] -> sharp_img[{}] (det={:.6}, a={:.4}, b={:.4}, c={:.4}, d={:.4})", 
+                        actual_curr_idx, actual_prev_idx, determinant, a, b, c, d);
+                }
             } else {
                 log::warn!("  FAILED: sharp_img[{}] -> sharp_img[{}]", actual_curr_idx, actual_prev_idx);
             }
@@ -522,59 +600,77 @@ pub fn align_images(
 
     let mut accumulated_transforms = Vec::new();
     
+    // Create a map from image index to transform
+    let mut transform_map: std::collections::HashMap<usize, Mat> = std::collections::HashMap::new();
+    for (transform, img_idx) in pairwise_transforms.iter().zip(pairwise_image_indices.iter()) {
+        transform_map.insert(*img_idx, transform.clone());
+    }
+    
     // Start with identity transform (3x3 for proper composition)
     let mut current_transform_3x3 = Mat::eye(3, 3, core::CV_32F)?.to_mat()?;
 
-    for (_i, t_step) in pairwise_transforms.iter().enumerate() {
-        // Convert 2x3 affine to 3x3 homogeneous matrix
-        let t_data = t_step.data_typed::<f32>()?;
-        let t_3x3_data = [
-            t_data[0], t_data[1], t_data[2],
-            t_data[3], t_data[4], t_data[5],
-            0.0, 0.0, 1.0,
-        ];
-        let t_step_3x3 = Mat::from_slice_2d::<f32>(&t_3x3_data.chunks(3).collect::<Vec<_>>())?;
+    // Process images 1 to N (image 0 is reference)
+    for img_idx in 1..sharp_image_paths.len() {
+        // Check if we have a pairwise transform for this image
+        if let Some(t_step) = transform_map.get(&img_idx) {
+            // We have a transform: compose it with the previous accumulated transform
+            // Convert 2x3 affine to 3x3 homogeneous matrix
+            let t_data = t_step.data_typed::<f32>()?;
+            let t_3x3_data = [
+                t_data[0], t_data[1], t_data[2],
+                t_data[3], t_data[4], t_data[5],
+                0.0, 0.0, 1.0,
+            ];
+            let t_step_3x3 = Mat::from_slice_2d::<f32>(&t_3x3_data.chunks(3).collect::<Vec<_>>())?;
 
-        // Compose transforms: new = current * step  
-        // Each accumulated transform maps image[i+1] to reference
-        let mut new_transform_3x3 = Mat::default();
-        let no_array = Mat::default();
-        core::gemm(
-            &current_transform_3x3,
-            &t_step_3x3,
-            1.0,
-            &no_array,
-            0.0,
-            &mut new_transform_3x3,
-            0,
-        )?;
+            // Compose transforms: accumulated[i] = accumulated[i-1] * transform[i->i-1]
+            // This builds the chain: image[i] -> image[i-1] -> ... -> reference
+            // Matrix multiplication order: the transform applied FIRST goes on the RIGHT
+            let mut new_transform_3x3 = Mat::default();
+            let no_array = Mat::default();
+            core::gemm(
+                &current_transform_3x3,
+                &t_step_3x3,
+                1.0,
+                &no_array,
+                0.0,
+                &mut new_transform_3x3,
+                0,
+            )?;
 
-        // DEBUG: Log composition
-        if _i < 3 {
-            let curr_data = current_transform_3x3.data_typed::<f32>()?;
-            let step_data = t_step_3x3.data_typed::<f32>()?;
-            let new_data_3x3 = new_transform_3x3.data_typed::<f32>()?;
-            log::info!("  Compose[{}]: current=[[{:.4},{:.4},{:.2}],[{:.4},{:.4},{:.2}]] * step=[[{:.4},{:.4},{:.2}],[{:.4},{:.4},{:.2}]] = [[{:.4},{:.4},{:.2}],[{:.4},{:.4},{:.2}]]",
-                _i,
-                curr_data[0], curr_data[1], curr_data[2],
-                curr_data[3], curr_data[4], curr_data[5],
-                step_data[0], step_data[1], step_data[2],
-                step_data[3], step_data[4], step_data[5],
-                new_data_3x3[0], new_data_3x3[1], new_data_3x3[2],
-                new_data_3x3[3], new_data_3x3[4], new_data_3x3[5],
-            );
+            // DEBUG: Log composition
+            if img_idx <= 10 {
+                let curr_data = current_transform_3x3.data_typed::<f32>()?;
+                let step_data = t_step_3x3.data_typed::<f32>()?;
+                let new_data_3x3 = new_transform_3x3.data_typed::<f32>()?;
+                log::info!("  Compose[img={}]: prev=[[{:.4},{:.4},{:.2}],[{:.4},{:.4},{:.2}]] * step=[[{:.4},{:.4},{:.2}],[{:.4},{:.4},{:.2}]] = [[{:.4},{:.4},{:.2}],[{:.4},{:.4},{:.2}]]",
+                    img_idx,
+                    curr_data[0], curr_data[1], curr_data[2],
+                    curr_data[3], curr_data[4], curr_data[5],
+                    step_data[0], step_data[1], step_data[2],
+                    step_data[3], step_data[4], step_data[5],
+                    new_data_3x3[0], new_data_3x3[1], new_data_3x3[2],
+                    new_data_3x3[3], new_data_3x3[4], new_data_3x3[5],
+                );
+            }
+
+            current_transform_3x3 = new_transform_3x3;
+        } else {
+            // No pairwise transform found: reset to identity
+            // This treats the image as if it's already at reference position (no alignment needed)
+            log::warn!("  No transform for image {}, using identity (treating as already aligned to reference)", img_idx);
+            current_transform_3x3 = Mat::eye(3, 3, core::CV_32F)?.to_mat()?;
         }
-
-        // Convert back to 2x3 for storage
-        let new_data = new_transform_3x3.data_typed::<f32>()?;
+        
+        // Convert current 3x3 to 2x3 for storage
+        let current_data = current_transform_3x3.data_typed::<f32>()?;
         let affine_2x3_data = [
-            new_data[0], new_data[1], new_data[2],
-            new_data[3], new_data[4], new_data[5],
+            current_data[0], current_data[1], current_data[2],
+            current_data[3], current_data[4], current_data[5],
         ];
         let affine_2x3 = Mat::from_slice_2d::<f32>(&affine_2x3_data.chunks(3).collect::<Vec<_>>())?;
         
         accumulated_transforms.push(affine_2x3);
-        current_transform_3x3 = new_transform_3x3;
     }
 
     // 3. Parallel Warp and Crop with Batched Processing

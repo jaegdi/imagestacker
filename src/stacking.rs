@@ -40,11 +40,11 @@ pub fn stack_images(
     let final_dir = output_dir.join("final");
     std::fs::create_dir_all(&final_dir)?;
 
-    let mut final_path = final_dir.join("result.png");
+    let mut final_path = final_dir.join("result_0001.png");
     let mut counter = 1;
     while final_path.exists() {
-        final_path = final_dir.join(format!("result_{}.png", counter));
         counter += 1;
+        final_path = final_dir.join(format!("result_{:04}.png", counter));
     }
 
     log::info!("Saving final result to {}", final_path.display());
