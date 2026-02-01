@@ -15,8 +15,19 @@ use super::super::log_capture::get_logs;
 impl ImageStacker {
     pub(crate) fn render_help_window(&self) -> Element<'_, Message> {
         // Load help text from markdown file
-        let help_markdown = fs::read_to_string("USER_MANUAL.md")
-            .unwrap_or_else(|_| "# Error\n\nCould not load USER_MANUAL.md file.".to_string());
+        // Try multiple locations: current dir, installation dir, and source dir
+        let help_paths = [
+            "USER_MANUAL.md",                                    // Current directory (development)
+            "/usr/share/doc/imagestacker/USER_MANUAL.md",       // System installation (Linux)
+            "/usr/local/share/doc/imagestacker/USER_MANUAL.md", // Local installation
+        ];
+        
+        let help_markdown = help_paths.iter()
+            .find_map(|path| fs::read_to_string(path).ok())
+            .unwrap_or_else(|| {
+                format!("# Error\n\nCould not load USER_MANUAL.md file.\n\nTried locations:\n{}", 
+                    help_paths.iter().map(|p| format!("- {}", p)).collect::<Vec<_>>().join("\n"))
+            });
         
         // Parse markdown and create formatted text elements
         let mut elements: Vec<Element<Message>> = Vec::new();
