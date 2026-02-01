@@ -22,11 +22,39 @@ impl ImageStacker {
             "/usr/local/share/doc/imagestacker/USER_MANUAL.md", // Local installation
         ];
         
+        let mut errors = Vec::new();
         let help_markdown = help_paths.iter()
-            .find_map(|path| fs::read_to_string(path).ok())
+            .find_map(|path| {
+                log::info!("Trying to load USER_MANUAL from: {}", path);
+                match fs::read_to_string(path) {
+                    Ok(content) => {
+                        log::info!("✓ Successfully loaded USER_MANUAL from: {} ({} bytes)", path, content.len());
+                        Some(content)
+                    }
+                    Err(e) => {
+                        let error_msg = format!("{}: {}", path, e);
+                        log::warn!("✗ Failed to load USER_MANUAL from {}: {}", path, e);
+                        errors.push(error_msg);
+                        None
+                    }
+                }
+            })
             .unwrap_or_else(|| {
-                format!("# Error\n\nCould not load USER_MANUAL.md file.\n\nTried locations:\n{}", 
-                    help_paths.iter().map(|p| format!("- {}", p)).collect::<Vec<_>>().join("\n"))
+                let error_details = errors.join("\n- ");
+                let error_msg = format!(
+                    "# Error Loading Manual\n\n\
+                    Could not load USER_MANUAL.md file from any location.\n\n\
+                    ## Tried locations:\n{}\n\n\
+                    ## Errors:\n- {}\n\n\
+                    ## Troubleshooting:\n\
+                    - Check if the package is properly installed\n\
+                    - Verify file exists: `ls -la /usr/share/doc/imagestacker/USER_MANUAL.md`\n\
+                    - Check file permissions: `test -r /usr/share/doc/imagestacker/USER_MANUAL.md && echo OK`",
+                    help_paths.iter().map(|p| format!("- {}", p)).collect::<Vec<_>>().join("\n"),
+                    error_details
+                );
+                log::error!("Failed to load USER_MANUAL.md from any location! Errors: {:?}", errors);
+                error_msg
             });
         
         // Parse markdown and create formatted text elements
