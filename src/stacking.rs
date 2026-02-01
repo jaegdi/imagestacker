@@ -236,10 +236,11 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
     
     // Check if OpenCL is available and use UMat for GPU acceleration
     let use_gpu = opencv::core::use_opencl().unwrap_or(false);
+    log::info!("🔍 stack_images_direct() called - OpenCL enabled: {}", use_gpu);
     if use_gpu {
-        log::info!("Using GPU acceleration for stacking");
+        log::info!("✓ Using GPU acceleration for stacking");
     } else {
-        log::info!("Using CPU for stacking");
+        log::warn!("⚠️  Using CPU for stacking (OpenCL disabled)");
     }
     
     let mut fused_pyramid: Vec<core::UMat> = Vec::new();

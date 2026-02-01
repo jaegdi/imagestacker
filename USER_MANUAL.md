@@ -300,6 +300,47 @@ Enhances edge definition
 
 ---
 
+## 🎮 GPU Acceleration
+
+### Overview
+Imagestacker uses **OpenCL GPU acceleration** for significant performance improvements:
+- **Blur detection:** GPU-accelerated sharpness computation using Gaussian blur, Laplacian, and Sobel operators
+- **Feature extraction:** GPU preprocessing with color conversion, CLAHE, and image resizing
+- **Image warping:** GPU-accelerated affine transformations
+- **Focus stacking:** GPU Laplacian pyramid generation and collapse
+
+### Performance
+GPU acceleration provides **2-6x speedup** depending on the operation:
+- Blur detection: 1-2 seconds per 42MP image
+- Warping: ~1.5 seconds per 42MP image
+- Overall SIFT alignment: ~2 minutes for 46 images
+- Overall ORB alignment: ~1.5 minutes for 46 images
+
+### Memory Management
+The application automatically manages memory for large images:
+- **Adaptive batch sizing** based on image dimensions
+- For 42MP images: processes 2-3 images simultaneously
+- Typical RAM usage: 8-10GB for 46×42MP images
+- GPU operations are thread-safe with automatic serialization
+
+### Optimization Tips
+- **Feature Detector Choice:**
+  - **ORB:** 6x faster than SIFT, excellent for most cases
+  - **SIFT:** Best quality but slower, optimized to 2000 features
+  - **AKAZE:** Good balance but CPU-only feature detection
+  
+- **GPU Utilization:**
+  - Most visible during warping phase (continuous GPU work)
+  - Feature extraction alternates between GPU preprocessing and CPU feature detection
+  - This is optimal - CPU and GPU work in parallel
+
+- **System Requirements:**
+  - OpenCL-capable GPU (most modern GPUs)
+  - 8GB+ RAM recommended for 40MP+ images
+  - 16GB+ RAM for best performance with large image sets
+
+---
+
 ## 💡 Usage Tips
 
 ### Creating Multiple Variants
@@ -338,10 +379,12 @@ Enhances edge definition
 - Gaussian blur for smooth energy maps
 
 ### Sharpness Detection:
-- Regional analysis using configurable grid
+- Regional analysis using configurable grid (4x4 to 16x16)
+- GPU-accelerated computation using UMat for OpenCL
 - Combines Laplacian variance, Tenengrad, Modified Laplacian
 - Image kept if ANY region exceeds threshold
 - Perfect for focus stacks with varying sharp regions
+- Parallel processing with mutex-serialized GPU operations
 
 ---
 

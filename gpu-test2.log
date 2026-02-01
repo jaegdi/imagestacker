@@ -1,0 +1,6 @@
+[2026-02-01T13:12:27Z INFO  imagestacker] OpenCV GPU acceleration (OpenCL) enabled
+error: unexpected argument '--aligned' found
+
+Usage: imagestacker --import <DIR>
+
+For more information, try '--help'.
