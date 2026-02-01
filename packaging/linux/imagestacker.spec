@@ -1,5 +1,5 @@
 Name:           imagestacker
-Version:        0.1.0
+Version:        1.0.0
 Release:        1%{?dist}
 Summary:        Focus stacking application for combining multiple images
 
@@ -111,6 +111,22 @@ if [ -x /usr/bin/update-desktop-database ]; then
 fi
 
 %changelog
+* Sat Feb 01 2025 ImageStacker Team <imagestacker@example.com> - 1.0.0-1
+- Version 1.0.0 stable release
+- Full GPU acceleration with OpenCL for image processing
+- GPU-accelerated blur detection and sharpness analysis
+- GPU-accelerated image preprocessing (CLAHE, resize, color conversion)
+- GPU-accelerated warping and Laplacian pyramid stacking
+- Smart GPU/CPU fallback with automatic detection
+- Adaptive batch processing for memory management (42MP images)
+- Optimized SIFT feature detection (2000 features)
+- Thread-safe OpenCL operations with global mutex
+- Regional sharpness detection with configurable grid
+- Focus stacking with multiple alignment methods (ORB, SIFT, AKAZE)
+- GUI with internal preview and external editor support
+- Advanced post-processing options
+- Comprehensive user manual and documentation
+
 * Thu Jan 30 2025 ImageStacker Team <imagestacker@example.com> - 0.1.0-1
 - Initial RPM release
 - Focus stacking with multiple alignment methods
