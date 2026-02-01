@@ -180,10 +180,6 @@ pub fn align_images(
     let batch_size = config.batch_config.sharpness_batch_size;
     let mut sharpness_scores: Vec<(usize, PathBuf, f64)> = Vec::new();
 
-    // Temporarily disable OpenCL for ALL parallel processing to avoid thread safety issues
-    // The guard will automatically restore OpenCL when dropped (even on early return/cancellation)
-    let _opencl_guard = OpenClGuard::new();
-
     let total_batches = (image_paths.len() + batch_size - 1) / batch_size;
     for (batch_idx, batch) in image_paths.chunks(batch_size).enumerate() {
         // Check for cancellation
@@ -201,10 +197,21 @@ pub fn align_images(
         let progress_pct = 5.0 + (batch_idx as f32 / total_batches as f32) * 15.0;
         report_progress(&format!("Blur detection: batch {}/{}", batch_idx + 1, total_batches), progress_pct);
 
-        let batch_results: Vec<(usize, PathBuf, f64)> = batch
-            .par_iter()
-            .enumerate()
-            .filter_map(|(batch_idx, path)| {
+        // Disable OpenCL ONLY during parallel iteration to avoid thread safety issues
+        // The guard scope ends after par_iter completes, automatically re-enabling OpenCL
+        let batch_results: Vec<(usize, PathBuf, f64)> = {
+            let _opencl_guard = OpenClGuard::new();
+            batch
+                .par_iter()
+                .enumerate()
+                .filter_map(|(batch_idx, path)| {
+                // Check for cancellation inside parallel work
+                if let Some(ref flag) = cancel_flag {
+                    if flag.load(Ordering::Relaxed) {
+                        return None; // Stop processing this item
+                    }
+                }
+                
                 let idx = batch_start + batch_idx;
                 let filename = path.file_name().unwrap_or_default().to_string_lossy().to_string();
                 match load_image(path) {
@@ -237,13 +244,21 @@ pub fn align_images(
                     }
                 }
             })
-            .collect();
+            .collect()
+        }; // _opencl_guard is dropped here, OpenCL re-enabled
 
         sharpness_scores.extend(batch_results);
+        
+        // Check if cancellation occurred during parallel work
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                log::info!("✋ Alignment cancelled by user during sharpness detection");
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
     }
 
     // Calculate statistics for adaptive thresholding
-    // (OpenCL will be automatically re-enabled when _opencl_guard is dropped)
     let scores: Vec<f64> = sharpness_scores.iter().map(|(_, _, s)| *s).collect();
     let mean_sharpness: f64 = scores.iter().sum::<f64>() / scores.len() as f64;
 
@@ -398,10 +413,6 @@ pub fn align_images(
     let total_feature_batches = (sharp_image_paths.len() + feature_batch_size) / feature_batch_size;
     let mut feature_batch_count = 0;
 
-    // Temporarily disable OpenCL for ALL parallel feature extraction to avoid thread safety issues
-    // The guard will automatically restore OpenCL when dropped (even on early return/cancellation)
-    let _opencl_guard = OpenClGuard::new();
-
     // Process sharp images in batches for memory efficiency with parallel processing within batches
     for batch_start in (0..sharp_image_paths.len()).step_by(feature_batch_size) {
         // Check for cancellation
@@ -457,9 +468,19 @@ pub fn align_images(
         let use_clahe = config.use_clahe;
 
         // Extract features for this batch in parallel
-        let batch_features: Vec<Result<(Vec<core::KeyPoint>, core::Mat, f64)>> = batch_paths
-            .par_iter()
-            .map(|&path| {
+        // Disable OpenCL ONLY during parallel iteration to avoid thread safety issues
+        let batch_features: Vec<Result<(Vec<core::KeyPoint>, core::Mat, f64)>> = {
+            let _opencl_guard = OpenClGuard::new();
+            batch_paths
+                .par_iter()
+                .map(|&path| {
+                // Check for cancellation inside parallel work
+                if let Some(ref flag) = cancel_flag {
+                    if flag.load(Ordering::Relaxed) {
+                        return Err(anyhow::anyhow!("Operation cancelled by user"));
+                    }
+                }
+                
                 let img = load_image(path)?;
 
                 // Convert to grayscale for preprocessing
@@ -503,7 +524,16 @@ pub fn align_images(
 
                 Ok((keypoints.to_vec(), descriptors, scale))
             })
-            .collect();
+            .collect()
+        }; // _opencl_guard is dropped here, OpenCL re-enabled
+
+        // Check if cancellation occurred during parallel work
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                log::info!("✋ Alignment cancelled by user during feature extraction");
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
 
         // Convert to valid features
         let mut valid_batch_features = Vec::new();
@@ -661,7 +691,6 @@ pub fn align_images(
     }
 
     // 2. Accumulate Transforms to Reference Frame
-    // (OpenCL will be automatically re-enabled when _opencl_guard is dropped)
     log::info!("Accumulating {} pairwise transforms to reference frame", pairwise_transforms.len());
     println!("\nAccumulating transforms to reference frame...");
 
@@ -757,10 +786,6 @@ pub fn align_images(
     let warp_batch_size = config.batch_config.warp_batch_size;
     let total_warp_batches = (accumulated_transforms.len() + warp_batch_size - 1) / warp_batch_size;
 
-    // Temporarily disable OpenCL for ALL parallel warping to avoid thread safety issues
-    // The guard will automatically restore OpenCL when dropped (even on early return/cancellation)
-    let _opencl_guard = OpenClGuard::new();
-
     for (batch_idx, batch) in accumulated_transforms.chunks(warp_batch_size).enumerate() {
         // Check for cancellation
         if let Some(ref flag) = cancel_flag {
@@ -774,9 +799,19 @@ pub fn align_images(
         let progress_pct = 50.0 + (batch_idx as f32 / total_warp_batches as f32) * 40.0;
         report_progress(&format!("Warping: batch {}/{}", batch_idx + 1, total_warp_batches), progress_pct);
 
-        let warp_results: Vec<Result<()>> = (batch_start..batch_start + batch.len())
-            .into_par_iter()
-            .map(|i| {
+        // Disable OpenCL ONLY during parallel iteration to avoid thread safety issues
+        let warp_results: Vec<Result<()>> = {
+            let _opencl_guard = OpenClGuard::new();
+            (batch_start..batch_start + batch.len())
+                .into_par_iter()
+                .map(|i| {
+                // Check for cancellation inside parallel work
+                if let Some(ref flag) = cancel_flag {
+                    if flag.load(Ordering::Relaxed) {
+                        return Err(anyhow::anyhow!("Operation cancelled by user"));
+                    }
+                }
+                
                 let img_idx = i + 1; // +1 because we skip the reference image
                 let img_path = &sharp_image_paths[img_idx].1;
                 let transform = &accumulated_transforms[i];
@@ -886,7 +921,16 @@ pub fn align_images(
 
                 Ok(())
             })
-            .collect();
+            .collect()
+        }; // _opencl_guard is dropped here, OpenCL re-enabled
+
+        // Check if cancellation occurred during parallel work
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                log::info!("✋ Alignment cancelled by user during warping");
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
 
         // Check for errors in batch
         for result in warp_results {
@@ -895,7 +939,6 @@ pub fn align_images(
     }
 
     // 4. Find Common Crop Rectangle
-    // (OpenCL will be automatically re-enabled when _opencl_guard is dropped)
     log::info!("Finding common crop rectangle from mask");
     println!("\nFinding optimal crop rectangle...");
 
