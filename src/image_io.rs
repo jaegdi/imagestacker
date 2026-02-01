@@ -10,7 +10,8 @@ pub fn load_image(path: &PathBuf) -> Result<Mat> {
     println!("Loading image: {}", filename);
     log::info!("Loading image: {}", path.display());
 
-    let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_COLOR)?;
+    // Use IMREAD_UNCHANGED to preserve alpha channel (transparency)
+    let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_UNCHANGED)?;
 
     let elapsed = start.elapsed();
     log::info!(

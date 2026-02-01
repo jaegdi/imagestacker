@@ -5,7 +5,8 @@ use opencv::imgproc;
 use opencv::prelude::{MatTraitConst, UMatTraitConst, MatTraitConstManual};
 
 pub fn generate_thumbnail(path: &PathBuf) -> anyhow::Result<iced::widget::image::Handle> {
-    let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_COLOR)?;
+    // Load with IMREAD_UNCHANGED to preserve alpha channel (transparency)
+    let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_UNCHANGED)?;
 
     if img.empty() {
         return Err(anyhow::anyhow!("Failed to load image for thumbnail"));
@@ -35,14 +36,31 @@ pub fn generate_thumbnail(path: &PathBuf) -> anyhow::Result<iced::widget::image:
         imgproc::INTER_AREA,
     )?;
 
+    // Convert to RGBA, handling both BGR and BGRA inputs
     let mut rgba_umat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-    imgproc::cvt_color(
-        &small_umat,
-        &mut rgba_umat,
-        imgproc::COLOR_BGR2RGBA,
-        0,
-        core::AlgorithmHint::ALGO_HINT_DEFAULT,
-    )?;
+    let rgba_mat = small_umat.get_mat(core::AccessFlag::ACCESS_READ)?;
+    
+    if rgba_mat.channels() == 3 {
+        // BGR to RGBA
+        imgproc::cvt_color(
+            &small_umat,
+            &mut rgba_umat,
+            imgproc::COLOR_BGR2RGBA,
+            0,
+            core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        )?;
+    } else if rgba_mat.channels() == 4 {
+        // BGRA to RGBA
+        imgproc::cvt_color(
+            &small_umat,
+            &mut rgba_umat,
+            imgproc::COLOR_BGRA2RGBA,
+            0,
+            core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        )?;
+    } else {
+        return Err(anyhow::anyhow!("Unsupported image format"));
+    }
 
     // Get raw pixels from GPU
     let rgba_mat = rgba_umat.get_mat(core::AccessFlag::ACCESS_READ)?;

@@ -4,6 +4,7 @@ use opencv::{calib3d, core, features2d, imgproc};
 use rayon::prelude::*;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use crate::config::{FeatureDetector, ProcessingConfig};
 use crate::image_io::load_image;
@@ -121,6 +122,7 @@ pub fn align_images(
     output_dir: &std::path::Path,
     config: &ProcessingConfig,
     progress_cb: Option<ProgressCallback>,
+    cancel_flag: Option<Arc<AtomicBool>>,
 ) -> Result<core::Rect> {
     let report_progress = |msg: &str, pct: f32| {
         if let Some(ref cb) = progress_cb {
@@ -155,6 +157,14 @@ pub fn align_images(
 
     let total_batches = (image_paths.len() + batch_size - 1) / batch_size;
     for (batch_idx, batch) in image_paths.chunks(batch_size).enumerate() {
+        // Check for cancellation
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                log::info!("✋ Alignment cancelled by user during sharpness detection (batch {})", batch_idx);
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
+        
         let batch_start = batch_idx * batch_size;
         println!("  Processing batch {}/{} ({} images)...",
                  batch_idx + 1, total_batches, batch.len());
@@ -219,21 +229,27 @@ pub fn align_images(
     let q1 = sorted_scores[sorted_scores.len() / 4];
     let q3 = sorted_scores[(3 * sorted_scores.len()) / 4];
 
-    // For focus stacking, use a very permissive threshold
+    // For focus stacking, use an adaptive threshold
     // Each image contributes sharp details from its focus plane, even if overall blurry
-    // Only filter out truly defective images (very far below the rest)
+    // But we still need to filter out truly blurry/defocused images
     let absolute_threshold = config.sharpness_threshold as f64;
     let iqr = q3 - q1;
     
-    // Use Q1 - 3.0 * IQR (very permissive, only filters extreme outliers)
-    // This keeps images that might be "blurry" overall but have sharp regions
-    let permissive_threshold = (q1 - 3.0 * iqr).max(absolute_threshold * 0.3);
+    // Use Q1 - IQR_multiplier * IQR for outlier detection
+    // Standard value is 1.5 (standard outlier detection)
+    // Higher values (e.g., 3.0) are more permissive
+    let iqr_multiplier = config.sharpness_iqr_multiplier as f64;
+    let outlier_threshold = q1 - iqr_multiplier * iqr;
+    let dynamic_threshold = outlier_threshold.max(absolute_threshold);
     
-    let dynamic_threshold = permissive_threshold;
-
     let stats_msg = format!(
-        "Sharpness statistics:\n  Mean: {:.2}\n  Median: {:.2}\n  StdDev: {:.2}\n  Q1: {:.2}\n  Q3: {:.2}\n  IQR: {:.2}\n  Threshold: {:.2}",
-        mean_sharpness, median, stddev, q1, q3, iqr, dynamic_threshold
+        "Sharpness statistics:\n  Mean: {:.2}\n  Median: {:.2}\n  StdDev: {:.2}\n  Q1: {:.2}\n  Q3: {:.2}\n  IQR: {:.2}\n  Min: {:.2}\n  Max: {:.2}\n  Outlier threshold: {:.2} (Q1 - {:.1}*IQR = {:.2} - {:.1}*{:.2})\n  Absolute threshold: {:.2}\n  Final threshold: {:.2} ({})",
+        mean_sharpness, median, stddev, q1, q3, iqr,
+        sorted_scores[0], sorted_scores[sorted_scores.len() - 1],
+        outlier_threshold, iqr_multiplier, q1, iqr_multiplier, iqr,
+        absolute_threshold,
+        dynamic_threshold,
+        if dynamic_threshold == absolute_threshold { "using ABSOLUTE" } else { "using OUTLIER" }
     );
     log::info!("{}", stats_msg);
     println!("\n{}", stats_msg);
@@ -354,6 +370,14 @@ pub fn align_images(
 
     // Process sharp images in batches for memory efficiency with parallel processing within batches
     for batch_start in (0..sharp_image_paths.len()).step_by(feature_batch_size) {
+        // Check for cancellation
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                log::info!("Alignment cancelled by user");
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
+        
         let is_first_batch = batch_start == 0;
         
         // First batch loads batch_size+1 images to create overlap
@@ -467,6 +491,14 @@ pub fn align_images(
 
         // Compute pairwise transforms for consecutive pairs in this batch
         for i in 0..valid_batch_features.len() - 1 {
+            // Check for cancellation
+            if let Some(ref flag) = cancel_flag {
+                if flag.load(Ordering::Relaxed) {
+                    log::info!("Alignment cancelled by user during pairwise matching");
+                    return Err(anyhow::anyhow!("Operation cancelled by user"));
+                }
+            }
+            
             let (ref prev_keypoints, ref prev_descriptors, prev_scale) = valid_batch_features[i];
             let (ref curr_keypoints, ref curr_descriptors, curr_scale) =
                 valid_batch_features[i + 1];
@@ -611,6 +643,14 @@ pub fn align_images(
 
     // Process images 1 to N (image 0 is reference)
     for img_idx in 1..sharp_image_paths.len() {
+        // Check for cancellation
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                log::info!("Alignment cancelled by user during transform accumulation");
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
+        
         // Check if we have a pairwise transform for this image
         if let Some(t_step) = transform_map.get(&img_idx) {
             // We have a transform: compose it with the previous accumulated transform
@@ -683,6 +723,14 @@ pub fn align_images(
     let total_warp_batches = (accumulated_transforms.len() + warp_batch_size - 1) / warp_batch_size;
 
     for (batch_idx, batch) in accumulated_transforms.chunks(warp_batch_size).enumerate() {
+        // Check for cancellation
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                log::info!("Alignment cancelled by user during warping");
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
+        
         let batch_start = batch_idx * warp_batch_size;
         let progress_pct = 50.0 + (batch_idx as f32 / total_warp_batches as f32) * 40.0;
         report_progress(&format!("Warping: batch {}/{}", batch_idx + 1, total_warp_batches), progress_pct);
@@ -717,15 +765,25 @@ pub fn align_images(
 
                 // Warp image to reference frame
                 // Use INTER_LANCZOS4 for highest quality interpolation
+                
+                // Convert to BGRA if needed (to support transparent borders)
+                let img_with_alpha = if img.channels() == 3 {
+                    let mut bgra = Mat::default();
+                    imgproc::cvt_color(&img, &mut bgra, imgproc::COLOR_BGR2BGRA, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+                    bgra
+                } else {
+                    img.clone()
+                };
+                
                 let mut warped = Mat::default();
                 imgproc::warp_affine(
-                    &img,
+                    &img_with_alpha,
                     &mut warped,
                     transform,
                     core::Size::new(ref_img.cols(), ref_img.rows()),
                     imgproc::INTER_LANCZOS4, // Best quality interpolation for alignment
                     core::BORDER_CONSTANT,
-                    core::Scalar::all(0.0),
+                    core::Scalar::new(0.0, 0.0, 0.0, 0.0), // Transparent black borders (BGRA)
                 )?;
 
                 // Update common mask (intersection of all valid pixels)
@@ -755,16 +813,36 @@ pub fn align_images(
                     core::Scalar::all(0.0),
                 )?;
 
+                // Set alpha channel from warped mask (make borders transparent)
+                if warped.channels() == 4 {
+                    // Split the BGRA channels
+                    let mut channels = opencv::core::Vector::<Mat>::new();
+                    core::split(&warped, &mut channels)?;
+                    
+                    // Replace the alpha channel (index 3) with the warped mask
+                    // This makes borders fully transparent (alpha=0) and valid areas opaque (alpha=255)
+                    channels.set(3, warped_mask)?;
+                    
+                    // Merge the channels back
+                    core::merge(&channels, &mut warped)?;
+                }
+
                 // Update common mask with intersection
                 // TODO: Fix parallel mask intersection
                 // core::bitwise_and(&common_mask, &warped_mask, &mut common_mask, &core::Mat::default())?;
 
-                // Save aligned image
+                // Save aligned image with alpha channel
                 let output_path = aligned_dir.join(format!("{:04}.png", sharp_image_paths[img_idx].0));
+                
+                // Ensure PNG saves with alpha channel
+                let mut params = opencv::core::Vector::new();
+                params.push(opencv::imgcodecs::IMWRITE_PNG_COMPRESSION);
+                params.push(3); // Compression level
+                
                 opencv::imgcodecs::imwrite(
                     output_path.to_str().unwrap(),
                     &warped,
-                    &opencv::core::Vector::new(),
+                    &params,
                 )?;
 
                 Ok(())
@@ -791,6 +869,16 @@ pub fn align_images(
 
     // Find bounding box of common valid area
     for row in 0..common_mask.rows() {
+        // Check for cancellation every 100 rows
+        if row % 100 == 0 {
+            if let Some(ref flag) = cancel_flag {
+                if flag.load(Ordering::Relaxed) {
+                    log::info!("Alignment cancelled by user during crop calculation");
+                    return Err(anyhow::anyhow!("Operation cancelled by user"));
+                }
+            }
+        }
+        
         for col in 0..common_mask.cols() {
             let pixel = common_mask.at_2d::<u8>(row, col)?;
             if *pixel > 0 {

@@ -25,9 +25,26 @@ pub fn apply_advanced_processing(mut image: Mat, config: &ProcessingConfig) -> R
 pub fn apply_noise_reduction(mut image: Mat, strength: f32) -> Result<Mat> {
     log::info!("Applying noise reduction (strength: {:.2})", strength);
 
+    // Bilateral filter works best with 3-channel images
+    // If we have 4 channels (BGRA), convert to BGR, process, then convert back
+    let has_alpha = image.channels() == 4;
+    let working_img = if has_alpha {
+        let mut bgr = Mat::default();
+        imgproc::cvt_color(
+            &image,
+            &mut bgr,
+            imgproc::COLOR_BGRA2BGR,
+            0,
+            core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        )?;
+        bgr
+    } else {
+        image.clone()
+    };
+
     // Convert to float for processing
     let mut float_img = Mat::default();
-    image.convert_to(&mut float_img, core::CV_32F, 1.0, 0.0)?;
+    working_img.convert_to(&mut float_img, core::CV_32F, 1.0, 0.0)?;
 
     // Bilateral filter for noise reduction while preserving edges
     let mut denoised = Mat::default();
@@ -41,9 +58,23 @@ pub fn apply_noise_reduction(mut image: Mat, strength: f32) -> Result<Mat> {
     )?;
 
     // Convert back to original type
-    denoised.convert_to(&mut image, core::CV_8U, 1.0, 0.0)?;
+    let mut result = Mat::default();
+    denoised.convert_to(&mut result, core::CV_8U, 1.0, 0.0)?;
 
-    Ok(image)
+    // Convert back to BGRA if needed
+    if has_alpha {
+        let mut bgra = Mat::default();
+        imgproc::cvt_color(
+            &result,
+            &mut bgra,
+            imgproc::COLOR_BGR2BGRA,
+            0,
+            core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        )?;
+        Ok(bgra)
+    } else {
+        Ok(result)
+    }
 }
 
 /// Apply sharpening using unsharp mask
@@ -92,10 +123,26 @@ pub fn apply_color_correction(mut image: Mat, contrast: f32, brightness: f32, sa
     log::info!("Applying color correction (contrast: {:.2}, brightness: {:.2}, saturation: {:.2})",
                contrast, brightness, saturation);
 
+    // Handle alpha channel if present
+    let has_alpha = image.channels() == 4;
+    let working_img = if has_alpha {
+        let mut bgr = Mat::default();
+        imgproc::cvt_color(
+            &image,
+            &mut bgr,
+            imgproc::COLOR_BGRA2BGR,
+            0,
+            core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        )?;
+        bgr
+    } else {
+        image.clone()
+    };
+
     // Convert to HSV for saturation adjustment
     let mut hsv = Mat::default();
     imgproc::cvt_color(
-        &image,
+        &working_img,
         &mut hsv,
         imgproc::COLOR_BGR2HSV,
         0,
@@ -123,9 +170,10 @@ pub fn apply_color_correction(mut image: Mat, contrast: f32, brightness: f32, sa
     core::merge(&channels, &mut hsv)?;
 
     // Convert back to BGR
+    let mut result = Mat::default();
     imgproc::cvt_color(
         &hsv,
-        &mut image,
+        &mut result,
         imgproc::COLOR_HSV2BGR,
         0,
         core::AlgorithmHint::ALGO_HINT_DEFAULT,
@@ -134,7 +182,7 @@ pub fn apply_color_correction(mut image: Mat, contrast: f32, brightness: f32, sa
     // Apply contrast and brightness to the entire image
     if contrast != 1.0 || brightness != 0.0 {
         let mut float_img = Mat::default();
-        image.convert_to(&mut float_img, core::CV_32F, 1.0, 0.0)?;
+        result.convert_to(&mut float_img, core::CV_32F, 1.0, 0.0)?;
 
         let mut adjusted = Mat::default();
         core::multiply(&float_img, &core::Scalar::all(contrast as f64), &mut adjusted, 1.0, -1)?;
@@ -142,8 +190,21 @@ pub fn apply_color_correction(mut image: Mat, contrast: f32, brightness: f32, sa
         let mut brightness_adjusted = Mat::default();
         core::add(&adjusted, &core::Scalar::all(brightness as f64), &mut brightness_adjusted, &core::Mat::default(), -1)?;
 
-        brightness_adjusted.convert_to(&mut image, core::CV_8U, 1.0, 0.0)?;
+        brightness_adjusted.convert_to(&mut result, core::CV_8U, 1.0, 0.0)?;
     }
 
-    Ok(image)
+    // Convert back to BGRA if needed
+    if has_alpha {
+        let mut bgra = Mat::default();
+        imgproc::cvt_color(
+            &result,
+            &mut bgra,
+            imgproc::COLOR_BGR2BGRA,
+            0,
+            core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        )?;
+        Ok(bgra)
+    } else {
+        Ok(result)
+    }
 }

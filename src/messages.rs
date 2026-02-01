@@ -48,6 +48,7 @@ pub enum Message {
     ResetToDefaults,
     SharpnessThresholdChanged(f32),
     SharpnessGridSizeChanged(f32),
+    SharpnessIqrMultiplierChanged(f32),
     UseAdaptiveBatchSizes(bool),
     UseCLAHE(bool),
     FeatureDetectorChanged(crate::config::FeatureDetector),

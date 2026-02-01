@@ -1,0 +1,5 @@
+error: unexpected argument '--stack-aligned' found
+
+Usage: imagestacker [OPTIONS]
+
+For more information, try '--help'.

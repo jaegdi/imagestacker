@@ -22,6 +22,7 @@ impl std::fmt::Display for FeatureDetector {
 pub struct ProcessingConfig {
     pub sharpness_threshold: f32,
     pub sharpness_grid_size: i32,  // Grid size for regional sharpness detection (4-16)
+    pub sharpness_iqr_multiplier: f32,  // IQR multiplier for outlier detection (1.5 = standard, 3.0 = very permissive)
     pub use_adaptive_batches: bool,
     pub use_clahe: bool,
     pub feature_detector: FeatureDetector,
@@ -49,6 +50,7 @@ impl Default for ProcessingConfig {
         Self {
             sharpness_threshold: 30.0,
             sharpness_grid_size: 4,  // Default 4x4 grid
+            sharpness_iqr_multiplier: 1.5,  // Standard outlier detection
             use_adaptive_batches: true,
             use_clahe: true,
             feature_detector: FeatureDetector::ORB,

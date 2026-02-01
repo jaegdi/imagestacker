@@ -7,6 +7,7 @@ use opencv::prelude::*;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::{Arc, RwLock, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 use std::fs;
 
@@ -86,6 +87,8 @@ pub struct ImageStacker {
     selected_aligned: Vec<PathBuf>,
     bunch_selection_mode: bool,
     selected_bunches: Vec<PathBuf>,
+    // Cancellation flag for background tasks
+    cancel_flag: Arc<AtomicBool>,
 }
 
 impl Default for ImageStacker {
@@ -121,6 +124,7 @@ impl Default for ImageStacker {
             selected_aligned: Vec::new(),
             bunch_selection_mode: false,
             selected_bunches: Vec::new(),
+            cancel_flag: Arc::new(AtomicBool::new(false)),
         }
     }
 }
@@ -524,8 +528,13 @@ impl ImageStacker {
                         self.status = "Aligning images...".to_string();
                         self.progress_message = "Starting alignment...".to_string();
                         self.progress_value = 0.0;
+                        
+                        // Reset cancel flag for new operation
+                        self.cancel_flag.store(false, Ordering::Relaxed);
+                        
                         let images_paths = self.images.clone();
                         let proc_config = self.create_processing_config();
+                        let cancel_flag = self.cancel_flag.clone();
                         self.is_processing = true;  // Mark as processing
 
                         Task::run(
@@ -546,6 +555,7 @@ impl ImageStacker {
                                         &output_dir,
                                         &proc_config,
                                         Some(progress_cb),
+                                        Some(cancel_flag),
                                     );
                                     
                                     // Send final result
@@ -573,7 +583,14 @@ impl ImageStacker {
                         self.status = "Aligned".to_string();
                         self.crop_rect = Some(rect);
                     }
-                    Err(e) => self.status = format!("Alignment failed: {}", e),
+                    Err(e) => {
+                        // Check if this was a user cancellation
+                        if e.contains("cancelled by user") {
+                            self.status = "Alignment cancelled by user".to_string();
+                        } else {
+                            self.status = format!("Alignment failed: {}", e);
+                        }
+                    }
                 }
                 Task::done(Message::RefreshPanes)
             }
@@ -648,8 +665,12 @@ impl ImageStacker {
                 self.progress_message = "Starting stacking of selected aligned images...".to_string();
                 self.progress_value = 0.0;
                 
+                // Reset cancel flag for new operation
+                self.cancel_flag.store(false, Ordering::Relaxed);
+                
                 let crop_rect = self.crop_rect;
                 let proc_config = self.create_processing_config();
+                let cancel_flag = self.cancel_flag.clone();
                 self.is_processing = true;
                 
                 Task::run(
@@ -670,6 +691,7 @@ impl ImageStacker {
                                 crop_rect,
                                 &proc_config,
                                 Some(progress_cb),
+                                Some(cancel_flag),
                             );
                             
                             match result {
@@ -757,8 +779,12 @@ impl ImageStacker {
                 self.progress_message = "Starting stacking of selected bunches...".to_string();
                 self.progress_value = 0.0;
                 
+                // Reset cancel flag for new operation
+                self.cancel_flag.store(false, Ordering::Relaxed);
+                
                 let crop_rect = self.crop_rect;
                 let proc_config = self.create_processing_config();
+                let cancel_flag = self.cancel_flag.clone();
                 self.is_processing = true;
                 
                 Task::run(
@@ -779,6 +805,7 @@ impl ImageStacker {
                                 crop_rect,
                                 &proc_config,
                                 Some(progress_cb),
+                                Some(cancel_flag),
                             );
                             
                             match result {
@@ -816,7 +843,14 @@ impl ImageStacker {
                         self.preview_handle = Some(iced::widget::image::Handle::from_bytes(bytes));
                         self.result_mat = Some(mat);
                     }
-                    Err(e) => self.status = format!("Stacking failed: {}", e),
+                    Err(e) => {
+                        // Check if this was a user cancellation
+                        if e.contains("cancelled by user") {
+                            self.status = "Stacking cancelled by user".to_string();
+                        } else {
+                            self.status = format!("Stacking failed: {}", e);
+                        }
+                    }
                 }
                 Task::done(Message::RefreshPanes)
             }
@@ -904,6 +938,18 @@ impl ImageStacker {
                 )
             },
             Message::CloseImagePreview => {
+                // If we're processing, ESC should cancel the operation instead
+                if self.is_processing {
+                    self.is_processing = false;
+                    // Signal background task to cancel
+                    self.cancel_flag.store(true, Ordering::Relaxed);
+                    // Keep progress bar visible showing cancellation in progress
+                    self.progress_message = "Cancelling... (stopping background task)".to_string();
+                    self.status = "Processing cancelled - stopping background task".to_string();
+                    log::warn!("User pressed ESC - cancel flag set to TRUE, waiting for background task to stop");
+                    return Task::none();
+                }
+                
                 self.preview_image_path = None;
                 self.preview_handle = None;
                 self.preview_loading = false;
@@ -1390,6 +1436,11 @@ impl ImageStacker {
                 let _ = save_settings(&self.config);
                 Task::none()
             }
+            Message::SharpnessIqrMultiplierChanged(value) => {
+                self.config.sharpness_iqr_multiplier = value;
+                let _ = save_settings(&self.config);
+                Task::none()
+            }
             Message::UseAdaptiveBatchSizes(enabled) => {
                 self.config.use_adaptive_batches = enabled;
                 if enabled {
@@ -1535,6 +1586,8 @@ impl ImageStacker {
                                 Some(Message::PreviousImageInPreview)
                             }
                             iced::keyboard::Key::Named(iced::keyboard::key::Named::Escape) => {
+                                // ESC can either close preview or cancel processing
+                                // The handler will decide based on is_processing state
                                 Some(Message::CloseImagePreview)
                             }
                             _ => None,
@@ -1729,7 +1782,12 @@ impl ImageStacker {
                         &self.progress_message
                     }).size(14),
                     iced::widget::progress_bar(0.0..=100.0, self.progress_value)
-                        .width(Length::Fill)
+                        .width(Length::Fill),
+                    text("Press ESC to cancel")
+                        .size(12)
+                        .style(|_| text::Style {
+                            color: Some(iced::Color::from_rgb(1.0, 0.8, 0.0))
+                        })
                 ]
                 .spacing(5)
             )
@@ -1943,9 +2001,10 @@ impl ImageStacker {
         
         let sharpness_slider = row![
             text("Blur Threshold:").width(label_width),
-            slider(10.0..=100.0, self.config.sharpness_threshold, Message::SharpnessThresholdChanged)
+            slider(10.0..=10000.0, self.config.sharpness_threshold, Message::SharpnessThresholdChanged)
+                .step(10.0)
                 .width(slider_width),
-            text(format!("{:.1}", self.config.sharpness_threshold)).width(value_width),
+            text(format!("{:.0}", self.config.sharpness_threshold)).width(value_width),
         ]
         .spacing(10)
         .align_y(iced::Alignment::Center);
@@ -1956,6 +2015,22 @@ impl ImageStacker {
                 .step(1.0)
                 .width(slider_width),
             text(format!("{}x{}", self.config.sharpness_grid_size, self.config.sharpness_grid_size)).width(value_width),
+        ]
+        .spacing(10)
+        .align_y(iced::Alignment::Center);
+
+        let iqr_multiplier_slider = row![
+            text("Blur Filter (IQR):").width(label_width),
+            slider(0.5..=5.0, self.config.sharpness_iqr_multiplier, Message::SharpnessIqrMultiplierChanged)
+                .step(0.1)
+                .width(slider_width),
+            text(format!("{:.1} {}", 
+                self.config.sharpness_iqr_multiplier,
+                if self.config.sharpness_iqr_multiplier <= 1.0 { "(strict)" }
+                else if self.config.sharpness_iqr_multiplier <= 2.0 { "(normal)" }
+                else if self.config.sharpness_iqr_multiplier <= 3.0 { "(relaxed)" }
+                else { "(very permissive)" }
+            )).width(value_width),
         ]
         .spacing(10)
         .align_y(iced::Alignment::Center);
@@ -2094,6 +2169,7 @@ impl ImageStacker {
                 }),
                 sharpness_slider,
                 grid_size_slider,
+                iqr_multiplier_slider,
                 adaptive_batch_checkbox,
                 batch_info,
                 clahe_checkbox,

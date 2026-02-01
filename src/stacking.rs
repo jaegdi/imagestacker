@@ -4,6 +4,7 @@ use opencv::{core, imgproc};
 use rayon::prelude::*;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use crate::config::ProcessingConfig;
 use crate::image_io::load_image;
@@ -18,6 +19,7 @@ pub fn stack_images(
     crop_rect: Option<core::Rect>,
     config: &ProcessingConfig,
     progress_cb: Option<ProgressCallback>,
+    cancel_flag: Option<Arc<AtomicBool>>,
 ) -> Result<Mat> {
     let report_progress = |msg: &str, pct: f32| {
         if let Some(ref cb) = progress_cb {
@@ -33,7 +35,7 @@ pub fn stack_images(
     let mut reversed_paths: Vec<PathBuf> = image_paths.iter().cloned().collect();
     reversed_paths.reverse();
 
-    let result = stack_recursive(&reversed_paths, output_dir, 0, config, progress_cb.clone())?;
+    let result = stack_recursive(&reversed_paths, output_dir, 0, config, progress_cb.clone(), cancel_flag.clone())?;
 
     report_progress("Saving final result...", 95.0);
 
@@ -77,7 +79,16 @@ fn stack_recursive(
     level: usize,
     config: &ProcessingConfig,
     progress_cb: Option<ProgressCallback>,
+    cancel_flag: Option<Arc<AtomicBool>>,
 ) -> Result<Mat> {
+    // Check for cancellation at the start of each recursive call
+    if let Some(ref flag) = cancel_flag {
+        if flag.load(Ordering::Relaxed) {
+            log::info!("Stacking cancelled by user");
+            return Err(anyhow::anyhow!("Operation cancelled by user"));
+        }
+    }
+    
     if image_paths.is_empty() {
         return Err(anyhow::anyhow!("No images to stack"));
     }
@@ -132,6 +143,14 @@ fn stack_recursive(
     let total_batches = ((image_paths.len() as f32 - OVERLAP as f32) / step as f32).ceil() as usize;
 
     while i < image_paths.len() {
+        // Check for cancellation
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                log::info!("Stacking cancelled by user during batch processing");
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
+        
         let end = (i + batch_size).min(image_paths.len());
         let batch_paths = &image_paths[i..end];
 
@@ -202,7 +221,7 @@ fn stack_recursive(
     }
 
     // Recursively stack the intermediate results
-    stack_recursive(&intermediate_files, output_dir, level + 1, config, progress_cb)
+    stack_recursive(&intermediate_files, output_dir, level + 1, config, progress_cb, cancel_flag)
 }
 
 fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
@@ -219,8 +238,26 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
 
     for (idx, img) in images.iter().enumerate() {
         log::info!("Processing image {}/{} for stacking", idx + 1, images.len());
+        
+        // Ensure all images have 4 channels (BGRA) for consistent processing
+        let img_normalized = if img.channels() == 3 {
+            log::info!("Converting 3-channel BGR image to 4-channel BGRA");
+            let mut bgra = Mat::default();
+            imgproc::cvt_color(
+                img,
+                &mut bgra,
+                imgproc::COLOR_BGR2BGRA,
+                0,
+                core::AlgorithmHint::ALGO_HINT_DEFAULT,
+            )?;
+            log::info!("Converted to {} channels", bgra.channels());
+            bgra
+        } else {
+            img.clone()
+        };
+        
         let mut float_img = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-        img.get_umat(
+        img_normalized.get_umat(
             core::AccessFlag::ACCESS_READ,
             core::UMatUsageFlags::USAGE_DEFAULT,
         )?
@@ -238,7 +275,17 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
 
                 // Compute initial energy using Laplacian for better focus detection
                 let mut gray = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-                if layer.channels() == 3 {
+                if layer.channels() == 4 {
+                    // BGRA to Gray
+                    imgproc::cvt_color(
+                        layer,
+                        &mut gray,
+                        imgproc::COLOR_BGRA2GRAY,
+                        0,
+                        core::AlgorithmHint::ALGO_HINT_DEFAULT,
+                    )?;
+                } else if layer.channels() == 3 {
+                    // BGR to Gray
                     imgproc::cvt_color(
                         layer,
                         &mut gray,
@@ -285,7 +332,15 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             
             // Compute energy for base level
             let mut gray = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-            if base_layer.channels() == 3 {
+            if base_layer.channels() == 4 {
+                imgproc::cvt_color(
+                    base_layer,
+                    &mut gray,
+                    imgproc::COLOR_BGRA2GRAY,
+                    0,
+                    core::AlgorithmHint::ALGO_HINT_DEFAULT,
+                )?;
+            } else if base_layer.channels() == 3 {
                 imgproc::cvt_color(
                     base_layer,
                     &mut gray,
@@ -334,7 +389,15 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
 
                 // Compute energy using Laplacian
                 let mut gray = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-                if layer.channels() == 3 {
+                if layer.channels() == 4 {
+                    imgproc::cvt_color(
+                        layer,
+                        &mut gray,
+                        imgproc::COLOR_BGRA2GRAY,
+                        0,
+                        core::AlgorithmHint::ALGO_HINT_DEFAULT,
+                    )?;
+                } else if layer.channels() == 3 {
                     imgproc::cvt_color(
                         layer,
                         &mut gray,
@@ -386,7 +449,15 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             
             // Compute energy for base level
             let mut gray = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-            if base_layer.channels() == 3 {
+            if base_layer.channels() == 4 {
+                imgproc::cvt_color(
+                    base_layer,
+                    &mut gray,
+                    imgproc::COLOR_BGRA2GRAY,
+                    0,
+                    core::AlgorithmHint::ALGO_HINT_DEFAULT,
+                )?;
+            } else if base_layer.channels() == 3 {
                 imgproc::cvt_color(
                     base_layer,
                     &mut gray,
@@ -427,7 +498,11 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             let mut base_mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
             core::compare(&blurred_base_energy, &max_energies[base_idx], &mut base_mask, core::CMP_GT)?;
 
-            base_layer.copy_to_masked(&mut fused_pyramid[base_idx], &base_mask)?;
+            // Convert base layer to float before copying
+            let mut float_base_layer = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            base_layer.convert_to(&mut float_base_layer, core::CV_32F, 1.0, 0.0)?;
+            
+            float_base_layer.copy_to_masked(&mut fused_pyramid[base_idx], &base_mask)?;
             blurred_base_energy.copy_to_masked(&mut max_energies[base_idx], &base_mask)?;
         }
     }
