@@ -13,6 +13,31 @@ use crate::sharpness;
 /// Progress callback: (message, percentage)
 pub type ProgressCallback = Arc<Mutex<dyn FnMut(String, f32) + Send>>;
 
+/// Guard to ensure OpenCL state is restored when dropped (even on early return/error)
+struct OpenClGuard {
+    restore_enabled: bool,
+}
+
+impl OpenClGuard {
+    fn new() -> Self {
+        let was_enabled = opencv::core::use_opencl().unwrap_or(false);
+        if was_enabled {
+            let _ = opencv::core::set_use_opencl(false);
+        }
+        Self {
+            restore_enabled: was_enabled,
+        }
+    }
+}
+
+impl Drop for OpenClGuard {
+    fn drop(&mut self) {
+        if self.restore_enabled {
+            let _ = opencv::core::set_use_opencl(true);
+        }
+    }
+}
+
 /// Extract features from an image using the specified detector
 pub fn extract_features(
     img: &Mat,
@@ -155,6 +180,10 @@ pub fn align_images(
     let batch_size = config.batch_config.sharpness_batch_size;
     let mut sharpness_scores: Vec<(usize, PathBuf, f64)> = Vec::new();
 
+    // Temporarily disable OpenCL for ALL parallel processing to avoid thread safety issues
+    // The guard will automatically restore OpenCL when dropped (even on early return/cancellation)
+    let _opencl_guard = OpenClGuard::new();
+
     let total_batches = (image_paths.len() + batch_size - 1) / batch_size;
     for (batch_idx, batch) in image_paths.chunks(batch_size).enumerate() {
         // Check for cancellation
@@ -214,6 +243,7 @@ pub fn align_images(
     }
 
     // Calculate statistics for adaptive thresholding
+    // (OpenCL will be automatically re-enabled when _opencl_guard is dropped)
     let scores: Vec<f64> = sharpness_scores.iter().map(|(_, _, s)| *s).collect();
     let mean_sharpness: f64 = scores.iter().sum::<f64>() / scores.len() as f64;
 
@@ -367,6 +397,10 @@ pub fn align_images(
 
     let total_feature_batches = (sharp_image_paths.len() + feature_batch_size) / feature_batch_size;
     let mut feature_batch_count = 0;
+
+    // Temporarily disable OpenCL for ALL parallel feature extraction to avoid thread safety issues
+    // The guard will automatically restore OpenCL when dropped (even on early return/cancellation)
+    let _opencl_guard = OpenClGuard::new();
 
     // Process sharp images in batches for memory efficiency with parallel processing within batches
     for batch_start in (0..sharp_image_paths.len()).step_by(feature_batch_size) {
@@ -627,6 +661,7 @@ pub fn align_images(
     }
 
     // 2. Accumulate Transforms to Reference Frame
+    // (OpenCL will be automatically re-enabled when _opencl_guard is dropped)
     log::info!("Accumulating {} pairwise transforms to reference frame", pairwise_transforms.len());
     println!("\nAccumulating transforms to reference frame...");
 
@@ -721,6 +756,10 @@ pub fn align_images(
 
     let warp_batch_size = config.batch_config.warp_batch_size;
     let total_warp_batches = (accumulated_transforms.len() + warp_batch_size - 1) / warp_batch_size;
+
+    // Temporarily disable OpenCL for ALL parallel warping to avoid thread safety issues
+    // The guard will automatically restore OpenCL when dropped (even on early return/cancellation)
+    let _opencl_guard = OpenClGuard::new();
 
     for (batch_idx, batch) in accumulated_transforms.chunks(warp_batch_size).enumerate() {
         // Check for cancellation
@@ -856,6 +895,7 @@ pub fn align_images(
     }
 
     // 4. Find Common Crop Rectangle
+    // (OpenCL will be automatically re-enabled when _opencl_guard is dropped)
     log::info!("Finding common crop rectangle from mask");
     println!("\nFinding optimal crop rectangle...");
 

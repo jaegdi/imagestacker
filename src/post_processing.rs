@@ -22,7 +22,7 @@ pub fn apply_advanced_processing(mut image: Mat, config: &ProcessingConfig) -> R
 }
 
 /// Apply noise reduction using bilateral filter
-pub fn apply_noise_reduction(mut image: Mat, strength: f32) -> Result<Mat> {
+pub fn apply_noise_reduction(image: Mat, strength: f32) -> Result<Mat> {
     log::info!("Applying noise reduction (strength: {:.2})", strength);
 
     // Bilateral filter works best with 3-channel images
@@ -119,7 +119,7 @@ pub fn apply_sharpening(mut image: Mat, strength: f32) -> Result<Mat> {
 }
 
 /// Apply color correction (contrast, brightness, saturation)
-pub fn apply_color_correction(mut image: Mat, contrast: f32, brightness: f32, saturation: f32) -> Result<Mat> {
+pub fn apply_color_correction(image: Mat, contrast: f32, brightness: f32, saturation: f32) -> Result<Mat> {
     log::info!("Applying color correction (contrast: {:.2}, brightness: {:.2}, saturation: {:.2})",
                contrast, brightness, saturation);
 

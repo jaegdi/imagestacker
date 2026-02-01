@@ -233,6 +233,15 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
     }
 
     let levels = 7; // Increased from 6 for finer detail preservation
+    
+    // Check if OpenCL is available and use UMat for GPU acceleration
+    let use_gpu = opencv::core::use_opencl().unwrap_or(false);
+    if use_gpu {
+        log::info!("Using GPU acceleration for stacking");
+    } else {
+        log::info!("Using CPU for stacking");
+    }
+    
     let mut fused_pyramid: Vec<core::UMat> = Vec::new();
     let mut max_energies: Vec<core::UMat> = Vec::new();
 
@@ -256,12 +265,12 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             img.clone()
         };
         
+        // Upload to GPU (UMat) for processing
         let mut float_img = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
         img_normalized.get_umat(
             core::AccessFlag::ACCESS_READ,
             core::UMatUsageFlags::USAGE_DEFAULT,
-        )?
-        .convert_to(&mut float_img, core::CV_32F, 1.0, 0.0)?;
+        )?.convert_to(&mut float_img, core::CV_32F, 1.0, 0.0)?;
 
         let current_pyramid = generate_laplacian_pyramid(&float_img, levels)?;
 
@@ -513,13 +522,13 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
     // 3. Collapse Pyramid
     let result_umat = collapse_pyramid(&fused_pyramid)?;
 
+    // Convert back to Mat and download from GPU
     let mut final_img_umat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
     result_umat.convert_to(&mut final_img_umat, core::CV_8U, 1.0, 0.0)?;
 
     let mut final_img = Mat::default();
-    final_img_umat
-        .get_mat(core::AccessFlag::ACCESS_READ)?
-        .copy_to(&mut final_img)?;
+    final_img_umat.get_mat(core::AccessFlag::ACCESS_READ)?.copy_to(&mut final_img)?;
+    
     log::info!("Stacking batch complete");
     Ok(final_img)
 }
@@ -574,11 +583,11 @@ fn collapse_pyramid(pyramid: &[core::UMat]) -> Result<core::UMat> {
     let mut current = pyramid.last().unwrap().clone();
 
     for i in (0..pyramid.len() - 1).rev() {
-        let mut up: core::UMat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+        let mut up = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
         imgproc::pyr_up(&current, &mut up, pyramid[i].size()?, core::BORDER_DEFAULT)?;
 
         if up.size()? != pyramid[i].size()? {
-            let mut resized: core::UMat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            let mut resized = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
             imgproc::resize(
                 &up,
                 &mut resized,
@@ -590,7 +599,7 @@ fn collapse_pyramid(pyramid: &[core::UMat]) -> Result<core::UMat> {
             up = resized;
         }
 
-        let mut next: core::UMat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+        let mut next = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
         core::add(
             &up,
             &pyramid[i],

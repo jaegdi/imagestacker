@@ -32,7 +32,23 @@ pub fn main() -> iced::Result {
         std::env::set_var("RUST_LOG", "imagestacker=info,wgpu_hal=off,wgpu_core=off");
     }
     // std::env::set_var("WGPU_BACKEND", "gl");
+    
     logger::DualLogger::init();
+    
+    // Try to enable OpenCL for GPU acceleration in OpenCV
+    // If it fails or causes issues, OpenCV will fall back to CPU
+    match opencv::core::set_use_opencl(true) {
+        Ok(_) => {
+            match opencv::core::use_opencl() {
+                Ok(true) => log::info!("OpenCV GPU acceleration (OpenCL) enabled"),
+                Ok(false) => log::info!("OpenCV using CPU (OpenCL not available)"),
+                Err(e) => log::warn!("Could not check OpenCL status: {}", e),
+            }
+        }
+        Err(e) => {
+            log::warn!("Could not enable OpenCL: {}, using CPU", e);
+        }
+    }
     
     // Parse command line arguments
     let args = Args::parse();
