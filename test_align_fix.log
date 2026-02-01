@@ -1,0 +1,697 @@
+
+=== BLUR DETECTION STARTING (Regional Analysis) ===
+Analyzing 81 images for sharpness in 4x4 grid regions (parallel batches)...
+Strategy: Accept image if ANY region is sharp (good for focus stacking)
+  Processing batch 1/11 (8 images)...
+Loading image: A7R03933.jpg
+Loading image: A7R03935.jpg
+Loading image: A7R03939.jpg
+Loading image: A7R03937.jpg
+Loading image: A7R03936.jpg
+Loading image: A7R03934.jpg
+Loading image: A7R03940.jpg
+Loading image: A7R03938.jpg
+  ✓ Loaded in 23.424433ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.625147ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.665153ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.97623ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.863731ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.993549ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.931573ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 40.154435ms - Size: 2624x1750, Channels: 3
+    [2] A7R03935.jpg: max_region=8785.10, global=1232.63, sharp_areas=5
+    [4] A7R03937.jpg: max_region=8879.00, global=1234.70, sharp_areas=6
+    [5] A7R03938.jpg: max_region=8789.12, global=1207.39, sharp_areas=5
+    [3] A7R03936.jpg: max_region=8801.73, global=1232.47, sharp_areas=6
+    [0] A7R03933.jpg: max_region=8867.28, global=1229.55, sharp_areas=5
+    [7] A7R03940.jpg: max_region=8670.65, global=1197.86, sharp_areas=5
+    [1] A7R03934.jpg: max_region=8714.69, global=1221.29, sharp_areas=5
+    [6] A7R03939.jpg: max_region=8773.46, global=1196.08, sharp_areas=5
+  Processing batch 2/11 (8 images)...
+Loading image: A7R03941.jpg
+Loading image: A7R03942.jpg
+Loading image: A7R03947.jpg
+Loading image: A7R03948.jpg
+Loading image: A7R03945.jpg
+Loading image: A7R03946.jpg
+Loading image: A7R03943.jpg
+Loading image: A7R03944.jpg
+  ✓ Loaded in 22.762013ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.788824ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.924735ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.217295ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.223627ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.475881ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.961271ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.097986ms - Size: 2624x1750, Channels: 3
+    [14] A7R03947.jpg: max_region=8955.70, global=1236.63, sharp_areas=6
+    [12] A7R03945.jpg: max_region=8982.88, global=1230.72, sharp_areas=5
+    [9] A7R03942.jpg: max_region=8777.32, global=1220.93, sharp_areas=6
+    [8] A7R03941.jpg: max_region=8739.95, global=1232.38, sharp_areas=6
+    [11] A7R03944.jpg: max_region=8747.55, global=1201.41, sharp_areas=5
+    [15] A7R03948.jpg: max_region=8801.73, global=1228.13, sharp_areas=5
+    [10] A7R03943.jpg: max_region=8759.47, global=1219.37, sharp_areas=6
+    [13] A7R03946.jpg: max_region=9016.89, global=1271.32, sharp_areas=6
+  Processing batch 3/11 (8 images)...
+Loading image: A7R03949.jpg
+Loading image: A7R03953.jpg
+Loading image: A7R03952.jpg
+Loading image: A7R03950.jpg
+Loading image: A7R03951.jpg
+Loading image: A7R03954.jpg
+Loading image: A7R03955.jpg
+Loading image: A7R03956.jpg
+  ✓ Loaded in 23.83001ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.253772ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.347612ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.409461ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 26.816764ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 27.460838ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.69146ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.866816ms - Size: 2624x1750, Channels: 3
+    [21] A7R03954.jpg: max_region=8906.80, global=1237.68, sharp_areas=5
+    [16] A7R03949.jpg: max_region=8755.81, global=1195.49, sharp_areas=5
+    [20] A7R03953.jpg: max_region=8857.92, global=1213.02, sharp_areas=5
+    [19] A7R03952.jpg: max_region=8856.25, global=1241.29, sharp_areas=5
+    [17] A7R03950.jpg: max_region=8795.89, global=1186.85, sharp_areas=5
+    [18] A7R03951.jpg: max_region=8889.27, global=1207.37, sharp_areas=5
+    [23] A7R03956.jpg: max_region=8890.54, global=1198.31, sharp_areas=5
+    [22] A7R03955.jpg: max_region=8848.42, global=1216.64, sharp_areas=5
+  Processing batch 4/11 (8 images)...
+Loading image: A7R03957.jpg
+Loading image: A7R03963.jpg
+Loading image: A7R03961.jpg
+Loading image: A7R03964.jpg
+Loading image: A7R03959.jpg
+Loading image: A7R03960.jpg
+Loading image: A7R03962.jpg
+Loading image: A7R03958.jpg
+  ✓ Loaded in 22.638697ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.845613ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.005831ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.173542ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.159645ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.249928ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.85101ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 25.843178ms - Size: 2624x1750, Channels: 3
+    [27] A7R03960.jpg: max_region=8706.81, global=1155.70, sharp_areas=5
+    [30] A7R03963.jpg: max_region=8751.58, global=1172.39, sharp_areas=5
+    [31] A7R03964.jpg: max_region=8820.30, global=1173.33, sharp_areas=5
+    [25] A7R03958.jpg: max_region=8685.40, global=1158.39, sharp_areas=5
+    [28] A7R03961.jpg: max_region=8823.15, global=1155.66, sharp_areas=5
+    [29] A7R03962.jpg: max_region=8736.66, global=1159.23, sharp_areas=5
+    [24] A7R03957.jpg: max_region=8740.90, global=1170.50, sharp_areas=5
+    [26] A7R03959.jpg: max_region=8666.14, global=1118.03, sharp_areas=5
+  Processing batch 5/11 (8 images)...
+Loading image: A7R03966.jpg
+Loading image: A7R03965.jpg
+Loading image: A7R03968.jpg
+Loading image: A7R03967.jpg
+Loading image: A7R03969.jpg
+Loading image: A7R03971.jpg
+Loading image: A7R03970.jpg
+Loading image: A7R03972.jpg
+  ✓ Loaded in 22.846175ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.867736ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.889708ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.975652ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.139196ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.185684ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.406488ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.425124ms - Size: 2624x1750, Channels: 3
+    [38] A7R03971.jpg: max_region=8971.12, global=1178.48, sharp_areas=5
+    [34] A7R03967.jpg: max_region=8883.87, global=1174.41, sharp_areas=4
+    [32] A7R03965.jpg: max_region=8951.47, global=1174.66, sharp_areas=5
+    [36] A7R03969.jpg: max_region=8895.26, global=1147.99, sharp_areas=4
+    [37] A7R03970.jpg: max_region=9032.12, global=1177.35, sharp_areas=5
+    [39] A7R03972.jpg: max_region=8944.63, global=1239.21, sharp_areas=5
+    [35] A7R03968.jpg: max_region=8809.55, global=1176.29, sharp_areas=4
+    [33] A7R03966.jpg: max_region=8935.58, global=1171.65, sharp_areas=5
+  Processing batch 6/11 (8 images)...
+Loading image: A7R03973.jpg
+Loading image: A7R03979.jpg
+Loading image: A7R03978.jpg
+Loading image: A7R03975.jpg
+Loading image: A7R03977.jpg
+Loading image: A7R03976.jpg
+Loading image: A7R03974.jpg
+Loading image: A7R03980.jpg
+  ✓ Loaded in 22.824703ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.96414ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.074742ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.263384ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.192658ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.38159ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.641028ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 25.873055ms - Size: 2624x1750, Channels: 3
+    [43] A7R03976.jpg: max_region=8903.50, global=1127.77, sharp_areas=4
+    [47] A7R03980.jpg: max_region=8697.13, global=1093.95, sharp_areas=3
+    [44] A7R03977.jpg: max_region=8862.30, global=1096.48, sharp_areas=4
+    [45] A7R03978.jpg: max_region=8867.83, global=1103.55, sharp_areas=4
+    [40] A7R03973.jpg: max_region=8894.77, global=1165.12, sharp_areas=5
+    [42] A7R03975.jpg: max_region=8935.54, global=1144.15, sharp_areas=5
+    [46] A7R03979.jpg: max_region=8784.67, global=1087.88, sharp_areas=4
+    [41] A7R03974.jpg: max_region=9019.90, global=1151.95, sharp_areas=5
+  Processing batch 7/11 (8 images)...
+Loading image: A7R03982.jpg
+Loading image: A7R03983.jpg
+Loading image: A7R03984.jpg
+Loading image: A7R03987.jpg
+Loading image: A7R03988.jpg
+Loading image: A7R03986.jpg
+Loading image: A7R03985.jpg
+Loading image: A7R03981.jpg
+  ✓ Loaded in 22.347879ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.298535ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.321058ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.682771ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.802932ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.904917ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.96443ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.102625ms - Size: 2624x1750, Channels: 3
+    [50] A7R03983.jpg: max_region=8860.28, global=1097.45, sharp_areas=4
+    [52] A7R03985.jpg: max_region=8658.78, global=1082.10, sharp_areas=3
+    [51] A7R03984.jpg: max_region=8751.46, global=1080.37, sharp_areas=3
+    [54] A7R03987.jpg: max_region=8537.84, global=1065.44, sharp_areas=3
+    [55] A7R03988.jpg: max_region=8441.86, global=1085.09, sharp_areas=4
+    [48] A7R03981.jpg: max_region=8816.81, global=1134.70, sharp_areas=4
+    [53] A7R03986.jpg: max_region=8560.33, global=1060.57, sharp_areas=3
+    [49] A7R03982.jpg: max_region=8767.28, global=1060.56, sharp_areas=2
+  Processing batch 8/11 (8 images)...
+Loading image: A7R03991.jpg
+Loading image: A7R03993.jpg
+Loading image: A7R03994.jpg
+Loading image: A7R03990.jpg
+Loading image: A7R03992.jpg
+Loading image: A7R03995.jpg
+Loading image: A7R03996.jpg
+Loading image: A7R03989.jpg
+  ✓ Loaded in 22.279779ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.296791ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.576518ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.852106ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.352454ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.90485ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 25.229151ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 25.337038ms - Size: 2624x1750, Channels: 3
+    [60] A7R03993.jpg: max_region=8712.49, global=1048.69, sharp_areas=2
+    [61] A7R03994.jpg: max_region=8721.68, global=1070.62, sharp_areas=2
+    [56] A7R03989.jpg: max_region=8506.29, global=1156.46, sharp_areas=4
+    [58] A7R03991.jpg: max_region=8438.58, global=1056.82, sharp_areas=3
+    [62] A7R03995.jpg: max_region=8691.48, global=1050.27, sharp_areas=2
+    [59] A7R03992.jpg: max_region=8506.31, global=1050.36, sharp_areas=3
+    [63] A7R03996.jpg: max_region=8760.48, global=1039.93, sharp_areas=3
+    [57] A7R03990.jpg: max_region=8494.98, global=1088.68, sharp_areas=4
+  Processing batch 9/11 (8 images)...
+Loading image: A7R03997.jpg
+Loading image: A7R04000.jpg
+Loading image: A7R04004.jpg
+Loading image: A7R03999.jpg
+Loading image: A7R04003.jpg
+Loading image: A7R04001.jpg
+Loading image: A7R04002.jpg
+Loading image: A7R03998.jpg
+  ✓ Loaded in 22.226637ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.35906ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.685994ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.766659ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.825902ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.360146ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.474384ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.506707ms - Size: 2624x1750, Channels: 3
+    [68] A7R04001.jpg: max_region=8466.66, global=1014.91, sharp_areas=2
+    [67] A7R04000.jpg: max_region=8590.95, global=966.21, sharp_areas=2
+    [66] A7R03999.jpg: max_region=8637.37, global=977.32, sharp_areas=2
+    [69] A7R04002.jpg: max_region=8532.03, global=1011.92, sharp_areas=2
+    [64] A7R03997.jpg: max_region=8700.72, global=1009.32, sharp_areas=2
+    [70] A7R04003.jpg: max_region=8687.19, global=986.88, sharp_areas=2
+    [71] A7R04004.jpg: max_region=8497.73, global=995.10, sharp_areas=2
+    [65] A7R03998.jpg: max_region=8770.81, global=1024.97, sharp_areas=2
+  Processing batch 10/11 (8 images)...
+Loading image: A7R04005.jpg
+Loading image: A7R04011.jpg
+Loading image: A7R04010.jpg
+Loading image: A7R04006.jpg
+Loading image: A7R04012.jpg
+Loading image: A7R04008.jpg
+Loading image: A7R04009.jpg
+Loading image: A7R04007.jpg
+  ✓ Loaded in 22.010432ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.16619ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.287033ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.401021ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.451448ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.64046ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.359207ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.637511ms - Size: 2624x1750, Channels: 3
+    [75] A7R04008.jpg: max_region=8511.98, global=948.36, sharp_areas=2
+    [78] A7R04011.jpg: max_region=7977.89, global=946.00, sharp_areas=3
+    [76] A7R04009.jpg: max_region=8442.12, global=926.19, sharp_areas=1
+    [72] A7R04005.jpg: max_region=8365.76, global=951.46, sharp_areas=2
+    [79] A7R04012.jpg: max_region=8186.58, global=1004.20, sharp_areas=3
+    [77] A7R04010.jpg: max_region=8222.26, global=971.34, sharp_areas=2
+    [74] A7R04007.jpg: max_region=8397.46, global=1039.99, sharp_areas=2
+    [73] A7R04006.jpg: max_region=8274.43, global=959.68, sharp_areas=2
+  Processing batch 11/11 (1 images)...
+Loading image: A7R04013.jpg
+  ✓ Loaded in 25.94368ms - Size: 2624x1750, Channels: 3
+    [80] A7R04013.jpg: max_region=8046.68, global=898.32, sharp_areas=2
+
+Sharpness statistics:
+  Mean: 8712.58
+  Median: 8759.47
+  StdDev: 215.18
+  Q1: 8637.37
+  Q3: 8862.30
+  IQR: 224.93
+  Threshold: 7962.56
+
+=== FILTERING RESULTS ===
+✓ Image 0 (A7R03933.jpg): 8867.28 - INCLUDED
+✓ Image 1 (A7R03934.jpg): 8714.69 - INCLUDED
+✓ Image 2 (A7R03935.jpg): 8785.10 - INCLUDED
+✓ Image 3 (A7R03936.jpg): 8801.73 - INCLUDED
+✓ Image 4 (A7R03937.jpg): 8879.00 - INCLUDED
+✓ Image 5 (A7R03938.jpg): 8789.12 - INCLUDED
+✓ Image 6 (A7R03939.jpg): 8773.46 - INCLUDED
+✓ Image 7 (A7R03940.jpg): 8670.65 - INCLUDED
+✓ Image 8 (A7R03941.jpg): 8739.95 - INCLUDED
+✓ Image 9 (A7R03942.jpg): 8777.32 - INCLUDED
+✓ Image 10 (A7R03943.jpg): 8759.47 - INCLUDED
+✓ Image 11 (A7R03944.jpg): 8747.55 - INCLUDED
+✓ Image 12 (A7R03945.jpg): 8982.88 - INCLUDED
+✓ Image 13 (A7R03946.jpg): 9016.89 - INCLUDED
+✓ Image 14 (A7R03947.jpg): 8955.70 - INCLUDED
+✓ Image 15 (A7R03948.jpg): 8801.73 - INCLUDED
+✓ Image 16 (A7R03949.jpg): 8755.81 - INCLUDED
+✓ Image 17 (A7R03950.jpg): 8795.89 - INCLUDED
+✓ Image 18 (A7R03951.jpg): 8889.27 - INCLUDED
+✓ Image 19 (A7R03952.jpg): 8856.25 - INCLUDED
+✓ Image 20 (A7R03953.jpg): 8857.92 - INCLUDED
+✓ Image 21 (A7R03954.jpg): 8906.80 - INCLUDED
+✓ Image 22 (A7R03955.jpg): 8848.42 - INCLUDED
+✓ Image 23 (A7R03956.jpg): 8890.54 - INCLUDED
+✓ Image 24 (A7R03957.jpg): 8740.90 - INCLUDED
+✓ Image 25 (A7R03958.jpg): 8685.40 - INCLUDED
+✓ Image 26 (A7R03959.jpg): 8666.14 - INCLUDED
+✓ Image 27 (A7R03960.jpg): 8706.81 - INCLUDED
+✓ Image 28 (A7R03961.jpg): 8823.15 - INCLUDED
+✓ Image 29 (A7R03962.jpg): 8736.66 - INCLUDED
+✓ Image 30 (A7R03963.jpg): 8751.58 - INCLUDED
+✓ Image 31 (A7R03964.jpg): 8820.30 - INCLUDED
+✓ Image 32 (A7R03965.jpg): 8951.47 - INCLUDED
+✓ Image 33 (A7R03966.jpg): 8935.58 - INCLUDED
+✓ Image 34 (A7R03967.jpg): 8883.87 - INCLUDED
+✓ Image 35 (A7R03968.jpg): 8809.55 - INCLUDED
+✓ Image 36 (A7R03969.jpg): 8895.26 - INCLUDED
+✓ Image 37 (A7R03970.jpg): 9032.12 - INCLUDED
+✓ Image 38 (A7R03971.jpg): 8971.12 - INCLUDED
+✓ Image 39 (A7R03972.jpg): 8944.63 - INCLUDED
+✓ Image 40 (A7R03973.jpg): 8894.77 - INCLUDED
+✓ Image 41 (A7R03974.jpg): 9019.90 - INCLUDED
+✓ Image 42 (A7R03975.jpg): 8935.54 - INCLUDED
+✓ Image 43 (A7R03976.jpg): 8903.50 - INCLUDED
+✓ Image 44 (A7R03977.jpg): 8862.30 - INCLUDED
+✓ Image 45 (A7R03978.jpg): 8867.83 - INCLUDED
+✓ Image 46 (A7R03979.jpg): 8784.67 - INCLUDED
+✓ Image 47 (A7R03980.jpg): 8697.13 - INCLUDED
+✓ Image 48 (A7R03981.jpg): 8816.81 - INCLUDED
+✓ Image 49 (A7R03982.jpg): 8767.28 - INCLUDED
+✓ Image 50 (A7R03983.jpg): 8860.28 - INCLUDED
+✓ Image 51 (A7R03984.jpg): 8751.46 - INCLUDED
+✓ Image 52 (A7R03985.jpg): 8658.78 - INCLUDED
+✓ Image 53 (A7R03986.jpg): 8560.33 - INCLUDED
+✓ Image 54 (A7R03987.jpg): 8537.84 - INCLUDED
+✓ Image 55 (A7R03988.jpg): 8441.86 - INCLUDED
+✓ Image 56 (A7R03989.jpg): 8506.29 - INCLUDED
+✓ Image 57 (A7R03990.jpg): 8494.98 - INCLUDED
+✓ Image 58 (A7R03991.jpg): 8438.58 - INCLUDED
+✓ Image 59 (A7R03992.jpg): 8506.31 - INCLUDED
+✓ Image 60 (A7R03993.jpg): 8712.49 - INCLUDED
+✓ Image 61 (A7R03994.jpg): 8721.68 - INCLUDED
+✓ Image 62 (A7R03995.jpg): 8691.48 - INCLUDED
+✓ Image 63 (A7R03996.jpg): 8760.48 - INCLUDED
+✓ Image 64 (A7R03997.jpg): 8700.72 - INCLUDED
+✓ Image 65 (A7R03998.jpg): 8770.81 - INCLUDED
+✓ Image 66 (A7R03999.jpg): 8637.37 - INCLUDED
+✓ Image 67 (A7R04000.jpg): 8590.95 - INCLUDED
+✓ Image 68 (A7R04001.jpg): 8466.66 - INCLUDED
+✓ Image 69 (A7R04002.jpg): 8532.03 - INCLUDED
+✓ Image 70 (A7R04003.jpg): 8687.19 - INCLUDED
+✓ Image 71 (A7R04004.jpg): 8497.73 - INCLUDED
+✓ Image 72 (A7R04005.jpg): 8365.76 - INCLUDED
+✓ Image 73 (A7R04006.jpg): 8274.43 - INCLUDED
+✓ Image 74 (A7R04007.jpg): 8397.46 - INCLUDED
+✓ Image 75 (A7R04008.jpg): 8511.98 - INCLUDED
+✓ Image 76 (A7R04009.jpg): 8442.12 - INCLUDED
+✓ Image 77 (A7R04010.jpg): 8222.26 - INCLUDED
+✓ Image 78 (A7R04011.jpg): 7977.89 - INCLUDED
+✓ Image 79 (A7R04012.jpg): 8186.58 - INCLUDED
+✓ Image 80 (A7R04013.jpg): 8046.68 - INCLUDED
+
+=== FILTERING SUMMARY ===
+  Total images: 81
+  Sharp images: 81
+  Blurry images skipped: 0
+========================
+
+
+=== STARTING ALIGNMENT ===
+Using 81 sharp images for alignment
+Reference image: A7R03933.jpg
+Loading image: A7R03933.jpg
+  ✓ Loaded in 22.65117ms - Size: 2624x1750, Channels: 3
+
+Extracting features and matching 80 image pairs...
+Using AKAZE (Balanced) feature detector
+Loading image: A7R03933.jpg
+Loading image: A7R03934.jpg
+Loading image: A7R03937.jpg
+Loading image: A7R03936.jpg
+Loading image: A7R03935.jpg
+  ✓ Loaded in 22.902241ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.221032ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.076061ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.228503ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 25.752274ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03938.jpg
+Loading image: A7R03940.jpg
+Loading image: A7R03939.jpg
+Loading image: A7R03941.jpg
+  ✓ Loaded in 23.850429ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.882611ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.886377ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 26.297349ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03942.jpg
+Loading image: A7R03945.jpg
+Loading image: A7R03943.jpg
+Loading image: A7R03944.jpg
+  ✓ Loaded in 22.899035ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.982736ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.116843ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.810208ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03946.jpg
+Loading image: A7R03948.jpg
+Loading image: A7R03949.jpg
+Loading image: A7R03947.jpg
+  ✓ Loaded in 22.837457ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.25089ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.56908ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.837822ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03950.jpg
+Loading image: A7R03951.jpg
+Loading image: A7R03953.jpg
+Loading image: A7R03952.jpg
+  ✓ Loaded in 23.225842ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.221223ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.816991ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 28.662121ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03954.jpg
+Loading image: A7R03956.jpg
+Loading image: A7R03957.jpg
+Loading image: A7R03955.jpg
+  ✓ Loaded in 22.630661ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.731745ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.882664ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.491418ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03958.jpg
+Loading image: A7R03961.jpg
+Loading image: A7R03960.jpg
+Loading image: A7R03959.jpg
+  ✓ Loaded in 22.405079ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.571127ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.344218ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.591292ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03962.jpg
+Loading image: A7R03964.jpg
+Loading image: A7R03965.jpg
+Loading image: A7R03963.jpg
+  ✓ Loaded in 22.598059ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.14699ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.13601ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.292897ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03966.jpg
+Loading image: A7R03968.jpg
+Loading image: A7R03969.jpg
+Loading image: A7R03967.jpg
+  ✓ Loaded in 22.772814ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.742075ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.767995ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.220461ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03970.jpg
+Loading image: A7R03972.jpg
+Loading image: A7R03973.jpg
+Loading image: A7R03971.jpg
+  ✓ Loaded in 22.517515ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.572169ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.818922ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.582325ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03974.jpg
+Loading image: A7R03975.jpg
+Loading image: A7R03976.jpg
+Loading image: A7R03977.jpg
+  ✓ Loaded in 22.874539ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.439932ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.851421ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.841058ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03978.jpg
+Loading image: A7R03980.jpg
+Loading image: A7R03979.jpg
+Loading image: A7R03981.jpg
+  ✓ Loaded in 22.46784ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.527613ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.196135ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 27.649881ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03982.jpg
+Loading image: A7R03984.jpg
+Loading image: A7R03985.jpg
+Loading image: A7R03983.jpg
+  ✓ Loaded in 22.159068ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.193373ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.513436ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.479341ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03986.jpg
+Loading image: A7R03987.jpg
+Loading image: A7R03988.jpg
+Loading image: A7R03989.jpg
+  ✓ Loaded in 22.788414ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.796889ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.255138ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.042286ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03990.jpg
+Loading image: A7R03992.jpg
+Loading image: A7R03993.jpg
+Loading image: A7R03991.jpg
+  ✓ Loaded in 22.508467ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.53608ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.236362ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.437824ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03994.jpg
+Loading image: A7R03996.jpg
+Loading image: A7R03995.jpg
+Loading image: A7R03997.jpg
+  ✓ Loaded in 22.063484ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.052002ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.284497ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 23.336975ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03998.jpg
+Loading image: A7R04000.jpg
+Loading image: A7R03999.jpg
+Loading image: A7R04001.jpg
+  ✓ Loaded in 22.086659ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.333512ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.404848ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.75544ms - Size: 2624x1750, Channels: 3
+Loading image: A7R04002.jpg
+Loading image: A7R04005.jpg
+Loading image: A7R04003.jpg
+Loading image: A7R04004.jpg
+  ✓ Loaded in 21.831961ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.374239ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.784476ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.851735ms - Size: 2624x1750, Channels: 3
+Loading image: A7R04006.jpg
+Loading image: A7R04008.jpg
+Loading image: A7R04007.jpg
+Loading image: A7R04009.jpg
+  ✓ Loaded in 21.689548ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.144569ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.295348ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.199335ms - Size: 2624x1750, Channels: 3
+Loading image: A7R04010.jpg
+Loading image: A7R04012.jpg
+Loading image: A7R04013.jpg
+Loading image: A7R04011.jpg
+  ✓ Loaded in 22.636432ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.712478ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 22.827278ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.635343ms - Size: 2624x1750, Channels: 3
+
+Accumulating transforms to reference frame...
+Warping 80 images to reference frame...
+Loading image: A7R03934.jpg
+Loading image: A7R03935.jpg
+Loading image: A7R03942.jpg
+Loading image: A7R03947.jpg
+Loading image: A7R03940.jpg
+Loading image: A7R03943.jpg
+Loading image: A7R03936.jpg
+Loading image: A7R03937.jpg
+Loading image: A7R03944.jpg
+Loading image: A7R03949.jpg
+Loading image: A7R03938.jpg
+Loading image: A7R03948.jpg
+Loading image: A7R03946.jpg
+Loading image: A7R03941.jpg
+Loading image: A7R03939.jpg
+Loading image: A7R03945.jpg
+  ✓ Loaded in 23.296537ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 24.551322ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 25.205566ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.303039ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.829878ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.505594ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.393713ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 35.89938ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 36.727878ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 37.079943ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 78.871706ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 107.085478ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 113.068885ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 113.660779ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 117.672026ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 118.127399ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03955.jpg
+Loading image: A7R03950.jpg
+Loading image: A7R03962.jpg
+Loading image: A7R03954.jpg
+Loading image: A7R03965.jpg
+Loading image: A7R03961.jpg
+Loading image: A7R03959.jpg
+Loading image: A7R03957.jpg
+Loading image: A7R03951.jpg
+Loading image: A7R03952.jpg
+Loading image: A7R03964.jpg
+Loading image: A7R03953.jpg
+Loading image: A7R03963.jpg
+Loading image: A7R03960.jpg
+Loading image: A7R03958.jpg
+Loading image: A7R03956.jpg
+  ✓ Loaded in 24.163519ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.925862ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.573143ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.828001ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.385737ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.205561ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.957002ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.147096ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 33.416713ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 34.969508ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 35.785803ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 36.172534ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 48.755329ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 62.488288ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 65.475512ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 69.577184ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03968.jpg
+Loading image: A7R03966.jpg
+Loading image: A7R03979.jpg
+Loading image: A7R03971.jpg
+Loading image: A7R03981.jpg
+Loading image: A7R03975.jpg
+Loading image: A7R03974.jpg
+Loading image: A7R03980.jpg
+Loading image: A7R03967.jpg
+Loading image: A7R03978.jpg
+Loading image: A7R03972.jpg
+Loading image: A7R03970.jpg
+Loading image: A7R03976.jpg
+Loading image: A7R03969.jpg
+Loading image: A7R03973.jpg
+Loading image: A7R03977.jpg
+  ✓ Loaded in 29.263823ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.660223ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.584257ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.755516ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.944058ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.92452ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.358442ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.279611ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 36.012307ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.69155ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 31.180457ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.271338ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.850297ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 59.247928ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 72.563606ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 73.143518ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03992.jpg
+Loading image: A7R03997.jpg
+Loading image: A7R03984.jpg
+Loading image: A7R03990.jpg
+Loading image: A7R03989.jpg
+Loading image: A7R03996.jpg
+Loading image: A7R03986.jpg
+Loading image: A7R03988.jpg
+Loading image: A7R03982.jpg
+Loading image: A7R03994.jpg
+Loading image: A7R03985.jpg
+Loading image: A7R03983.jpg
+Loading image: A7R03995.jpg
+Loading image: A7R03991.jpg
+Loading image: A7R03987.jpg
+Loading image: A7R03993.jpg
+  ✓ Loaded in 23.42829ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.185794ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.46566ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.466582ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.046697ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.83096ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.492873ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 35.096241ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.467333ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 37.20357ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 43.780284ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 49.823165ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 77.88236ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 91.47485ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 94.662739ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 98.250094ms - Size: 2624x1750, Channels: 3
+Loading image: A7R03998.jpg
+Loading image: A7R04006.jpg
+Loading image: A7R04004.jpg
+Loading image: A7R04007.jpg
+Loading image: A7R04013.jpg
+Loading image: A7R03999.jpg
+Loading image: A7R04008.jpg
+Loading image: A7R04001.jpg
+Loading image: A7R04010.jpg
+Loading image: A7R04002.jpg
+Loading image: A7R04011.jpg
+Loading image: A7R04012.jpg
+Loading image: A7R04003.jpg
+Loading image: A7R04009.jpg
+Loading image: A7R04005.jpg
+Loading image: A7R04000.jpg
+  ✓ Loaded in 28.482286ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 28.666849ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 28.875089ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.071825ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.635766ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.89333ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 30.137648ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 31.58442ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.137952ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.429891ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 32.685902ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 33.485854ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 29.128715ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 28.984439ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 40.030136ms - Size: 2624x1750, Channels: 3
+  ✓ Loaded in 76.372015ms - Size: 2624x1750, Channels: 3
+
+Finding optimal crop rectangle...
+Crop rectangle: 2624x1750 at (0, 0)
+
+✓ Alignment completed in 21.795265713s
+  Matching time: 21.795190188s

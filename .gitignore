@@ -1,2 +1,7 @@
 /target
 /testimages
+/testimages-preprocess
+
+/testimages_small/aligned
+/testimages_small/bunches
+/testimages_small/final

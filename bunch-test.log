@@ -1,0 +1,64 @@
+[2026-02-01T01:02:41Z INFO  imagestacker::settings] Settings loaded from: /home/dirk/.config/imagestacker/settings.json
+[2026-02-01T01:02:41Z INFO  imagestacker] Auto-importing directory from CLI: "/home/dirk/devel/rust/imagestacker/testimages"
+[2026-02-01T01:03:01Z INFO  imagestacker::stacking] Stacking 5 images
+Loading 5 images for direct stacking...
+Loading image: L0_B0004.png
+[2026-02-01T01:03:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0004.png
+Loading image: L0_B0002.png
+[2026-02-01T01:03:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0002.png
+Loading image: L0_B0003.png
+[2026-02-01T01:03:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0003.png
+Loading image: L0_B0001.png
+[2026-02-01T01:03:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0001.png
+Loading image: L0_B0000.png
+[2026-02-01T01:03:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0000.png
+[2026-02-01T01:03:02Z INFO  imagestacker::image_io] Loaded L0_B0000.png in 886.481739ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 886.481739ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:02Z INFO  imagestacker::image_io] Loaded L0_B0004.png in 887.511471ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 887.511471ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:02Z INFO  imagestacker::image_io] Loaded L0_B0003.png in 893.846573ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 893.846573ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:02Z INFO  imagestacker::image_io] Loaded L0_B0001.png in 912.820132ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 912.820132ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:02Z INFO  imagestacker::image_io] Loaded L0_B0002.png in 921.336342ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 921.336342ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:02Z INFO  imagestacker::stacking] Processing image 1/5 for stacking
+[2026-02-01T01:03:03Z INFO  imagestacker::stacking] Processing image 2/5 for stacking
+[2026-02-01T01:03:03Z INFO  imagestacker::stacking] Processing image 3/5 for stacking
+[2026-02-01T01:03:04Z INFO  imagestacker::stacking] Processing image 4/5 for stacking
+[2026-02-01T01:03:04Z INFO  imagestacker::stacking] Processing image 5/5 for stacking
+[2026-02-01T01:03:04Z INFO  imagestacker::stacking] Collapsing pyramid...
+[2026-02-01T01:03:05Z INFO  imagestacker::stacking] Stacking batch complete
+[2026-02-01T01:03:05Z INFO  imagestacker::stacking] Saving final result to /home/dirk/devel/rust/imagestacker/testimages/final/result_0001.png
+[2026-02-01T01:03:05Z INFO  imagestacker::post_processing] Applying noise reduction (strength: 3.00)
+[2026-02-01T01:03:26Z INFO  imagestacker::stacking] Stacking 5 images
+Loading 5 images for direct stacking...
+Loading image: L0_B0004.png
+[2026-02-01T01:03:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0004.png
+Loading image: L0_B0002.png
+Loading image: L0_B0003.png
+[2026-02-01T01:03:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0002.png
+[2026-02-01T01:03:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0003.png
+Loading image: L0_B0001.png
+[2026-02-01T01:03:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0001.png
+Loading image: L0_B0000.png
+[2026-02-01T01:03:26Z INFO  imagestacker::image_io] Loading image: /home/dirk/devel/rust/imagestacker/testimages/bunches/L0_B0000.png
+[2026-02-01T01:03:27Z INFO  imagestacker::image_io] Loaded L0_B0004.png in 885.356313ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 885.356313ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:27Z INFO  imagestacker::image_io] Loaded L0_B0003.png in 896.852961ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 896.852961ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:27Z INFO  imagestacker::image_io] Loaded L0_B0000.png in 900.730287ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 900.730287ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:27Z INFO  imagestacker::image_io] Loaded L0_B0002.png in 911.233573ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 911.233573ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:27Z INFO  imagestacker::image_io] Loaded L0_B0001.png in 916.146873ms - Size: 7952x5304, Channels: 4
+  ✓ Loaded in 916.146873ms - Size: 7952x5304, Channels: 4
+[2026-02-01T01:03:27Z INFO  imagestacker::stacking] Processing image 1/5 for stacking
+[2026-02-01T01:03:28Z INFO  imagestacker::stacking] Processing image 2/5 for stacking
+[2026-02-01T01:03:28Z INFO  imagestacker::stacking] Processing image 3/5 for stacking
+[2026-02-01T01:03:28Z INFO  imagestacker::stacking] Processing image 4/5 for stacking
+[2026-02-01T01:03:29Z INFO  imagestacker::stacking] Processing image 5/5 for stacking
+[2026-02-01T01:03:29Z INFO  imagestacker::stacking] Collapsing pyramid...
+[2026-02-01T01:03:29Z INFO  imagestacker::stacking] Stacking batch complete
+[2026-02-01T01:03:29Z INFO  imagestacker::stacking] Saving final result to /home/dirk/devel/rust/imagestacker/testimages/final/result_0001.png
+[2026-02-01T01:03:29Z INFO  imagestacker::post_processing] Applying noise reduction (strength: 3.00)

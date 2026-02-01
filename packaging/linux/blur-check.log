@@ -1,0 +1,1867 @@
+[2026-01-31T22:14:48Z INFO  imagestacker::settings] Settings loaded from: /home/dirk/.config/imagestacker/settings.json
+[2026-01-31T22:14:48Z INFO  imagestacker] Auto-importing directory from CLI: "/home/dirk/Bilder/FocusStacking/Messer"
+[2026-01-31T22:15:00Z INFO  imagestacker::gui] Cleaning up existing aligned images in /home/dirk/Bilder/FocusStacking/Messer/aligned
+[2026-01-31T22:15:00Z INFO  imagestacker::gui] Cleaning up existing bunches images in /home/dirk/Bilder/FocusStacking/Messer/bunches
+[2026-01-31T22:15:00Z INFO  imagestacker::alignment] Checking image sharpness for 139 images (regional analysis)...
+
+=== BLUR DETECTION STARTING (Regional Analysis) ===
+Analyzing 139 images for sharpness in 4x4 grid regions (parallel batches)...
+Strategy: Accept image if ANY region is sharp (good for focus stacking)
+  Processing batch 1/18 (8 images)...
+Loading image: A7R04109.jpg
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04109.jpg
+Loading image: A7R04113.jpg
+Loading image: A7R04114.jpg
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04113.jpg
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04114.jpg
+Loading image: A7R04111.jpg
+Loading image: A7R04110.jpg
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04111.jpg
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04110.jpg
+Loading image: A7R04115.jpg
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04115.jpg
+Loading image: A7R04116.jpg
+Loading image: A7R04112.jpg
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04116.jpg
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04112.jpg
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loaded A7R04116.jpg in 38.349225ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.349225ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loaded A7R04112.jpg in 38.740735ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.740735ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loaded A7R04111.jpg in 42.255947ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.255947ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loaded A7R04109.jpg in 44.567443ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.567443ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loaded A7R04110.jpg in 46.119176ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.119176ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loaded A7R04115.jpg in 53.214715ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 53.214715ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loaded A7R04113.jpg in 62.549692ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 62.549692ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:00Z INFO  imagestacker::image_io] Loaded A7R04114.jpg in 64.157241ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 64.157241ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 3 (A7R04112.jpg): max_regional=10186.61, global=1271.87, sharp_regions=7
+    [3] A7R04112.jpg: max_region=10186.61, global=1271.87, sharp_areas=7
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 6 (A7R04115.jpg): max_regional=10139.97, global=1255.41, sharp_regions=6
+    [6] A7R04115.jpg: max_region=10139.97, global=1255.41, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 1 (A7R04110.jpg): max_regional=10255.06, global=1267.88, sharp_regions=6
+    [1] A7R04110.jpg: max_region=10255.06, global=1267.88, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 7 (A7R04116.jpg): max_regional=10014.25, global=1246.44, sharp_regions=6
+    [7] A7R04116.jpg: max_region=10014.25, global=1246.44, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 0 (A7R04109.jpg): max_regional=10251.98, global=1254.84, sharp_regions=6
+    [0] A7R04109.jpg: max_region=10251.98, global=1254.84, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 5 (A7R04114.jpg): max_regional=10131.56, global=1247.94, sharp_regions=6
+    [5] A7R04114.jpg: max_region=10131.56, global=1247.94, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 2 (A7R04111.jpg): max_regional=10160.54, global=1270.25, sharp_regions=6
+    [2] A7R04111.jpg: max_region=10160.54, global=1270.25, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 4 (A7R04113.jpg): max_regional=10138.38, global=1267.22, sharp_regions=6
+    [4] A7R04113.jpg: max_region=10138.38, global=1267.22, sharp_areas=6
+  Processing batch 2/18 (8 images)...
+Loading image: A7R04119.jpg
+Loading image: A7R04118.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04118.jpg
+Loading image: A7R04120.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04120.jpg
+Loading image: A7R04117.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04119.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04117.jpg
+Loading image: A7R04121.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04121.jpg
+Loading image: A7R04123.jpg
+Loading image: A7R04124.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04123.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04124.jpg
+Loading image: A7R04122.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04122.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04118.jpg in 38.554889ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.554889ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04119.jpg in 39.769996ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 39.769996ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04120.jpg in 42.531846ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.531846ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04124.jpg in 44.031237ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.031237ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04121.jpg in 48.838122ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 48.838122ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04123.jpg in 49.854249ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 49.854249ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04117.jpg in 51.511323ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 51.511323ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04122.jpg in 55.156153ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 55.156153ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 9 (A7R04118.jpg): max_regional=9905.32, global=1233.18, sharp_regions=6
+    [9] A7R04118.jpg: max_region=9905.32, global=1233.18, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 11 (A7R04120.jpg): max_regional=9992.66, global=1244.07, sharp_regions=6
+    [11] A7R04120.jpg: max_region=9992.66, global=1244.07, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 13 (A7R04122.jpg): max_regional=9953.49, global=1218.72, sharp_regions=6
+    [13] A7R04122.jpg: max_region=9953.49, global=1218.72, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 8 (A7R04117.jpg): max_regional=10056.07, global=1247.22, sharp_regions=6
+    [8] A7R04117.jpg: max_region=10056.07, global=1247.22, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 12 (A7R04121.jpg): max_regional=9875.99, global=1221.10, sharp_regions=6
+    [12] A7R04121.jpg: max_region=9875.99, global=1221.10, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 10 (A7R04119.jpg): max_regional=10061.38, global=1234.31, sharp_regions=6
+    [10] A7R04119.jpg: max_region=10061.38, global=1234.31, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 14 (A7R04123.jpg): max_regional=9939.03, global=1221.65, sharp_regions=6
+    [14] A7R04123.jpg: max_region=9939.03, global=1221.65, sharp_areas=6
+[2026-01-31T22:15:01Z INFO  imagestacker::alignment] Image 15 (A7R04124.jpg): max_regional=9851.52, global=1216.29, sharp_regions=6
+    [15] A7R04124.jpg: max_region=9851.52, global=1216.29, sharp_areas=6
+  Processing batch 3/18 (8 images)...
+Loading image: A7R04125.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04125.jpg
+Loading image: A7R04129.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04129.jpg
+Loading image: A7R04127.jpg
+Loading image: A7R04128.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04127.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04128.jpg
+Loading image: A7R04130.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04130.jpg
+Loading image: A7R04131.jpg
+Loading image: A7R04126.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04131.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04126.jpg
+Loading image: A7R04132.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04132.jpg
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04130.jpg in 38.093505ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.093505ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04127.jpg in 38.634501ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.634501ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04132.jpg in 38.889439ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.889439ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04131.jpg in 42.331552ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.331552ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04129.jpg in 43.099643ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.099643ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04126.jpg in 43.767692ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.767692ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04128.jpg in 50.810801ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 50.810801ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:01Z INFO  imagestacker::image_io] Loaded A7R04125.jpg in 51.15995ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 51.15995ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:02Z INFO  imagestacker::alignment] Image 22 (A7R04131.jpg): max_regional=9856.30, global=1194.45, sharp_regions=6
+    [22] A7R04131.jpg: max_region=9856.30, global=1194.45, sharp_areas=6
+[2026-01-31T22:15:02Z INFO  imagestacker::alignment] Image 17 (A7R04126.jpg): max_regional=9866.25, global=1211.39, sharp_regions=6
+    [17] A7R04126.jpg: max_region=9866.25, global=1211.39, sharp_areas=6
+[2026-01-31T22:15:02Z INFO  imagestacker::alignment] Image 18 (A7R04127.jpg): max_regional=9795.13, global=1215.69, sharp_regions=6
+    [18] A7R04127.jpg: max_region=9795.13, global=1215.69, sharp_areas=6
+[2026-01-31T22:15:02Z INFO  imagestacker::alignment] Image 23 (A7R04132.jpg): max_regional=9827.82, global=1197.83, sharp_regions=6
+    [23] A7R04132.jpg: max_region=9827.82, global=1197.83, sharp_areas=6
+[2026-01-31T22:15:02Z INFO  imagestacker::alignment] Image 21 (A7R04130.jpg): max_regional=9763.77, global=1194.55, sharp_regions=6
+    [21] A7R04130.jpg: max_region=9763.77, global=1194.55, sharp_areas=6
+[2026-01-31T22:15:02Z INFO  imagestacker::alignment] Image 20 (A7R04129.jpg): max_regional=9646.95, global=1201.92, sharp_regions=6
+    [20] A7R04129.jpg: max_region=9646.95, global=1201.92, sharp_areas=6
+[2026-01-31T22:15:02Z INFO  imagestacker::alignment] Image 16 (A7R04125.jpg): max_regional=9851.46, global=1215.78, sharp_regions=6
+    [16] A7R04125.jpg: max_region=9851.46, global=1215.78, sharp_areas=6
+[2026-01-31T22:15:02Z INFO  imagestacker::alignment] Image 19 (A7R04128.jpg): max_regional=9804.96, global=1203.13, sharp_regions=6
+    [19] A7R04128.jpg: max_region=9804.96, global=1203.13, sharp_areas=6
+  Processing batch 4/18 (8 images)...
+Loading image: A7R04133.jpg
+Loading image: A7R04135.jpg
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04133.jpg
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04135.jpg
+Loading image: A7R04136.jpg
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04136.jpg
+Loading image: A7R04134.jpg
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04134.jpg
+Loading image: A7R04137.jpg
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04137.jpg
+Loading image: A7R04139.jpg
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04139.jpg
+Loading image: A7R04140.jpg
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04140.jpg
+Loading image: A7R04138.jpg
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04138.jpg
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loaded A7R04137.jpg in 37.757121ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 37.757121ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loaded A7R04138.jpg in 39.560575ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 39.560575ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loaded A7R04133.jpg in 40.224566ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.224566ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loaded A7R04136.jpg in 43.872123ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.872123ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loaded A7R04134.jpg in 46.240428ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.240428ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loaded A7R04139.jpg in 48.492692ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 48.492692ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loaded A7R04135.jpg in 50.267661ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 50.267661ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:02Z INFO  imagestacker::image_io] Loaded A7R04140.jpg in 72.555235ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 72.555235ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:03Z INFO  imagestacker::alignment] Image 25 (A7R04134.jpg): max_regional=9807.86, global=1195.29, sharp_regions=6
+    [25] A7R04134.jpg: max_region=9807.86, global=1195.29, sharp_areas=6
+[2026-01-31T22:15:03Z INFO  imagestacker::alignment] Image 27 (A7R04136.jpg): max_regional=9842.69, global=1192.50, sharp_regions=6
+    [27] A7R04136.jpg: max_region=9842.69, global=1192.50, sharp_areas=6
+[2026-01-31T22:15:03Z INFO  imagestacker::alignment] Image 24 (A7R04133.jpg): max_regional=9834.39, global=1203.31, sharp_regions=6
+    [24] A7R04133.jpg: max_region=9834.39, global=1203.31, sharp_areas=6
+[2026-01-31T22:15:03Z INFO  imagestacker::alignment] Image 28 (A7R04137.jpg): max_regional=9890.35, global=1192.00, sharp_regions=6
+    [28] A7R04137.jpg: max_region=9890.35, global=1192.00, sharp_areas=6
+[2026-01-31T22:15:03Z INFO  imagestacker::alignment] Image 30 (A7R04139.jpg): max_regional=9662.81, global=1173.83, sharp_regions=6
+    [30] A7R04139.jpg: max_region=9662.81, global=1173.83, sharp_areas=6
+[2026-01-31T22:15:03Z INFO  imagestacker::alignment] Image 26 (A7R04135.jpg): max_regional=9970.66, global=1198.42, sharp_regions=6
+    [26] A7R04135.jpg: max_region=9970.66, global=1198.42, sharp_areas=6
+[2026-01-31T22:15:03Z INFO  imagestacker::alignment] Image 29 (A7R04138.jpg): max_regional=10021.34, global=1194.08, sharp_regions=6
+    [29] A7R04138.jpg: max_region=10021.34, global=1194.08, sharp_areas=6
+[2026-01-31T22:15:03Z INFO  imagestacker::alignment] Image 31 (A7R04140.jpg): max_regional=9764.70, global=1169.26, sharp_regions=6
+    [31] A7R04140.jpg: max_region=9764.70, global=1169.26, sharp_areas=6
+  Processing batch 5/18 (8 images)...
+Loading image: A7R04141.jpg
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04141.jpg
+Loading image: A7R04142.jpg
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04142.jpg
+Loading image: A7R04143.jpg
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04143.jpg
+Loading image: A7R04144.jpg
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04144.jpg
+Loading image: A7R04145.jpg
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04145.jpg
+Loading image: A7R04147.jpg
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04147.jpg
+Loading image: A7R04148.jpg
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04148.jpg
+Loading image: A7R04146.jpg
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04146.jpg
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loaded A7R04142.jpg in 37.830051ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 37.830051ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loaded A7R04144.jpg in 46.739684ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.739684ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loaded A7R04145.jpg in 47.79754ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 47.79754ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loaded A7R04143.jpg in 48.055174ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 48.055174ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loaded A7R04146.jpg in 55.432072ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 55.432072ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loaded A7R04147.jpg in 60.091505ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 60.091505ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loaded A7R04148.jpg in 61.527505ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 61.527505ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:03Z INFO  imagestacker::image_io] Loaded A7R04141.jpg in 62.557517ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 62.557517ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:04Z INFO  imagestacker::alignment] Image 34 (A7R04143.jpg): max_regional=9786.60, global=1157.24, sharp_regions=6
+    [34] A7R04143.jpg: max_region=9786.60, global=1157.24, sharp_areas=6
+[2026-01-31T22:15:04Z INFO  imagestacker::alignment] Image 32 (A7R04141.jpg): max_regional=9649.94, global=1166.14, sharp_regions=6
+    [32] A7R04141.jpg: max_region=9649.94, global=1166.14, sharp_areas=6
+[2026-01-31T22:15:04Z INFO  imagestacker::alignment] Image 37 (A7R04146.jpg): max_regional=9662.79, global=1145.78, sharp_regions=6
+    [37] A7R04146.jpg: max_region=9662.79, global=1145.78, sharp_areas=6
+[2026-01-31T22:15:04Z INFO  imagestacker::alignment] Image 33 (A7R04142.jpg): max_regional=10028.93, global=1196.45, sharp_regions=6
+    [33] A7R04142.jpg: max_region=10028.93, global=1196.45, sharp_areas=6
+[2026-01-31T22:15:04Z INFO  imagestacker::alignment] Image 35 (A7R04144.jpg): max_regional=9657.82, global=1165.27, sharp_regions=6
+    [35] A7R04144.jpg: max_region=9657.82, global=1165.27, sharp_areas=6
+[2026-01-31T22:15:04Z INFO  imagestacker::alignment] Image 39 (A7R04148.jpg): max_regional=9594.46, global=1158.37, sharp_regions=6
+    [39] A7R04148.jpg: max_region=9594.46, global=1158.37, sharp_areas=6
+[2026-01-31T22:15:04Z INFO  imagestacker::alignment] Image 36 (A7R04145.jpg): max_regional=9763.34, global=1152.84, sharp_regions=6
+    [36] A7R04145.jpg: max_region=9763.34, global=1152.84, sharp_areas=6
+[2026-01-31T22:15:04Z INFO  imagestacker::alignment] Image 38 (A7R04147.jpg): max_regional=9516.61, global=1142.35, sharp_regions=6
+    [38] A7R04147.jpg: max_region=9516.61, global=1142.35, sharp_areas=6
+  Processing batch 6/18 (8 images)...
+Loading image: A7R04153.jpg
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04153.jpg
+Loading image: A7R04149.jpg
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04149.jpg
+Loading image: A7R04151.jpg
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04151.jpg
+Loading image: A7R04152.jpg
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04152.jpg
+Loading image: A7R04155.jpg
+Loading image: A7R04156.jpg
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04155.jpg
+Loading image: A7R04150.jpg
+Loading image: A7R04154.jpg
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04156.jpg
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04150.jpg
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04154.jpg
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loaded A7R04156.jpg in 47.005162ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loaded A7R04149.jpg in 47.109142ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loaded A7R04154.jpg in 47.000253ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 47.005162ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 47.000253ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 47.109142ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loaded A7R04150.jpg in 51.613999ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 51.613999ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loaded A7R04155.jpg in 52.702504ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 52.702504ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loaded A7R04153.jpg in 54.075924ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 54.075924ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loaded A7R04151.jpg in 58.676996ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 58.676996ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:04Z INFO  imagestacker::image_io] Loaded A7R04152.jpg in 60.106443ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 60.106443ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 40 (A7R04149.jpg): max_regional=9492.06, global=1151.09, sharp_regions=6
+    [40] A7R04149.jpg: max_region=9492.06, global=1151.09, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 41 (A7R04150.jpg): max_regional=9530.62, global=1142.66, sharp_regions=6
+    [41] A7R04150.jpg: max_region=9530.62, global=1142.66, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 42 (A7R04151.jpg): max_regional=9408.89, global=1169.48, sharp_regions=6
+    [42] A7R04151.jpg: max_region=9408.89, global=1169.48, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 44 (A7R04153.jpg): max_regional=9225.69, global=1147.82, sharp_regions=6
+    [44] A7R04153.jpg: max_region=9225.69, global=1147.82, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 47 (A7R04156.jpg): max_regional=9134.30, global=1118.23, sharp_regions=6
+    [47] A7R04156.jpg: max_region=9134.30, global=1118.23, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 45 (A7R04154.jpg): max_regional=9194.94, global=1144.92, sharp_regions=6
+    [45] A7R04154.jpg: max_region=9194.94, global=1144.92, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 43 (A7R04152.jpg): max_regional=9338.95, global=1147.46, sharp_regions=6
+    [43] A7R04152.jpg: max_region=9338.95, global=1147.46, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 46 (A7R04155.jpg): max_regional=9246.69, global=1146.94, sharp_regions=6
+    [46] A7R04155.jpg: max_region=9246.69, global=1146.94, sharp_areas=6
+  Processing batch 7/18 (8 images)...
+Loading image: A7R04157.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04157.jpg
+Loading image: A7R04159.jpg
+Loading image: A7R04160.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04159.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04160.jpg
+Loading image: A7R04161.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04161.jpg
+Loading image: A7R04163.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04163.jpg
+Loading image: A7R04162.jpg
+Loading image: A7R04164.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04162.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04164.jpg
+Loading image: A7R04158.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04158.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04157.jpg in 43.205966ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.205966ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04164.jpg in 43.172853ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.172853ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04159.jpg in 43.306269ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.306269ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04161.jpg in 43.73513ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.73513ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04162.jpg in 44.029995ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.029995ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04160.jpg in 44.569859ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04163.jpg in 44.51296ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.569859ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.51296ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04158.jpg in 48.77912ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 48.77912ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 48 (A7R04157.jpg): max_regional=9033.33, global=1126.59, sharp_regions=6
+    [48] A7R04157.jpg: max_region=9033.33, global=1126.59, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 50 (A7R04159.jpg): max_regional=9037.54, global=1095.45, sharp_regions=6
+    [50] A7R04159.jpg: max_region=9037.54, global=1095.45, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 49 (A7R04158.jpg): max_regional=9084.95, global=1122.54, sharp_regions=6
+    [49] A7R04158.jpg: max_region=9084.95, global=1122.54, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 55 (A7R04164.jpg): max_regional=8884.60, global=1093.89, sharp_regions=6
+    [55] A7R04164.jpg: max_region=8884.60, global=1093.89, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 54 (A7R04163.jpg): max_regional=8968.03, global=1110.59, sharp_regions=6
+    [54] A7R04163.jpg: max_region=8968.03, global=1110.59, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 53 (A7R04162.jpg): max_regional=8915.75, global=1080.31, sharp_regions=6
+    [53] A7R04162.jpg: max_region=8915.75, global=1080.31, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 51 (A7R04160.jpg): max_regional=8973.16, global=1132.43, sharp_regions=6
+    [51] A7R04160.jpg: max_region=8973.16, global=1132.43, sharp_areas=6
+[2026-01-31T22:15:05Z INFO  imagestacker::alignment] Image 52 (A7R04161.jpg): max_regional=8976.01, global=1089.38, sharp_regions=6
+    [52] A7R04161.jpg: max_region=8976.01, global=1089.38, sharp_areas=6
+  Processing batch 8/18 (8 images)...
+Loading image: A7R04165.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04165.jpg
+Loading image: A7R04167.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04167.jpg
+Loading image: A7R04168.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04168.jpg
+Loading image: A7R04169.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04169.jpg
+Loading image: A7R04166.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04166.jpg
+Loading image: A7R04170.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04170.jpg
+Loading image: A7R04171.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04171.jpg
+Loading image: A7R04172.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04172.jpg
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04166.jpg in 44.512548ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.512548ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04169.jpg in 45.887732ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 45.887732ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04170.jpg in 46.456171ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.456171ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04165.jpg in 46.796222ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.796222ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04167.jpg in 49.688762ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 49.688762ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04172.jpg in 50.485327ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 50.485327ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04168.jpg in 52.358845ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 52.358845ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:05Z INFO  imagestacker::image_io] Loaded A7R04171.jpg in 53.845673ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 53.845673ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:06Z INFO  imagestacker::alignment] Image 58 (A7R04167.jpg): max_regional=9028.80, global=1079.38, sharp_regions=6
+    [58] A7R04167.jpg: max_region=9028.80, global=1079.38, sharp_areas=6
+[2026-01-31T22:15:06Z INFO  imagestacker::alignment] Image 59 (A7R04168.jpg): max_regional=9192.65, global=1087.53, sharp_regions=6
+    [59] A7R04168.jpg: max_region=9192.65, global=1087.53, sharp_areas=6
+[2026-01-31T22:15:06Z INFO  imagestacker::alignment] Image 56 (A7R04165.jpg): max_regional=8877.69, global=1086.73, sharp_regions=6
+    [56] A7R04165.jpg: max_region=8877.69, global=1086.73, sharp_areas=6
+[2026-01-31T22:15:06Z INFO  imagestacker::alignment] Image 62 (A7R04171.jpg): max_regional=9430.65, global=1087.78, sharp_regions=5
+    [62] A7R04171.jpg: max_region=9430.65, global=1087.78, sharp_areas=5
+[2026-01-31T22:15:06Z INFO  imagestacker::alignment] Image 60 (A7R04169.jpg): max_regional=9494.99, global=1097.94, sharp_regions=6
+    [60] A7R04169.jpg: max_region=9494.99, global=1097.94, sharp_areas=6
+[2026-01-31T22:15:06Z INFO  imagestacker::alignment] Image 63 (A7R04172.jpg): max_regional=9905.48, global=1112.84, sharp_regions=4
+    [63] A7R04172.jpg: max_region=9905.48, global=1112.84, sharp_areas=4
+[2026-01-31T22:15:06Z INFO  imagestacker::alignment] Image 57 (A7R04166.jpg): max_regional=9105.94, global=1073.44, sharp_regions=6
+    [57] A7R04166.jpg: max_region=9105.94, global=1073.44, sharp_areas=6
+[2026-01-31T22:15:06Z INFO  imagestacker::alignment] Image 61 (A7R04170.jpg): max_regional=9710.14, global=1121.91, sharp_regions=5
+    [61] A7R04170.jpg: max_region=9710.14, global=1121.91, sharp_areas=5
+  Processing batch 9/18 (8 images)...
+Loading image: A7R04173.jpg
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04173.jpg
+Loading image: A7R04175.jpg
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04175.jpg
+Loading image: A7R04176.jpg
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04176.jpg
+Loading image: A7R04174.jpg
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04174.jpg
+Loading image: A7R04177.jpg
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04177.jpg
+Loading image: A7R04179.jpg
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04179.jpg
+Loading image: A7R04180.jpg
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04180.jpg
+Loading image: A7R04178.jpg
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04178.jpg
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loaded A7R04177.jpg in 52.415163ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 52.415163ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loaded A7R04176.jpg in 54.189561ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 54.189561ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loaded A7R04173.jpg in 54.317828ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 54.317828ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loaded A7R04179.jpg in 56.897468ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 56.897468ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loaded A7R04175.jpg in 58.192117ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 58.192117ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loaded A7R04178.jpg in 56.979215ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 56.979215ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loaded A7R04180.jpg in 62.399546ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 62.399546ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:06Z INFO  imagestacker::image_io] Loaded A7R04174.jpg in 63.405422ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 63.405422ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:07Z INFO  imagestacker::alignment] Image 65 (A7R04174.jpg): max_regional=8773.63, global=1029.30, sharp_regions=6
+    [65] A7R04174.jpg: max_region=8773.63, global=1029.30, sharp_areas=6
+[2026-01-31T22:15:07Z INFO  imagestacker::alignment] Image 70 (A7R04179.jpg): max_regional=8831.35, global=1026.13, sharp_regions=6
+    [70] A7R04179.jpg: max_region=8831.35, global=1026.13, sharp_areas=6
+[2026-01-31T22:15:07Z INFO  imagestacker::alignment] Image 69 (A7R04178.jpg): max_regional=9432.18, global=1050.46, sharp_regions=4
+    [69] A7R04178.jpg: max_region=9432.18, global=1050.46, sharp_areas=4
+[2026-01-31T22:15:07Z INFO  imagestacker::alignment] Image 64 (A7R04173.jpg): max_regional=9491.99, global=1080.26, sharp_regions=4
+    [64] A7R04173.jpg: max_region=9491.99, global=1080.26, sharp_areas=4
+[2026-01-31T22:15:07Z INFO  imagestacker::alignment] Image 66 (A7R04175.jpg): max_regional=9106.03, global=1053.86, sharp_regions=6
+    [66] A7R04175.jpg: max_region=9106.03, global=1053.86, sharp_areas=6
+[2026-01-31T22:15:07Z INFO  imagestacker::alignment] Image 68 (A7R04177.jpg): max_regional=9484.44, global=1073.08, sharp_regions=4
+    [68] A7R04177.jpg: max_region=9484.44, global=1073.08, sharp_areas=4
+[2026-01-31T22:15:07Z INFO  imagestacker::alignment] Image 67 (A7R04176.jpg): max_regional=9034.99, global=1048.71, sharp_regions=6
+    [67] A7R04176.jpg: max_region=9034.99, global=1048.71, sharp_areas=6
+[2026-01-31T22:15:07Z INFO  imagestacker::alignment] Image 71 (A7R04180.jpg): max_regional=9141.34, global=1039.18, sharp_regions=6
+    [71] A7R04180.jpg: max_region=9141.34, global=1039.18, sharp_areas=6
+  Processing batch 10/18 (8 images)...
+Loading image: A7R04181.jpg
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04181.jpg
+Loading image: A7R04183.jpg
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04183.jpg
+Loading image: A7R04184.jpg
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04184.jpg
+Loading image: A7R04187.jpg
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04187.jpg
+Loading image: A7R04185.jpg
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04185.jpg
+Loading image: A7R04186.jpg
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04186.jpg
+Loading image: A7R04188.jpg
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04188.jpg
+Loading image: A7R04182.jpg
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04182.jpg
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loaded A7R04182.jpg in 43.773263ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.773263ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loaded A7R04184.jpg in 44.942713ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.942713ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loaded A7R04183.jpg in 45.011213ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 45.011213ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loaded A7R04188.jpg in 46.030826ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.030826ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loaded A7R04181.jpg in 50.371539ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 50.371539ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loaded A7R04187.jpg in 54.225881ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 54.225881ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loaded A7R04185.jpg in 56.990065ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 56.990065ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:07Z INFO  imagestacker::image_io] Loaded A7R04186.jpg in 57.692801ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 57.692801ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 79 (A7R04188.jpg): max_regional=8702.74, global=1014.04, sharp_regions=6
+    [79] A7R04188.jpg: max_region=8702.74, global=1014.04, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 74 (A7R04183.jpg): max_regional=9415.39, global=1053.07, sharp_regions=4
+    [74] A7R04183.jpg: max_region=9415.39, global=1053.07, sharp_areas=4
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 73 (A7R04182.jpg): max_regional=8643.59, global=1009.77, sharp_regions=6
+    [73] A7R04182.jpg: max_region=8643.59, global=1009.77, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 75 (A7R04184.jpg): max_regional=9425.34, global=1047.76, sharp_regions=4
+    [75] A7R04184.jpg: max_region=9425.34, global=1047.76, sharp_areas=4
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 76 (A7R04185.jpg): max_regional=9273.49, global=1033.50, sharp_regions=6
+    [76] A7R04185.jpg: max_region=9273.49, global=1033.50, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 72 (A7R04181.jpg): max_regional=8669.71, global=1012.51, sharp_regions=6
+    [72] A7R04181.jpg: max_region=8669.71, global=1012.51, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 78 (A7R04187.jpg): max_regional=8913.17, global=1016.69, sharp_regions=6
+    [78] A7R04187.jpg: max_region=8913.17, global=1016.69, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 77 (A7R04186.jpg): max_regional=9050.44, global=1012.01, sharp_regions=6
+    [77] A7R04186.jpg: max_region=9050.44, global=1012.01, sharp_areas=6
+  Processing batch 11/18 (8 images)...
+Loading image: A7R04189.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04189.jpg
+Loading image: A7R04193.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04193.jpg
+Loading image: A7R04191.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04191.jpg
+Loading image: A7R04192.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04192.jpg
+Loading image: A7R04194.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04194.jpg
+Loading image: A7R04190.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04190.jpg
+Loading image: A7R04195.jpg
+Loading image: A7R04196.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04195.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04196.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04193.jpg in 42.334567ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04196.jpg in 42.228755ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.334567ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.228755ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04195.jpg in 42.986235ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.986235ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04192.jpg in 43.339713ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.339713ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04191.jpg in 43.87637ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.87637ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04194.jpg in 43.885178ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.885178ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04190.jpg in 44.944907ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.944907ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04189.jpg in 49.966223ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 49.966223ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 85 (A7R04194.jpg): max_regional=8600.82, global=993.19, sharp_regions=6
+    [85] A7R04194.jpg: max_region=8600.82, global=993.19, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 81 (A7R04190.jpg): max_regional=8386.34, global=981.88, sharp_regions=6
+    [81] A7R04190.jpg: max_region=8386.34, global=981.88, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 83 (A7R04192.jpg): max_regional=8469.93, global=985.40, sharp_regions=6
+    [83] A7R04192.jpg: max_region=8469.93, global=985.40, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 80 (A7R04189.jpg): max_regional=8630.28, global=1009.21, sharp_regions=6
+    [80] A7R04189.jpg: max_region=8630.28, global=1009.21, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 84 (A7R04193.jpg): max_regional=8502.48, global=983.66, sharp_regions=6
+    [84] A7R04193.jpg: max_region=8502.48, global=983.66, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 87 (A7R04196.jpg): max_regional=8257.48, global=959.77, sharp_regions=6
+    [87] A7R04196.jpg: max_region=8257.48, global=959.77, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 82 (A7R04191.jpg): max_regional=8545.19, global=982.93, sharp_regions=6
+    [82] A7R04191.jpg: max_region=8545.19, global=982.93, sharp_areas=6
+[2026-01-31T22:15:08Z INFO  imagestacker::alignment] Image 86 (A7R04195.jpg): max_regional=8583.63, global=985.64, sharp_regions=6
+    [86] A7R04195.jpg: max_region=8583.63, global=985.64, sharp_areas=6
+  Processing batch 12/18 (8 images)...
+Loading image: A7R04203.jpg
+Loading image: A7R04199.jpg
+Loading image: A7R04201.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04199.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04203.jpg
+Loading image: A7R04202.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04201.jpg
+Loading image: A7R04200.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04202.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04200.jpg
+Loading image: A7R04198.jpg
+Loading image: A7R04204.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04198.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04204.jpg
+Loading image: A7R04197.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04197.jpg
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04198.jpg in 42.322374ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.322374ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04203.jpg in 42.60168ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.60168ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04201.jpg in 42.798767ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.798767ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04202.jpg in 43.48416ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.48416ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04204.jpg in 44.316724ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.316724ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04200.jpg in 45.015522ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04199.jpg in 45.049487ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 45.015522ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 45.049487ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:08Z INFO  imagestacker::image_io] Loaded A7R04197.jpg in 48.873991ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 48.873991ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:09Z INFO  imagestacker::alignment] Image 90 (A7R04199.jpg): max_regional=8739.46, global=984.79, sharp_regions=6
+    [90] A7R04199.jpg: max_region=8739.46, global=984.79, sharp_areas=6
+[2026-01-31T22:15:09Z INFO  imagestacker::alignment] Image 92 (A7R04201.jpg): max_regional=8836.84, global=985.48, sharp_regions=6
+    [92] A7R04201.jpg: max_region=8836.84, global=985.48, sharp_areas=6
+[2026-01-31T22:15:09Z INFO  imagestacker::alignment] Image 95 (A7R04204.jpg): max_regional=8136.10, global=950.05, sharp_regions=6
+    [95] A7R04204.jpg: max_region=8136.10, global=950.05, sharp_areas=6
+[2026-01-31T22:15:09Z INFO  imagestacker::alignment] Image 89 (A7R04198.jpg): max_regional=8452.95, global=977.59, sharp_regions=6
+    [89] A7R04198.jpg: max_region=8452.95, global=977.59, sharp_areas=6
+[2026-01-31T22:15:09Z INFO  imagestacker::alignment] Image 94 (A7R04203.jpg): max_regional=8156.40, global=969.47, sharp_regions=6
+    [94] A7R04203.jpg: max_region=8156.40, global=969.47, sharp_areas=6
+[2026-01-31T22:15:09Z INFO  imagestacker::alignment] Image 91 (A7R04200.jpg): max_regional=8730.72, global=977.89, sharp_regions=6
+    [91] A7R04200.jpg: max_region=8730.72, global=977.89, sharp_areas=6
+[2026-01-31T22:15:09Z INFO  imagestacker::alignment] Image 88 (A7R04197.jpg): max_regional=8471.57, global=972.28, sharp_regions=6
+    [88] A7R04197.jpg: max_region=8471.57, global=972.28, sharp_areas=6
+[2026-01-31T22:15:09Z INFO  imagestacker::alignment] Image 93 (A7R04202.jpg): max_regional=8614.45, global=985.73, sharp_regions=6
+    [93] A7R04202.jpg: max_region=8614.45, global=985.73, sharp_areas=6
+  Processing batch 13/18 (8 images)...
+Loading image: A7R04205.jpg
+Loading image: A7R04207.jpg
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04205.jpg
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04207.jpg
+Loading image: A7R04210.jpg
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04210.jpg
+Loading image: A7R04211.jpg
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04211.jpg
+Loading image: A7R04212.jpg
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04212.jpg
+Loading image: A7R04209.jpg
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04209.jpg
+Loading image: A7R04206.jpg
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04206.jpg
+Loading image: A7R04208.jpg
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04208.jpg
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loaded A7R04210.jpg in 41.334953ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.334953ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loaded A7R04205.jpg in 42.190943ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.190943ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loaded A7R04211.jpg in 42.282328ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.282328ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loaded A7R04212.jpg in 42.603753ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.603753ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loaded A7R04207.jpg in 44.198256ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.198256ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loaded A7R04206.jpg in 46.583736ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.583736ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loaded A7R04208.jpg in 46.670642ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.670642ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:09Z INFO  imagestacker::image_io] Loaded A7R04209.jpg in 50.260857ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 50.260857ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:10Z INFO  imagestacker::alignment] Image 99 (A7R04208.jpg): max_regional=8126.11, global=970.14, sharp_regions=6
+    [99] A7R04208.jpg: max_region=8126.11, global=970.14, sharp_areas=6
+[2026-01-31T22:15:10Z INFO  imagestacker::alignment] Image 101 (A7R04210.jpg): max_regional=8243.71, global=958.39, sharp_regions=6
+    [101] A7R04210.jpg: max_region=8243.71, global=958.39, sharp_areas=6
+[2026-01-31T22:15:10Z INFO  imagestacker::alignment] Image 98 (A7R04207.jpg): max_regional=8149.99, global=957.15, sharp_regions=6
+    [98] A7R04207.jpg: max_region=8149.99, global=957.15, sharp_areas=6
+[2026-01-31T22:15:10Z INFO  imagestacker::alignment] Image 96 (A7R04205.jpg): max_regional=8265.77, global=963.22, sharp_regions=6
+    [96] A7R04205.jpg: max_region=8265.77, global=963.22, sharp_areas=6
+[2026-01-31T22:15:10Z INFO  imagestacker::alignment] Image 97 (A7R04206.jpg): max_regional=7965.76, global=944.47, sharp_regions=6
+    [97] A7R04206.jpg: max_region=7965.76, global=944.47, sharp_areas=6
+[2026-01-31T22:15:10Z INFO  imagestacker::alignment] Image 103 (A7R04212.jpg): max_regional=7797.55, global=937.42, sharp_regions=6
+    [103] A7R04212.jpg: max_region=7797.55, global=937.42, sharp_areas=6
+[2026-01-31T22:15:10Z INFO  imagestacker::alignment] Image 100 (A7R04209.jpg): max_regional=7934.33, global=953.36, sharp_regions=6
+    [100] A7R04209.jpg: max_region=7934.33, global=953.36, sharp_areas=6
+[2026-01-31T22:15:10Z INFO  imagestacker::alignment] Image 102 (A7R04211.jpg): max_regional=8092.60, global=952.91, sharp_regions=6
+    [102] A7R04211.jpg: max_region=8092.60, global=952.91, sharp_areas=6
+  Processing batch 14/18 (8 images)...
+Loading image: A7R04213.jpg
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04213.jpg
+Loading image: A7R04217.jpg
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04217.jpg
+Loading image: A7R04215.jpg
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04215.jpg
+Loading image: A7R04216.jpg
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04216.jpg
+Loading image: A7R04219.jpg
+Loading image: A7R04220.jpg
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04219.jpg
+Loading image: A7R04218.jpg
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04220.jpg
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04218.jpg
+Loading image: A7R04214.jpg
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04214.jpg
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loaded A7R04215.jpg in 41.709411ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.709411ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loaded A7R04218.jpg in 41.802518ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.802518ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loaded A7R04214.jpg in 42.350949ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.350949ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loaded A7R04219.jpg in 44.627709ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.627709ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loaded A7R04216.jpg in 45.634597ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 45.634597ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loaded A7R04213.jpg in 46.474687ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.474687ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loaded A7R04217.jpg in 46.661334ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.661334ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:10Z INFO  imagestacker::image_io] Loaded A7R04220.jpg in 48.009025ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 48.009025ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 110 (A7R04219.jpg): max_regional=7608.34, global=902.18, sharp_regions=6
+    [110] A7R04219.jpg: max_region=7608.34, global=902.18, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 106 (A7R04215.jpg): max_regional=7602.88, global=932.23, sharp_regions=6
+    [106] A7R04215.jpg: max_region=7602.88, global=932.23, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 109 (A7R04218.jpg): max_regional=7607.95, global=893.39, sharp_regions=6
+    [109] A7R04218.jpg: max_region=7607.95, global=893.39, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 108 (A7R04217.jpg): max_regional=7555.72, global=905.07, sharp_regions=6
+    [108] A7R04217.jpg: max_region=7555.72, global=905.07, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 104 (A7R04213.jpg): max_regional=7759.95, global=941.58, sharp_regions=6
+    [104] A7R04213.jpg: max_region=7759.95, global=941.58, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 107 (A7R04216.jpg): max_regional=7600.91, global=954.43, sharp_regions=6
+    [107] A7R04216.jpg: max_region=7600.91, global=954.43, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 111 (A7R04220.jpg): max_regional=7549.72, global=891.42, sharp_regions=6
+    [111] A7R04220.jpg: max_region=7549.72, global=891.42, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 105 (A7R04214.jpg): max_regional=7608.17, global=921.80, sharp_regions=6
+    [105] A7R04214.jpg: max_region=7608.17, global=921.80, sharp_areas=6
+  Processing batch 15/18 (8 images)...
+Loading image: A7R04221.jpg
+Loading image: A7R04223.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04221.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04223.jpg
+Loading image: A7R04222.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04222.jpg
+Loading image: A7R04225.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04225.jpg
+Loading image: A7R04226.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04226.jpg
+Loading image: A7R04227.jpg
+Loading image: A7R04228.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04227.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04228.jpg
+Loading image: A7R04224.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04224.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04223.jpg in 42.077686ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04222.jpg in 42.058289ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.077686ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.058289ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04224.jpg in 41.685605ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.685605ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04221.jpg in 42.421554ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.421554ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04227.jpg in 42.920761ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.920761ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04225.jpg in 43.642743ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.642743ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04228.jpg in 55.615873ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 55.615873ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04226.jpg in 62.586092ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 62.586092ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 115 (A7R04224.jpg): max_regional=7713.56, global=899.56, sharp_regions=6
+    [115] A7R04224.jpg: max_region=7713.56, global=899.56, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 118 (A7R04227.jpg): max_regional=7801.79, global=886.30, sharp_regions=6
+    [118] A7R04227.jpg: max_region=7801.79, global=886.30, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 114 (A7R04223.jpg): max_regional=7729.72, global=910.94, sharp_regions=6
+    [114] A7R04223.jpg: max_region=7729.72, global=910.94, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 119 (A7R04228.jpg): max_regional=7739.27, global=863.60, sharp_regions=6
+    [119] A7R04228.jpg: max_region=7739.27, global=863.60, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 113 (A7R04222.jpg): max_regional=7646.02, global=880.78, sharp_regions=6
+    [113] A7R04222.jpg: max_region=7646.02, global=880.78, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 117 (A7R04226.jpg): max_regional=7731.48, global=884.65, sharp_regions=6
+    [117] A7R04226.jpg: max_region=7731.48, global=884.65, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 112 (A7R04221.jpg): max_regional=7675.94, global=901.49, sharp_regions=6
+    [112] A7R04221.jpg: max_region=7675.94, global=901.49, sharp_areas=6
+[2026-01-31T22:15:11Z INFO  imagestacker::alignment] Image 116 (A7R04225.jpg): max_regional=7786.64, global=897.08, sharp_regions=6
+    [116] A7R04225.jpg: max_region=7786.64, global=897.08, sharp_areas=6
+  Processing batch 16/18 (8 images)...
+Loading image: A7R04229.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04229.jpg
+Loading image: A7R04231.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04231.jpg
+Loading image: A7R04232.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04232.jpg
+Loading image: A7R04233.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04233.jpg
+Loading image: A7R04234.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04234.jpg
+Loading image: A7R04230.jpg
+Loading image: A7R04235.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04230.jpg
+Loading image: A7R04236.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04235.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04236.jpg
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04234.jpg in 41.146452ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.146452ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04230.jpg in 42.668387ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.668387ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04236.jpg in 42.839504ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.839504ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04231.jpg in 42.974192ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.974192ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04232.jpg in 43.328361ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.328361ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04235.jpg in 43.419385ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.419385ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04229.jpg in 53.021444ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 53.021444ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:11Z INFO  imagestacker::image_io] Loaded A7R04233.jpg in 53.069827ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 53.069827ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:12Z INFO  imagestacker::alignment] Image 126 (A7R04235.jpg): max_regional=7978.25, global=864.26, sharp_regions=4
+    [126] A7R04235.jpg: max_region=7978.25, global=864.26, sharp_areas=4
+[2026-01-31T22:15:12Z INFO  imagestacker::alignment] Image 127 (A7R04236.jpg): max_regional=7998.34, global=854.87, sharp_regions=4
+    [127] A7R04236.jpg: max_region=7998.34, global=854.87, sharp_areas=4
+[2026-01-31T22:15:12Z INFO  imagestacker::alignment] Image 122 (A7R04231.jpg): max_regional=7873.32, global=871.72, sharp_regions=5
+    [122] A7R04231.jpg: max_region=7873.32, global=871.72, sharp_areas=5
+[2026-01-31T22:15:12Z INFO  imagestacker::alignment] Image 125 (A7R04234.jpg): max_regional=7955.85, global=875.47, sharp_regions=4
+    [125] A7R04234.jpg: max_region=7955.85, global=875.47, sharp_areas=4
+[2026-01-31T22:15:12Z INFO  imagestacker::alignment] Image 120 (A7R04229.jpg): max_regional=7834.03, global=856.15, sharp_regions=6
+    [120] A7R04229.jpg: max_region=7834.03, global=856.15, sharp_areas=6
+[2026-01-31T22:15:12Z INFO  imagestacker::alignment] Image 123 (A7R04232.jpg): max_regional=7940.61, global=867.88, sharp_regions=4
+    [123] A7R04232.jpg: max_region=7940.61, global=867.88, sharp_areas=4
+[2026-01-31T22:15:12Z INFO  imagestacker::alignment] Image 124 (A7R04233.jpg): max_regional=7980.56, global=853.04, sharp_regions=4
+    [124] A7R04233.jpg: max_region=7980.56, global=853.04, sharp_areas=4
+[2026-01-31T22:15:12Z INFO  imagestacker::alignment] Image 121 (A7R04230.jpg): max_regional=7811.60, global=870.80, sharp_regions=6
+    [121] A7R04230.jpg: max_region=7811.60, global=870.80, sharp_areas=6
+  Processing batch 17/18 (8 images)...
+Loading image: A7R04237.jpg
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04237.jpg
+Loading image: A7R04238.jpg
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04238.jpg
+Loading image: A7R04241.jpg
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04241.jpg
+Loading image: A7R04243.jpg
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04243.jpg
+Loading image: A7R04242.jpg
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04242.jpg
+Loading image: A7R04244.jpg
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04244.jpg
+Loading image: A7R04239.jpg
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04239.jpg
+Loading image: A7R04240.jpg
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04240.jpg
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loaded A7R04242.jpg in 41.159898ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.159898ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loaded A7R04238.jpg in 42.036257ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.036257ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loaded A7R04239.jpg in 42.578905ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.578905ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loaded A7R04243.jpg in 43.111535ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.111535ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loaded A7R04241.jpg in 43.837616ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.837616ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loaded A7R04240.jpg in 47.713199ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loaded A7R04244.jpg in 47.968467ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 47.713199ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 47.968467ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:12Z INFO  imagestacker::image_io] Loaded A7R04237.jpg in 48.287198ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 48.287198ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 133 (A7R04242.jpg): max_regional=8171.77, global=829.06, sharp_regions=3
+    [133] A7R04242.jpg: max_region=8171.77, global=829.06, sharp_areas=3
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 131 (A7R04240.jpg): max_regional=8050.06, global=865.62, sharp_regions=4
+    [131] A7R04240.jpg: max_region=8050.06, global=865.62, sharp_areas=4
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 128 (A7R04237.jpg): max_regional=7987.00, global=858.32, sharp_regions=4
+    [128] A7R04237.jpg: max_region=7987.00, global=858.32, sharp_areas=4
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 135 (A7R04244.jpg): max_regional=8159.02, global=823.95, sharp_regions=3
+    [135] A7R04244.jpg: max_region=8159.02, global=823.95, sharp_areas=3
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 130 (A7R04239.jpg): max_regional=8063.89, global=842.34, sharp_regions=3
+    [130] A7R04239.jpg: max_region=8063.89, global=842.34, sharp_areas=3
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 134 (A7R04243.jpg): max_regional=8179.94, global=841.71, sharp_regions=4
+    [134] A7R04243.jpg: max_region=8179.94, global=841.71, sharp_areas=4
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 132 (A7R04241.jpg): max_regional=8079.70, global=866.38, sharp_regions=4
+    [132] A7R04241.jpg: max_region=8079.70, global=866.38, sharp_areas=4
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 129 (A7R04238.jpg): max_regional=8014.70, global=859.31, sharp_regions=4
+    [129] A7R04238.jpg: max_region=8014.70, global=859.31, sharp_areas=4
+  Processing batch 18/18 (3 images)...
+Loading image: A7R04245.jpg
+Loading image: A7R04246.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04245.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04246.jpg
+Loading image: A7R04247.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04247.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loaded A7R04245.jpg in 38.596518ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.596518ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loaded A7R04247.jpg in 38.893949ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.893949ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loaded A7R04246.jpg in 39.566446ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 39.566446ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 137 (A7R04246.jpg): max_regional=8322.39, global=819.31, sharp_regions=3
+    [137] A7R04246.jpg: max_region=8322.39, global=819.31, sharp_areas=3
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 136 (A7R04245.jpg): max_regional=8239.88, global=849.32, sharp_regions=4
+    [136] A7R04245.jpg: max_region=8239.88, global=849.32, sharp_areas=4
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Image 138 (A7R04247.jpg): max_regional=8298.41, global=843.45, sharp_regions=3
+    [138] A7R04247.jpg: max_region=8298.41, global=843.45, sharp_areas=3
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Sharpness statistics:
+      Mean: 8911.59
+      Median: 8973.16
+      StdDev: 822.98
+      Q1: 8136.10
+      Q3: 9710.14
+      IQR: 1574.04
+      Threshold: 7349.08 (max of outlier=7349.08 [Q1-0.5*IQR] and absolute=30.00)
+
+Sharpness statistics:
+  Mean: 8911.59
+  Median: 8973.16
+  StdDev: 822.98
+  Q1: 8136.10
+  Q3: 9710.14
+  IQR: 1574.04
+  Threshold: 7349.08 (max of outlier=7349.08 [Q1-0.5*IQR] and absolute=30.00)
+
+=== FILTERING RESULTS ===
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 0 (A7R04109.jpg): 10251.98 - INCLUDED
+✓ Image 0 (A7R04109.jpg): 10251.98 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 1 (A7R04110.jpg): 10255.06 - INCLUDED
+✓ Image 1 (A7R04110.jpg): 10255.06 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 2 (A7R04111.jpg): 10160.54 - INCLUDED
+✓ Image 2 (A7R04111.jpg): 10160.54 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 3 (A7R04112.jpg): 10186.61 - INCLUDED
+✓ Image 3 (A7R04112.jpg): 10186.61 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 4 (A7R04113.jpg): 10138.38 - INCLUDED
+✓ Image 4 (A7R04113.jpg): 10138.38 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 5 (A7R04114.jpg): 10131.56 - INCLUDED
+✓ Image 5 (A7R04114.jpg): 10131.56 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 6 (A7R04115.jpg): 10139.97 - INCLUDED
+✓ Image 6 (A7R04115.jpg): 10139.97 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 7 (A7R04116.jpg): 10014.25 - INCLUDED
+✓ Image 7 (A7R04116.jpg): 10014.25 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 8 (A7R04117.jpg): 10056.07 - INCLUDED
+✓ Image 8 (A7R04117.jpg): 10056.07 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 9 (A7R04118.jpg): 9905.32 - INCLUDED
+✓ Image 9 (A7R04118.jpg): 9905.32 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 10 (A7R04119.jpg): 10061.38 - INCLUDED
+✓ Image 10 (A7R04119.jpg): 10061.38 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 11 (A7R04120.jpg): 9992.66 - INCLUDED
+✓ Image 11 (A7R04120.jpg): 9992.66 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 12 (A7R04121.jpg): 9875.99 - INCLUDED
+✓ Image 12 (A7R04121.jpg): 9875.99 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 13 (A7R04122.jpg): 9953.49 - INCLUDED
+✓ Image 13 (A7R04122.jpg): 9953.49 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 14 (A7R04123.jpg): 9939.03 - INCLUDED
+✓ Image 14 (A7R04123.jpg): 9939.03 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 15 (A7R04124.jpg): 9851.52 - INCLUDED
+✓ Image 15 (A7R04124.jpg): 9851.52 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 16 (A7R04125.jpg): 9851.46 - INCLUDED
+✓ Image 16 (A7R04125.jpg): 9851.46 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 17 (A7R04126.jpg): 9866.25 - INCLUDED
+✓ Image 17 (A7R04126.jpg): 9866.25 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 18 (A7R04127.jpg): 9795.13 - INCLUDED
+✓ Image 18 (A7R04127.jpg): 9795.13 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 19 (A7R04128.jpg): 9804.96 - INCLUDED
+✓ Image 19 (A7R04128.jpg): 9804.96 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 20 (A7R04129.jpg): 9646.95 - INCLUDED
+✓ Image 20 (A7R04129.jpg): 9646.95 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 21 (A7R04130.jpg): 9763.77 - INCLUDED
+✓ Image 21 (A7R04130.jpg): 9763.77 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 22 (A7R04131.jpg): 9856.30 - INCLUDED
+✓ Image 22 (A7R04131.jpg): 9856.30 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 23 (A7R04132.jpg): 9827.82 - INCLUDED
+✓ Image 23 (A7R04132.jpg): 9827.82 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 24 (A7R04133.jpg): 9834.39 - INCLUDED
+✓ Image 24 (A7R04133.jpg): 9834.39 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 25 (A7R04134.jpg): 9807.86 - INCLUDED
+✓ Image 25 (A7R04134.jpg): 9807.86 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 26 (A7R04135.jpg): 9970.66 - INCLUDED
+✓ Image 26 (A7R04135.jpg): 9970.66 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 27 (A7R04136.jpg): 9842.69 - INCLUDED
+✓ Image 27 (A7R04136.jpg): 9842.69 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 28 (A7R04137.jpg): 9890.35 - INCLUDED
+✓ Image 28 (A7R04137.jpg): 9890.35 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 29 (A7R04138.jpg): 10021.34 - INCLUDED
+✓ Image 29 (A7R04138.jpg): 10021.34 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 30 (A7R04139.jpg): 9662.81 - INCLUDED
+✓ Image 30 (A7R04139.jpg): 9662.81 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 31 (A7R04140.jpg): 9764.70 - INCLUDED
+✓ Image 31 (A7R04140.jpg): 9764.70 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 32 (A7R04141.jpg): 9649.94 - INCLUDED
+✓ Image 32 (A7R04141.jpg): 9649.94 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 33 (A7R04142.jpg): 10028.93 - INCLUDED
+✓ Image 33 (A7R04142.jpg): 10028.93 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 34 (A7R04143.jpg): 9786.60 - INCLUDED
+✓ Image 34 (A7R04143.jpg): 9786.60 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 35 (A7R04144.jpg): 9657.82 - INCLUDED
+✓ Image 35 (A7R04144.jpg): 9657.82 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 36 (A7R04145.jpg): 9763.34 - INCLUDED
+✓ Image 36 (A7R04145.jpg): 9763.34 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 37 (A7R04146.jpg): 9662.79 - INCLUDED
+✓ Image 37 (A7R04146.jpg): 9662.79 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 38 (A7R04147.jpg): 9516.61 - INCLUDED
+✓ Image 38 (A7R04147.jpg): 9516.61 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 39 (A7R04148.jpg): 9594.46 - INCLUDED
+✓ Image 39 (A7R04148.jpg): 9594.46 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 40 (A7R04149.jpg): 9492.06 - INCLUDED
+✓ Image 40 (A7R04149.jpg): 9492.06 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 41 (A7R04150.jpg): 9530.62 - INCLUDED
+✓ Image 41 (A7R04150.jpg): 9530.62 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 42 (A7R04151.jpg): 9408.89 - INCLUDED
+✓ Image 42 (A7R04151.jpg): 9408.89 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 43 (A7R04152.jpg): 9338.95 - INCLUDED
+✓ Image 43 (A7R04152.jpg): 9338.95 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 44 (A7R04153.jpg): 9225.69 - INCLUDED
+✓ Image 44 (A7R04153.jpg): 9225.69 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 45 (A7R04154.jpg): 9194.94 - INCLUDED
+✓ Image 45 (A7R04154.jpg): 9194.94 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 46 (A7R04155.jpg): 9246.69 - INCLUDED
+✓ Image 46 (A7R04155.jpg): 9246.69 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 47 (A7R04156.jpg): 9134.30 - INCLUDED
+✓ Image 47 (A7R04156.jpg): 9134.30 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 48 (A7R04157.jpg): 9033.33 - INCLUDED
+✓ Image 48 (A7R04157.jpg): 9033.33 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 49 (A7R04158.jpg): 9084.95 - INCLUDED
+✓ Image 49 (A7R04158.jpg): 9084.95 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 50 (A7R04159.jpg): 9037.54 - INCLUDED
+✓ Image 50 (A7R04159.jpg): 9037.54 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 51 (A7R04160.jpg): 8973.16 - INCLUDED
+✓ Image 51 (A7R04160.jpg): 8973.16 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 52 (A7R04161.jpg): 8976.01 - INCLUDED
+✓ Image 52 (A7R04161.jpg): 8976.01 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 53 (A7R04162.jpg): 8915.75 - INCLUDED
+✓ Image 53 (A7R04162.jpg): 8915.75 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 54 (A7R04163.jpg): 8968.03 - INCLUDED
+✓ Image 54 (A7R04163.jpg): 8968.03 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 55 (A7R04164.jpg): 8884.60 - INCLUDED
+✓ Image 55 (A7R04164.jpg): 8884.60 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 56 (A7R04165.jpg): 8877.69 - INCLUDED
+✓ Image 56 (A7R04165.jpg): 8877.69 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 57 (A7R04166.jpg): 9105.94 - INCLUDED
+✓ Image 57 (A7R04166.jpg): 9105.94 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 58 (A7R04167.jpg): 9028.80 - INCLUDED
+✓ Image 58 (A7R04167.jpg): 9028.80 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 59 (A7R04168.jpg): 9192.65 - INCLUDED
+✓ Image 59 (A7R04168.jpg): 9192.65 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 60 (A7R04169.jpg): 9494.99 - INCLUDED
+✓ Image 60 (A7R04169.jpg): 9494.99 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 61 (A7R04170.jpg): 9710.14 - INCLUDED
+✓ Image 61 (A7R04170.jpg): 9710.14 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 62 (A7R04171.jpg): 9430.65 - INCLUDED
+✓ Image 62 (A7R04171.jpg): 9430.65 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 63 (A7R04172.jpg): 9905.48 - INCLUDED
+✓ Image 63 (A7R04172.jpg): 9905.48 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 64 (A7R04173.jpg): 9491.99 - INCLUDED
+✓ Image 64 (A7R04173.jpg): 9491.99 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 65 (A7R04174.jpg): 8773.63 - INCLUDED
+✓ Image 65 (A7R04174.jpg): 8773.63 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 66 (A7R04175.jpg): 9106.03 - INCLUDED
+✓ Image 66 (A7R04175.jpg): 9106.03 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 67 (A7R04176.jpg): 9034.99 - INCLUDED
+✓ Image 67 (A7R04176.jpg): 9034.99 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 68 (A7R04177.jpg): 9484.44 - INCLUDED
+✓ Image 68 (A7R04177.jpg): 9484.44 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 69 (A7R04178.jpg): 9432.18 - INCLUDED
+✓ Image 69 (A7R04178.jpg): 9432.18 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 70 (A7R04179.jpg): 8831.35 - INCLUDED
+✓ Image 70 (A7R04179.jpg): 8831.35 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 71 (A7R04180.jpg): 9141.34 - INCLUDED
+✓ Image 71 (A7R04180.jpg): 9141.34 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 72 (A7R04181.jpg): 8669.71 - INCLUDED
+✓ Image 72 (A7R04181.jpg): 8669.71 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 73 (A7R04182.jpg): 8643.59 - INCLUDED
+✓ Image 73 (A7R04182.jpg): 8643.59 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 74 (A7R04183.jpg): 9415.39 - INCLUDED
+✓ Image 74 (A7R04183.jpg): 9415.39 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 75 (A7R04184.jpg): 9425.34 - INCLUDED
+✓ Image 75 (A7R04184.jpg): 9425.34 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 76 (A7R04185.jpg): 9273.49 - INCLUDED
+✓ Image 76 (A7R04185.jpg): 9273.49 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 77 (A7R04186.jpg): 9050.44 - INCLUDED
+✓ Image 77 (A7R04186.jpg): 9050.44 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 78 (A7R04187.jpg): 8913.17 - INCLUDED
+✓ Image 78 (A7R04187.jpg): 8913.17 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 79 (A7R04188.jpg): 8702.74 - INCLUDED
+✓ Image 79 (A7R04188.jpg): 8702.74 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 80 (A7R04189.jpg): 8630.28 - INCLUDED
+✓ Image 80 (A7R04189.jpg): 8630.28 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 81 (A7R04190.jpg): 8386.34 - INCLUDED
+✓ Image 81 (A7R04190.jpg): 8386.34 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 82 (A7R04191.jpg): 8545.19 - INCLUDED
+✓ Image 82 (A7R04191.jpg): 8545.19 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 83 (A7R04192.jpg): 8469.93 - INCLUDED
+✓ Image 83 (A7R04192.jpg): 8469.93 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 84 (A7R04193.jpg): 8502.48 - INCLUDED
+✓ Image 84 (A7R04193.jpg): 8502.48 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 85 (A7R04194.jpg): 8600.82 - INCLUDED
+✓ Image 85 (A7R04194.jpg): 8600.82 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 86 (A7R04195.jpg): 8583.63 - INCLUDED
+✓ Image 86 (A7R04195.jpg): 8583.63 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 87 (A7R04196.jpg): 8257.48 - INCLUDED
+✓ Image 87 (A7R04196.jpg): 8257.48 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 88 (A7R04197.jpg): 8471.57 - INCLUDED
+✓ Image 88 (A7R04197.jpg): 8471.57 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 89 (A7R04198.jpg): 8452.95 - INCLUDED
+✓ Image 89 (A7R04198.jpg): 8452.95 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 90 (A7R04199.jpg): 8739.46 - INCLUDED
+✓ Image 90 (A7R04199.jpg): 8739.46 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 91 (A7R04200.jpg): 8730.72 - INCLUDED
+✓ Image 91 (A7R04200.jpg): 8730.72 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 92 (A7R04201.jpg): 8836.84 - INCLUDED
+✓ Image 92 (A7R04201.jpg): 8836.84 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 93 (A7R04202.jpg): 8614.45 - INCLUDED
+✓ Image 93 (A7R04202.jpg): 8614.45 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 94 (A7R04203.jpg): 8156.40 - INCLUDED
+✓ Image 94 (A7R04203.jpg): 8156.40 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 95 (A7R04204.jpg): 8136.10 - INCLUDED
+✓ Image 95 (A7R04204.jpg): 8136.10 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 96 (A7R04205.jpg): 8265.77 - INCLUDED
+✓ Image 96 (A7R04205.jpg): 8265.77 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 97 (A7R04206.jpg): 7965.76 - INCLUDED
+✓ Image 97 (A7R04206.jpg): 7965.76 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 98 (A7R04207.jpg): 8149.99 - INCLUDED
+✓ Image 98 (A7R04207.jpg): 8149.99 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 99 (A7R04208.jpg): 8126.11 - INCLUDED
+✓ Image 99 (A7R04208.jpg): 8126.11 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 100 (A7R04209.jpg): 7934.33 - INCLUDED
+✓ Image 100 (A7R04209.jpg): 7934.33 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 101 (A7R04210.jpg): 8243.71 - INCLUDED
+✓ Image 101 (A7R04210.jpg): 8243.71 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 102 (A7R04211.jpg): 8092.60 - INCLUDED
+✓ Image 102 (A7R04211.jpg): 8092.60 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 103 (A7R04212.jpg): 7797.55 - INCLUDED
+✓ Image 103 (A7R04212.jpg): 7797.55 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 104 (A7R04213.jpg): 7759.95 - INCLUDED
+✓ Image 104 (A7R04213.jpg): 7759.95 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 105 (A7R04214.jpg): 7608.17 - INCLUDED
+✓ Image 105 (A7R04214.jpg): 7608.17 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 106 (A7R04215.jpg): 7602.88 - INCLUDED
+✓ Image 106 (A7R04215.jpg): 7602.88 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 107 (A7R04216.jpg): 7600.91 - INCLUDED
+✓ Image 107 (A7R04216.jpg): 7600.91 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 108 (A7R04217.jpg): 7555.72 - INCLUDED
+✓ Image 108 (A7R04217.jpg): 7555.72 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 109 (A7R04218.jpg): 7607.95 - INCLUDED
+✓ Image 109 (A7R04218.jpg): 7607.95 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 110 (A7R04219.jpg): 7608.34 - INCLUDED
+✓ Image 110 (A7R04219.jpg): 7608.34 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 111 (A7R04220.jpg): 7549.72 - INCLUDED
+✓ Image 111 (A7R04220.jpg): 7549.72 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 112 (A7R04221.jpg): 7675.94 - INCLUDED
+✓ Image 112 (A7R04221.jpg): 7675.94 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 113 (A7R04222.jpg): 7646.02 - INCLUDED
+✓ Image 113 (A7R04222.jpg): 7646.02 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 114 (A7R04223.jpg): 7729.72 - INCLUDED
+✓ Image 114 (A7R04223.jpg): 7729.72 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 115 (A7R04224.jpg): 7713.56 - INCLUDED
+✓ Image 115 (A7R04224.jpg): 7713.56 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 116 (A7R04225.jpg): 7786.64 - INCLUDED
+✓ Image 116 (A7R04225.jpg): 7786.64 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 117 (A7R04226.jpg): 7731.48 - INCLUDED
+✓ Image 117 (A7R04226.jpg): 7731.48 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 118 (A7R04227.jpg): 7801.79 - INCLUDED
+✓ Image 118 (A7R04227.jpg): 7801.79 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 119 (A7R04228.jpg): 7739.27 - INCLUDED
+✓ Image 119 (A7R04228.jpg): 7739.27 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 120 (A7R04229.jpg): 7834.03 - INCLUDED
+✓ Image 120 (A7R04229.jpg): 7834.03 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 121 (A7R04230.jpg): 7811.60 - INCLUDED
+✓ Image 121 (A7R04230.jpg): 7811.60 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 122 (A7R04231.jpg): 7873.32 - INCLUDED
+✓ Image 122 (A7R04231.jpg): 7873.32 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 123 (A7R04232.jpg): 7940.61 - INCLUDED
+✓ Image 123 (A7R04232.jpg): 7940.61 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 124 (A7R04233.jpg): 7980.56 - INCLUDED
+✓ Image 124 (A7R04233.jpg): 7980.56 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 125 (A7R04234.jpg): 7955.85 - INCLUDED
+✓ Image 125 (A7R04234.jpg): 7955.85 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 126 (A7R04235.jpg): 7978.25 - INCLUDED
+✓ Image 126 (A7R04235.jpg): 7978.25 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 127 (A7R04236.jpg): 7998.34 - INCLUDED
+✓ Image 127 (A7R04236.jpg): 7998.34 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 128 (A7R04237.jpg): 7987.00 - INCLUDED
+✓ Image 128 (A7R04237.jpg): 7987.00 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 129 (A7R04238.jpg): 8014.70 - INCLUDED
+✓ Image 129 (A7R04238.jpg): 8014.70 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 130 (A7R04239.jpg): 8063.89 - INCLUDED
+✓ Image 130 (A7R04239.jpg): 8063.89 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 131 (A7R04240.jpg): 8050.06 - INCLUDED
+✓ Image 131 (A7R04240.jpg): 8050.06 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 132 (A7R04241.jpg): 8079.70 - INCLUDED
+✓ Image 132 (A7R04241.jpg): 8079.70 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 133 (A7R04242.jpg): 8171.77 - INCLUDED
+✓ Image 133 (A7R04242.jpg): 8171.77 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 134 (A7R04243.jpg): 8179.94 - INCLUDED
+✓ Image 134 (A7R04243.jpg): 8179.94 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 135 (A7R04244.jpg): 8159.02 - INCLUDED
+✓ Image 135 (A7R04244.jpg): 8159.02 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 136 (A7R04245.jpg): 8239.88 - INCLUDED
+✓ Image 136 (A7R04245.jpg): 8239.88 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 137 (A7R04246.jpg): 8322.39 - INCLUDED
+✓ Image 137 (A7R04246.jpg): 8322.39 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] ✓ Image 138 (A7R04247.jpg): 8298.41 - INCLUDED
+✓ Image 138 (A7R04247.jpg): 8298.41 - INCLUDED
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] 
+    === FILTERING SUMMARY ===
+      Total images: 139
+      Sharp images: 139
+      Blurry images skipped: 0
+    ========================
+    
+
+=== FILTERING SUMMARY ===
+  Total images: 139
+  Sharp images: 139
+  Blurry images skipped: 0
+========================
+
+
+=== STARTING ALIGNMENT ===
+Using 139 sharp images for alignment
+Reference image: A7R04109.jpg
+Loading image: A7R04109.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04109.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loaded A7R04109.jpg in 38.505263ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.505263ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Processing 138 sharp image pairs in batches...
+
+Extracting features and matching 138 image pairs...
+Using AKAZE (Balanced) feature detector
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Using AKAZE detector with batch size 4 (base: 16)
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] DEBUG: batch_start=0, is_first_batch=true, load_start=0, load_count=5, batch_end=5
+[2026-01-31T22:15:13Z INFO  imagestacker::alignment] Extracting features for batch 0-4 of 138 (batch size: 5)
+Loading image: A7R04109.jpg
+Loading image: A7R04111.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04109.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04111.jpg
+Loading image: A7R04110.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04110.jpg
+Loading image: A7R04112.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04112.jpg
+Loading image: A7R04113.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04113.jpg
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loaded A7R04110.jpg in 34.866926ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.866926ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loaded A7R04113.jpg in 35.00495ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 35.00495ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loaded A7R04109.jpg in 35.467406ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 35.467406ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loaded A7R04111.jpg in 37.996991ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 37.996991ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:13Z INFO  imagestacker::image_io] Loaded A7R04112.jpg in 41.765468ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.765468ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:15Z INFO  imagestacker::alignment]   Pairwise[0]: sharp_img[1] -> sharp_img[0] (det=1.0580)
+[2026-01-31T22:15:15Z INFO  imagestacker::alignment]   Pairwise[1]: sharp_img[2] -> sharp_img[1] (det=1.0080)
+[2026-01-31T22:15:15Z INFO  imagestacker::alignment]   Pairwise[2]: sharp_img[3] -> sharp_img[2] (det=0.9828)
+[2026-01-31T22:15:15Z INFO  imagestacker::alignment]   Pairwise[3]: sharp_img[4] -> sharp_img[3] (det=0.9875)
+[2026-01-31T22:15:15Z INFO  imagestacker::alignment] DEBUG: batch_start=4, is_first_batch=false, load_start=5, load_count=4, batch_end=9
+[2026-01-31T22:15:15Z INFO  imagestacker::alignment] Extracting features for batch 5-8 of 138 (batch size: 4)
+Loading image: A7R04114.jpg
+[2026-01-31T22:15:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04114.jpg
+Loading image: A7R04116.jpg
+[2026-01-31T22:15:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04116.jpg
+Loading image: A7R04115.jpg
+[2026-01-31T22:15:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04115.jpg
+Loading image: A7R04117.jpg
+[2026-01-31T22:15:15Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04117.jpg
+[2026-01-31T22:15:15Z INFO  imagestacker::image_io] Loaded A7R04115.jpg in 34.704044ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.704044ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:15Z INFO  imagestacker::image_io] Loaded A7R04116.jpg in 36.165603ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 36.165603ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:15Z INFO  imagestacker::image_io] Loaded A7R04117.jpg in 36.532896ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 36.532896ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:15Z INFO  imagestacker::image_io] Loaded A7R04114.jpg in 38.447774ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 38.447774ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:16Z INFO  imagestacker::alignment]   Pairwise[4]: sharp_img[5] -> sharp_img[4] (det=1.0070)
+[2026-01-31T22:15:16Z INFO  imagestacker::alignment]   Pairwise[5]: sharp_img[6] -> sharp_img[5] (det=0.9611)
+[2026-01-31T22:15:16Z INFO  imagestacker::alignment]   Pairwise[6]: sharp_img[7] -> sharp_img[6] (det=0.9937)
+[2026-01-31T22:15:16Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[8] -> sharp_img[7] (det=0.000148, a=0.0099, b=-0.0070, c=0.0070, d=0.0099)
+[2026-01-31T22:15:16Z INFO  imagestacker::alignment] DEBUG: batch_start=8, is_first_batch=false, load_start=9, load_count=4, batch_end=13
+[2026-01-31T22:15:16Z INFO  imagestacker::alignment] Extracting features for batch 9-12 of 138 (batch size: 4)
+Loading image: A7R04118.jpg
+[2026-01-31T22:15:16Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04118.jpg
+Loading image: A7R04120.jpg
+[2026-01-31T22:15:16Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04120.jpg
+Loading image: A7R04119.jpg
+[2026-01-31T22:15:16Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04119.jpg
+Loading image: A7R04121.jpg
+[2026-01-31T22:15:16Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04121.jpg
+[2026-01-31T22:15:16Z INFO  imagestacker::image_io] Loaded A7R04118.jpg in 34.266466ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.266466ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:16Z INFO  imagestacker::image_io] Loaded A7R04119.jpg in 35.029267ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 35.029267ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:16Z INFO  imagestacker::image_io] Loaded A7R04120.jpg in 36.060512ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:16Z INFO  imagestacker::image_io] Loaded A7R04121.jpg in 36.428216ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 36.428216ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 36.060512ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:18Z INFO  imagestacker::alignment]   Pairwise[7]: sharp_img[9] -> sharp_img[8] (det=0.9905)
+[2026-01-31T22:15:18Z INFO  imagestacker::alignment]   Pairwise[8]: sharp_img[10] -> sharp_img[9] (det=0.9920)
+[2026-01-31T22:15:18Z INFO  imagestacker::alignment]   Pairwise[9]: sharp_img[11] -> sharp_img[10] (det=0.9972)
+[2026-01-31T22:15:18Z INFO  imagestacker::alignment]   Pairwise[10]: sharp_img[12] -> sharp_img[11] (det=0.9851)
+[2026-01-31T22:15:18Z INFO  imagestacker::alignment] DEBUG: batch_start=12, is_first_batch=false, load_start=13, load_count=4, batch_end=17
+[2026-01-31T22:15:18Z INFO  imagestacker::alignment] Extracting features for batch 13-16 of 138 (batch size: 4)
+Loading image: A7R04122.jpg
+[2026-01-31T22:15:18Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04122.jpg
+Loading image: A7R04124.jpg
+[2026-01-31T22:15:18Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04124.jpg
+Loading image: A7R04123.jpg
+[2026-01-31T22:15:18Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04123.jpg
+Loading image: A7R04125.jpg
+[2026-01-31T22:15:18Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04125.jpg
+[2026-01-31T22:15:18Z INFO  imagestacker::image_io] Loaded A7R04125.jpg in 34.590316ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.590316ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:18Z INFO  imagestacker::image_io] Loaded A7R04123.jpg in 35.325324ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 35.325324ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:18Z INFO  imagestacker::image_io] Loaded A7R04124.jpg in 35.403283ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 35.403283ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:18Z INFO  imagestacker::image_io] Loaded A7R04122.jpg in 35.658432ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 35.658432ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:19Z INFO  imagestacker::alignment]   Pairwise[11]: sharp_img[13] -> sharp_img[12] (det=0.9903)
+[2026-01-31T22:15:19Z INFO  imagestacker::alignment]   Pairwise[12]: sharp_img[14] -> sharp_img[13] (det=1.0116)
+[2026-01-31T22:15:19Z INFO  imagestacker::alignment]   Pairwise[13]: sharp_img[15] -> sharp_img[14] (det=1.0888)
+[2026-01-31T22:15:19Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[16] -> sharp_img[15] (det=0.000000, a=-0.0003, b=-0.0002, c=0.0002, d=-0.0003)
+[2026-01-31T22:15:19Z INFO  imagestacker::alignment] DEBUG: batch_start=16, is_first_batch=false, load_start=17, load_count=4, batch_end=21
+[2026-01-31T22:15:19Z INFO  imagestacker::alignment] Extracting features for batch 17-20 of 138 (batch size: 4)
+Loading image: A7R04126.jpg
+Loading image: A7R04128.jpg
+[2026-01-31T22:15:19Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04126.jpg
+Loading image: A7R04127.jpg
+[2026-01-31T22:15:19Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04128.jpg
+[2026-01-31T22:15:19Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04127.jpg
+Loading image: A7R04129.jpg
+[2026-01-31T22:15:19Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04129.jpg
+[2026-01-31T22:15:19Z INFO  imagestacker::image_io] Loaded A7R04126.jpg in 34.368381ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.368381ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:19Z INFO  imagestacker::image_io] Loaded A7R04127.jpg in 34.442062ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.442062ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:19Z INFO  imagestacker::image_io] Loaded A7R04128.jpg in 36.074569ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 36.074569ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:19Z INFO  imagestacker::image_io] Loaded A7R04129.jpg in 36.970394ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 36.970394ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:20Z INFO  imagestacker::alignment]   Pairwise[14]: sharp_img[17] -> sharp_img[16] (det=0.9941)
+[2026-01-31T22:15:20Z INFO  imagestacker::alignment]   Pairwise[15]: sharp_img[18] -> sharp_img[17] (det=1.0016)
+[2026-01-31T22:15:20Z INFO  imagestacker::alignment]   Pairwise[16]: sharp_img[19] -> sharp_img[18] (det=0.9971)
+[2026-01-31T22:15:20Z INFO  imagestacker::alignment]   Pairwise[17]: sharp_img[20] -> sharp_img[19] (det=1.0037)
+[2026-01-31T22:15:20Z INFO  imagestacker::alignment] DEBUG: batch_start=20, is_first_batch=false, load_start=21, load_count=4, batch_end=25
+[2026-01-31T22:15:20Z INFO  imagestacker::alignment] Extracting features for batch 21-24 of 138 (batch size: 4)
+Loading image: A7R04130.jpg
+[2026-01-31T22:15:20Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04130.jpg
+Loading image: A7R04131.jpg
+[2026-01-31T22:15:20Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04131.jpg
+Loading image: A7R04132.jpg
+[2026-01-31T22:15:20Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04132.jpg
+Loading image: A7R04133.jpg
+[2026-01-31T22:15:20Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04133.jpg
+[2026-01-31T22:15:20Z INFO  imagestacker::image_io] Loaded A7R04133.jpg in 34.373942ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.373942ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:20Z INFO  imagestacker::image_io] Loaded A7R04130.jpg in 34.590807ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.590807ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:20Z INFO  imagestacker::image_io] Loaded A7R04131.jpg in 35.766218ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 35.766218ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:20Z INFO  imagestacker::image_io] Loaded A7R04132.jpg in 36.702211ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 36.702211ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:21Z INFO  imagestacker::alignment]   Pairwise[18]: sharp_img[21] -> sharp_img[20] (det=0.9926)
+[2026-01-31T22:15:21Z WARN  imagestacker::alignment]   FAILED: sharp_img[22] -> sharp_img[21]
+[2026-01-31T22:15:21Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[23] -> sharp_img[22] (det=0.000000, a=0.0000, b=0.0000, c=-0.0000, d=0.0000)
+[2026-01-31T22:15:21Z INFO  imagestacker::alignment]   Pairwise[19]: sharp_img[24] -> sharp_img[23] (det=1.0000)
+[2026-01-31T22:15:21Z INFO  imagestacker::alignment] DEBUG: batch_start=24, is_first_batch=false, load_start=25, load_count=4, batch_end=29
+[2026-01-31T22:15:21Z INFO  imagestacker::alignment] Extracting features for batch 25-28 of 138 (batch size: 4)
+Loading image: A7R04134.jpg
+[2026-01-31T22:15:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04134.jpg
+Loading image: A7R04136.jpg
+Loading image: A7R04135.jpg
+Loading image: A7R04137.jpg
+[2026-01-31T22:15:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04136.jpg
+[2026-01-31T22:15:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04135.jpg
+[2026-01-31T22:15:21Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04137.jpg
+[2026-01-31T22:15:22Z INFO  imagestacker::image_io] Loaded A7R04136.jpg in 34.580658ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.580658ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:22Z INFO  imagestacker::image_io] Loaded A7R04137.jpg in 34.629742ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.629742ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:22Z INFO  imagestacker::image_io] Loaded A7R04135.jpg in 35.819109ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 35.819109ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:22Z INFO  imagestacker::image_io] Loaded A7R04134.jpg in 36.608601ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 36.608601ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:23Z INFO  imagestacker::alignment]   Pairwise[20]: sharp_img[25] -> sharp_img[24] (det=1.0012)
+[2026-01-31T22:15:23Z INFO  imagestacker::alignment]   Pairwise[21]: sharp_img[26] -> sharp_img[25] (det=0.9988)
+[2026-01-31T22:15:23Z INFO  imagestacker::alignment]   Pairwise[22]: sharp_img[27] -> sharp_img[26] (det=1.8095)
+[2026-01-31T22:15:23Z INFO  imagestacker::alignment]   Pairwise[23]: sharp_img[28] -> sharp_img[27] (det=0.9783)
+[2026-01-31T22:15:23Z INFO  imagestacker::alignment] DEBUG: batch_start=28, is_first_batch=false, load_start=29, load_count=4, batch_end=33
+[2026-01-31T22:15:23Z INFO  imagestacker::alignment] Extracting features for batch 29-32 of 138 (batch size: 4)
+Loading image: A7R04138.jpg
+Loading image: A7R04140.jpg
+[2026-01-31T22:15:23Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04138.jpg
+[2026-01-31T22:15:23Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04140.jpg
+Loading image: A7R04139.jpg
+[2026-01-31T22:15:23Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04139.jpg
+Loading image: A7R04141.jpg
+[2026-01-31T22:15:23Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04141.jpg
+[2026-01-31T22:15:23Z INFO  imagestacker::image_io] Loaded A7R04138.jpg in 34.57686ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.57686ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:23Z INFO  imagestacker::image_io] Loaded A7R04139.jpg in 44.290133ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.290133ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:23Z INFO  imagestacker::image_io] Loaded A7R04141.jpg in 44.939617ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.939617ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:23Z INFO  imagestacker::image_io] Loaded A7R04140.jpg in 45.396371ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 45.396371ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:24Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[29] -> sharp_img[28] (det=0.000001, a=-0.0005, b=-0.0007, c=0.0007, d=-0.0005)
+[2026-01-31T22:15:24Z INFO  imagestacker::alignment]   Pairwise[24]: sharp_img[30] -> sharp_img[29] (det=1.0124)
+[2026-01-31T22:15:24Z INFO  imagestacker::alignment]   Pairwise[25]: sharp_img[31] -> sharp_img[30] (det=0.9901)
+[2026-01-31T22:15:24Z INFO  imagestacker::alignment]   Pairwise[26]: sharp_img[32] -> sharp_img[31] (det=0.9923)
+[2026-01-31T22:15:24Z INFO  imagestacker::alignment] DEBUG: batch_start=32, is_first_batch=false, load_start=33, load_count=4, batch_end=37
+[2026-01-31T22:15:24Z INFO  imagestacker::alignment] Extracting features for batch 33-36 of 138 (batch size: 4)
+Loading image: A7R04142.jpg
+[2026-01-31T22:15:24Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04142.jpg
+Loading image: A7R04144.jpg
+[2026-01-31T22:15:24Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04144.jpg
+Loading image: A7R04145.jpg
+[2026-01-31T22:15:24Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04145.jpg
+Loading image: A7R04143.jpg
+[2026-01-31T22:15:24Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04143.jpg
+[2026-01-31T22:15:24Z INFO  imagestacker::image_io] Loaded A7R04142.jpg in 34.299169ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 34.299169ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:24Z INFO  imagestacker::image_io] Loaded A7R04145.jpg in 42.310501ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.310501ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:24Z INFO  imagestacker::image_io] Loaded A7R04143.jpg in 45.721414ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 45.721414ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:24Z INFO  imagestacker::image_io] Loaded A7R04144.jpg in 47.273726ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 47.273726ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:25Z INFO  imagestacker::alignment]   Pairwise[27]: sharp_img[33] -> sharp_img[32] (det=0.9924)
+[2026-01-31T22:15:25Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[34] -> sharp_img[33] (det=0.000000, a=0.0000, b=-0.0000, c=0.0000, d=0.0000)
+[2026-01-31T22:15:25Z INFO  imagestacker::alignment]   Pairwise[28]: sharp_img[35] -> sharp_img[34] (det=1.0098)
+[2026-01-31T22:15:25Z WARN  imagestacker::alignment]   FAILED: sharp_img[36] -> sharp_img[35]
+[2026-01-31T22:15:25Z INFO  imagestacker::alignment] DEBUG: batch_start=36, is_first_batch=false, load_start=37, load_count=4, batch_end=41
+[2026-01-31T22:15:25Z INFO  imagestacker::alignment] Extracting features for batch 37-40 of 138 (batch size: 4)
+Loading image: A7R04146.jpg
+[2026-01-31T22:15:25Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04146.jpg
+Loading image: A7R04148.jpg
+[2026-01-31T22:15:25Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04148.jpg
+Loading image: A7R04147.jpg
+[2026-01-31T22:15:25Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04147.jpg
+Loading image: A7R04149.jpg
+[2026-01-31T22:15:25Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04149.jpg
+[2026-01-31T22:15:25Z INFO  imagestacker::image_io] Loaded A7R04148.jpg in 41.534957ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.534957ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:25Z INFO  imagestacker::image_io] Loaded A7R04146.jpg in 42.130527ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.130527ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:25Z INFO  imagestacker::image_io] Loaded A7R04147.jpg in 43.059576ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.059576ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:25Z INFO  imagestacker::image_io] Loaded A7R04149.jpg in 48.4188ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 48.4188ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:27Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[37] -> sharp_img[36] (det=0.000000, a=0.0000, b=0.0000, c=-0.0000, d=0.0000)
+[2026-01-31T22:15:27Z INFO  imagestacker::alignment]   Pairwise[29]: sharp_img[38] -> sharp_img[37] (det=1.0084)
+[2026-01-31T22:15:27Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[39] -> sharp_img[38] (det=0.000005, a=0.0014, b=-0.0018, c=0.0018, d=0.0014)
+[2026-01-31T22:15:27Z INFO  imagestacker::alignment]   Pairwise[30]: sharp_img[40] -> sharp_img[39] (det=0.9987)
+[2026-01-31T22:15:27Z INFO  imagestacker::alignment] DEBUG: batch_start=40, is_first_batch=false, load_start=41, load_count=4, batch_end=45
+[2026-01-31T22:15:27Z INFO  imagestacker::alignment] Extracting features for batch 41-44 of 138 (batch size: 4)
+Loading image: A7R04150.jpg
+Loading image: A7R04151.jpg
+[2026-01-31T22:15:27Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04151.jpg
+Loading image: A7R04152.jpg
+[2026-01-31T22:15:27Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04152.jpg
+[2026-01-31T22:15:27Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04150.jpg
+Loading image: A7R04153.jpg
+[2026-01-31T22:15:27Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04153.jpg
+[2026-01-31T22:15:27Z INFO  imagestacker::image_io] Loaded A7R04152.jpg in 41.228228ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.228228ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:27Z INFO  imagestacker::image_io] Loaded A7R04150.jpg in 41.600622ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.600622ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:27Z INFO  imagestacker::image_io] Loaded A7R04151.jpg in 43.593128ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.593128ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:27Z INFO  imagestacker::image_io] Loaded A7R04153.jpg in 43.665246ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.665246ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:28Z INFO  imagestacker::alignment]   Pairwise[31]: sharp_img[41] -> sharp_img[40] (det=0.9962)
+[2026-01-31T22:15:28Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[42] -> sharp_img[41] (det=0.000000, a=-0.0000, b=-0.0000, c=0.0000, d=-0.0000)
+[2026-01-31T22:15:28Z INFO  imagestacker::alignment]   Pairwise[32]: sharp_img[43] -> sharp_img[42] (det=0.9938)
+[2026-01-31T22:15:28Z INFO  imagestacker::alignment]   Pairwise[33]: sharp_img[44] -> sharp_img[43] (det=0.9974)
+[2026-01-31T22:15:28Z INFO  imagestacker::alignment] DEBUG: batch_start=44, is_first_batch=false, load_start=45, load_count=4, batch_end=49
+[2026-01-31T22:15:28Z INFO  imagestacker::alignment] Extracting features for batch 45-48 of 138 (batch size: 4)
+Loading image: A7R04154.jpg
+[2026-01-31T22:15:28Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04154.jpg
+Loading image: A7R04156.jpg
+Loading image: A7R04155.jpg
+[2026-01-31T22:15:28Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04156.jpg
+[2026-01-31T22:15:28Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04155.jpg
+Loading image: A7R04157.jpg
+[2026-01-31T22:15:28Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04157.jpg
+[2026-01-31T22:15:28Z INFO  imagestacker::image_io] Loaded A7R04154.jpg in 41.270279ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.270279ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:28Z INFO  imagestacker::image_io] Loaded A7R04156.jpg in 44.030325ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.030325ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:28Z INFO  imagestacker::image_io] Loaded A7R04157.jpg in 44.680239ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.680239ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:28Z INFO  imagestacker::image_io] Loaded A7R04155.jpg in 47.580915ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 47.580915ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:29Z INFO  imagestacker::alignment]   Pairwise[34]: sharp_img[45] -> sharp_img[44] (det=0.9981)
+[2026-01-31T22:15:29Z INFO  imagestacker::alignment]   Pairwise[35]: sharp_img[46] -> sharp_img[45] (det=0.9967)
+[2026-01-31T22:15:29Z INFO  imagestacker::alignment]   Pairwise[36]: sharp_img[47] -> sharp_img[46] (det=0.9913)
+[2026-01-31T22:15:29Z INFO  imagestacker::alignment]   Pairwise[37]: sharp_img[48] -> sharp_img[47] (det=0.9969)
+[2026-01-31T22:15:29Z INFO  imagestacker::alignment] DEBUG: batch_start=48, is_first_batch=false, load_start=49, load_count=4, batch_end=53
+[2026-01-31T22:15:29Z INFO  imagestacker::alignment] Extracting features for batch 49-52 of 138 (batch size: 4)
+Loading image: A7R04158.jpg
+[2026-01-31T22:15:29Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04158.jpg
+Loading image: A7R04160.jpg
+[2026-01-31T22:15:29Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04160.jpg
+Loading image: A7R04161.jpg
+[2026-01-31T22:15:29Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04161.jpg
+Loading image: A7R04159.jpg
+[2026-01-31T22:15:29Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04159.jpg
+[2026-01-31T22:15:29Z INFO  imagestacker::image_io] Loaded A7R04159.jpg in 41.236725ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.236725ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:29Z INFO  imagestacker::image_io] Loaded A7R04161.jpg in 41.630029ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.630029ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:29Z INFO  imagestacker::image_io] Loaded A7R04158.jpg in 41.781949ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.781949ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:29Z INFO  imagestacker::image_io] Loaded A7R04160.jpg in 42.529551ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.529551ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:30Z INFO  imagestacker::alignment]   Pairwise[38]: sharp_img[49] -> sharp_img[48] (det=0.9936)
+[2026-01-31T22:15:30Z INFO  imagestacker::alignment]   Pairwise[39]: sharp_img[50] -> sharp_img[49] (det=0.9837)
+[2026-01-31T22:15:30Z INFO  imagestacker::alignment]   Pairwise[40]: sharp_img[51] -> sharp_img[50] (det=0.9970)
+[2026-01-31T22:15:30Z INFO  imagestacker::alignment]   Pairwise[41]: sharp_img[52] -> sharp_img[51] (det=0.9909)
+[2026-01-31T22:15:30Z INFO  imagestacker::alignment] DEBUG: batch_start=52, is_first_batch=false, load_start=53, load_count=4, batch_end=57
+[2026-01-31T22:15:30Z INFO  imagestacker::alignment] Extracting features for batch 53-56 of 138 (batch size: 4)
+Loading image: A7R04162.jpg
+[2026-01-31T22:15:30Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04162.jpg
+Loading image: A7R04164.jpg
+[2026-01-31T22:15:30Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04164.jpg
+Loading image: A7R04163.jpg
+[2026-01-31T22:15:30Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04163.jpg
+Loading image: A7R04165.jpg
+[2026-01-31T22:15:30Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04165.jpg
+[2026-01-31T22:15:30Z INFO  imagestacker::image_io] Loaded A7R04163.jpg in 41.483147ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.483147ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:30Z INFO  imagestacker::image_io] Loaded A7R04164.jpg in 41.818659ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.818659ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:30Z INFO  imagestacker::image_io] Loaded A7R04162.jpg in 41.948498ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.948498ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:30Z INFO  imagestacker::image_io] Loaded A7R04165.jpg in 44.897386ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.897386ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:32Z INFO  imagestacker::alignment]   Pairwise[42]: sharp_img[53] -> sharp_img[52] (det=0.9973)
+[2026-01-31T22:15:32Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[54] -> sharp_img[53] (det=0.000000, a=0.0000, b=-0.0000, c=0.0000, d=0.0000)
+[2026-01-31T22:15:32Z INFO  imagestacker::alignment]   Pairwise[43]: sharp_img[55] -> sharp_img[54] (det=0.9969)
+[2026-01-31T22:15:32Z INFO  imagestacker::alignment]   Pairwise[44]: sharp_img[56] -> sharp_img[55] (det=0.9993)
+[2026-01-31T22:15:32Z INFO  imagestacker::alignment] DEBUG: batch_start=56, is_first_batch=false, load_start=57, load_count=4, batch_end=61
+[2026-01-31T22:15:32Z INFO  imagestacker::alignment] Extracting features for batch 57-60 of 138 (batch size: 4)
+Loading image: A7R04166.jpg
+[2026-01-31T22:15:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04166.jpg
+Loading image: A7R04168.jpg
+[2026-01-31T22:15:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04168.jpg
+Loading image: A7R04169.jpg
+[2026-01-31T22:15:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04169.jpg
+Loading image: A7R04167.jpg
+[2026-01-31T22:15:32Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04167.jpg
+[2026-01-31T22:15:32Z INFO  imagestacker::image_io] Loaded A7R04166.jpg in 40.859242ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.859242ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:32Z INFO  imagestacker::image_io] Loaded A7R04167.jpg in 40.920259ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.920259ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:32Z INFO  imagestacker::image_io] Loaded A7R04168.jpg in 42.206853ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.206853ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:32Z INFO  imagestacker::image_io] Loaded A7R04169.jpg in 42.587071ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.587071ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:33Z INFO  imagestacker::alignment]   Pairwise[45]: sharp_img[57] -> sharp_img[56] (det=1.3663)
+[2026-01-31T22:15:33Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[58] -> sharp_img[57] (det=0.000000, a=0.0000, b=-0.0000, c=0.0000, d=0.0000)
+[2026-01-31T22:15:33Z INFO  imagestacker::alignment]   Pairwise[46]: sharp_img[59] -> sharp_img[58] (det=0.9951)
+[2026-01-31T22:15:33Z INFO  imagestacker::alignment]   Pairwise[47]: sharp_img[60] -> sharp_img[59] (det=0.9978)
+[2026-01-31T22:15:33Z INFO  imagestacker::alignment] DEBUG: batch_start=60, is_first_batch=false, load_start=61, load_count=4, batch_end=65
+[2026-01-31T22:15:33Z INFO  imagestacker::alignment] Extracting features for batch 61-64 of 138 (batch size: 4)
+Loading image: A7R04170.jpg
+[2026-01-31T22:15:33Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04170.jpg
+Loading image: A7R04172.jpg
+[2026-01-31T22:15:33Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04172.jpg
+Loading image: A7R04171.jpg
+[2026-01-31T22:15:33Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04171.jpg
+Loading image: A7R04173.jpg
+[2026-01-31T22:15:33Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04173.jpg
+[2026-01-31T22:15:33Z INFO  imagestacker::image_io] Loaded A7R04171.jpg in 40.759982ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.759982ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:33Z INFO  imagestacker::image_io] Loaded A7R04173.jpg in 40.888518ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.888518ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:33Z INFO  imagestacker::image_io] Loaded A7R04170.jpg in 42.940027ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.940027ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:33Z INFO  imagestacker::image_io] Loaded A7R04172.jpg in 45.135802ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 45.135802ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:34Z INFO  imagestacker::alignment]   Pairwise[48]: sharp_img[61] -> sharp_img[60] (det=0.9975)
+[2026-01-31T22:15:34Z INFO  imagestacker::alignment]   Pairwise[49]: sharp_img[62] -> sharp_img[61] (det=0.9944)
+[2026-01-31T22:15:34Z INFO  imagestacker::alignment]   Pairwise[50]: sharp_img[63] -> sharp_img[62] (det=0.9964)
+[2026-01-31T22:15:34Z INFO  imagestacker::alignment]   Pairwise[51]: sharp_img[64] -> sharp_img[63] (det=0.9933)
+[2026-01-31T22:15:34Z INFO  imagestacker::alignment] DEBUG: batch_start=64, is_first_batch=false, load_start=65, load_count=4, batch_end=69
+[2026-01-31T22:15:34Z INFO  imagestacker::alignment] Extracting features for batch 65-68 of 138 (batch size: 4)
+Loading image: A7R04174.jpg
+[2026-01-31T22:15:34Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04174.jpg
+Loading image: A7R04176.jpg
+[2026-01-31T22:15:34Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04176.jpg
+Loading image: A7R04177.jpg
+[2026-01-31T22:15:34Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04177.jpg
+Loading image: A7R04175.jpg
+[2026-01-31T22:15:34Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04175.jpg
+[2026-01-31T22:15:34Z INFO  imagestacker::image_io] Loaded A7R04177.jpg in 41.185988ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.185988ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:34Z INFO  imagestacker::image_io] Loaded A7R04174.jpg in 41.694341ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.694341ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:34Z INFO  imagestacker::image_io] Loaded A7R04176.jpg in 41.884085ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.884085ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:34Z INFO  imagestacker::image_io] Loaded A7R04175.jpg in 43.169828ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.169828ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:35Z INFO  imagestacker::alignment]   Pairwise[52]: sharp_img[65] -> sharp_img[64] (det=0.9938)
+[2026-01-31T22:15:35Z INFO  imagestacker::alignment]   Pairwise[53]: sharp_img[66] -> sharp_img[65] (det=0.9975)
+[2026-01-31T22:15:35Z INFO  imagestacker::alignment]   Pairwise[54]: sharp_img[67] -> sharp_img[66] (det=0.9972)
+[2026-01-31T22:15:35Z INFO  imagestacker::alignment]   Pairwise[55]: sharp_img[68] -> sharp_img[67] (det=0.9943)
+[2026-01-31T22:15:35Z INFO  imagestacker::alignment] DEBUG: batch_start=68, is_first_batch=false, load_start=69, load_count=4, batch_end=73
+[2026-01-31T22:15:35Z INFO  imagestacker::alignment] Extracting features for batch 69-72 of 138 (batch size: 4)
+Loading image: A7R04178.jpg
+[2026-01-31T22:15:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04178.jpg
+Loading image: A7R04180.jpg
+Loading image: A7R04181.jpg
+[2026-01-31T22:15:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04181.jpg
+[2026-01-31T22:15:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04180.jpg
+Loading image: A7R04179.jpg
+[2026-01-31T22:15:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04179.jpg
+[2026-01-31T22:15:35Z INFO  imagestacker::image_io] Loaded A7R04179.jpg in 40.721929ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.721929ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:35Z INFO  imagestacker::image_io] Loaded A7R04178.jpg in 41.454793ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.454793ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:35Z INFO  imagestacker::image_io] Loaded A7R04181.jpg in 41.955792ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.955792ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:35Z INFO  imagestacker::image_io] Loaded A7R04180.jpg in 44.592902ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.592902ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:37Z INFO  imagestacker::alignment]   Pairwise[56]: sharp_img[69] -> sharp_img[68] (det=0.9971)
+[2026-01-31T22:15:37Z INFO  imagestacker::alignment]   Pairwise[57]: sharp_img[70] -> sharp_img[69] (det=0.9934)
+[2026-01-31T22:15:37Z INFO  imagestacker::alignment]   Pairwise[58]: sharp_img[71] -> sharp_img[70] (det=0.9968)
+[2026-01-31T22:15:37Z INFO  imagestacker::alignment]   Pairwise[59]: sharp_img[72] -> sharp_img[71] (det=1.0006)
+[2026-01-31T22:15:37Z INFO  imagestacker::alignment] DEBUG: batch_start=72, is_first_batch=false, load_start=73, load_count=4, batch_end=77
+[2026-01-31T22:15:37Z INFO  imagestacker::alignment] Extracting features for batch 73-76 of 138 (batch size: 4)
+Loading image: A7R04182.jpg
+Loading image: A7R04184.jpg
+[2026-01-31T22:15:37Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04182.jpg
+[2026-01-31T22:15:37Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04184.jpg
+Loading image: A7R04183.jpg
+Loading image: A7R04185.jpg
+[2026-01-31T22:15:37Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04183.jpg
+[2026-01-31T22:15:37Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04185.jpg
+[2026-01-31T22:15:37Z INFO  imagestacker::image_io] Loaded A7R04182.jpg in 40.764181ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.764181ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:37Z INFO  imagestacker::image_io] Loaded A7R04184.jpg in 40.849464ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.849464ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:37Z INFO  imagestacker::image_io] Loaded A7R04185.jpg in 41.477827ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.477827ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:37Z INFO  imagestacker::image_io] Loaded A7R04183.jpg in 42.867007ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.867007ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:38Z INFO  imagestacker::alignment]   Pairwise[60]: sharp_img[73] -> sharp_img[72] (det=0.9958)
+[2026-01-31T22:15:38Z INFO  imagestacker::alignment]   Pairwise[61]: sharp_img[74] -> sharp_img[73] (det=0.9958)
+[2026-01-31T22:15:38Z INFO  imagestacker::alignment]   Pairwise[62]: sharp_img[75] -> sharp_img[74] (det=0.9994)
+[2026-01-31T22:15:38Z INFO  imagestacker::alignment]   Pairwise[63]: sharp_img[76] -> sharp_img[75] (det=0.9988)
+[2026-01-31T22:15:38Z INFO  imagestacker::alignment] DEBUG: batch_start=76, is_first_batch=false, load_start=77, load_count=4, batch_end=81
+[2026-01-31T22:15:38Z INFO  imagestacker::alignment] Extracting features for batch 77-80 of 138 (batch size: 4)
+Loading image: A7R04186.jpg
+[2026-01-31T22:15:38Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04186.jpg
+Loading image: A7R04187.jpg
+[2026-01-31T22:15:38Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04187.jpg
+Loading image: A7R04188.jpg
+[2026-01-31T22:15:38Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04188.jpg
+Loading image: A7R04189.jpg
+[2026-01-31T22:15:38Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04189.jpg
+[2026-01-31T22:15:38Z INFO  imagestacker::image_io] Loaded A7R04189.jpg in 41.116114ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.116114ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:38Z INFO  imagestacker::image_io] Loaded A7R04187.jpg in 42.30435ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.30435ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:38Z INFO  imagestacker::image_io] Loaded A7R04186.jpg in 42.766404ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.766404ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:38Z INFO  imagestacker::image_io] Loaded A7R04188.jpg in 44.070823ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.070823ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:39Z INFO  imagestacker::alignment]   Pairwise[64]: sharp_img[77] -> sharp_img[76] (det=0.9963)
+[2026-01-31T22:15:39Z INFO  imagestacker::alignment]   Pairwise[65]: sharp_img[78] -> sharp_img[77] (det=0.9972)
+[2026-01-31T22:15:39Z INFO  imagestacker::alignment]   Pairwise[66]: sharp_img[79] -> sharp_img[78] (det=0.9917)
+[2026-01-31T22:15:39Z INFO  imagestacker::alignment]   Pairwise[67]: sharp_img[80] -> sharp_img[79] (det=0.9998)
+[2026-01-31T22:15:39Z INFO  imagestacker::alignment] DEBUG: batch_start=80, is_first_batch=false, load_start=81, load_count=4, batch_end=85
+[2026-01-31T22:15:39Z INFO  imagestacker::alignment] Extracting features for batch 81-84 of 138 (batch size: 4)
+Loading image: A7R04190.jpg
+[2026-01-31T22:15:39Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04190.jpg
+Loading image: A7R04192.jpg
+[2026-01-31T22:15:39Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04192.jpg
+Loading image: A7R04193.jpg
+[2026-01-31T22:15:39Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04193.jpg
+Loading image: A7R04191.jpg
+[2026-01-31T22:15:39Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04191.jpg
+[2026-01-31T22:15:39Z INFO  imagestacker::image_io] Loaded A7R04193.jpg in 40.752587ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:39Z INFO  imagestacker::image_io] Loaded A7R04191.jpg in 40.751045ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.751045ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.752587ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:39Z INFO  imagestacker::image_io] Loaded A7R04190.jpg in 40.927853ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.927853ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:39Z INFO  imagestacker::image_io] Loaded A7R04192.jpg in 43.792439ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.792439ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:40Z INFO  imagestacker::alignment]   Pairwise[68]: sharp_img[81] -> sharp_img[80] (det=0.9931)
+[2026-01-31T22:15:40Z INFO  imagestacker::alignment]   Pairwise[69]: sharp_img[82] -> sharp_img[81] (det=1.0006)
+[2026-01-31T22:15:40Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[83] -> sharp_img[82] (det=0.000000, a=0.0004, b=0.0001, c=-0.0001, d=0.0004)
+[2026-01-31T22:15:40Z INFO  imagestacker::alignment]   Pairwise[70]: sharp_img[84] -> sharp_img[83] (det=0.9998)
+[2026-01-31T22:15:40Z INFO  imagestacker::alignment] DEBUG: batch_start=84, is_first_batch=false, load_start=85, load_count=4, batch_end=89
+[2026-01-31T22:15:40Z INFO  imagestacker::alignment] Extracting features for batch 85-88 of 138 (batch size: 4)
+Loading image: A7R04194.jpg
+[2026-01-31T22:15:40Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04194.jpg
+Loading image: A7R04196.jpg
+[2026-01-31T22:15:40Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04196.jpg
+Loading image: A7R04195.jpg
+[2026-01-31T22:15:40Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04195.jpg
+Loading image: A7R04197.jpg
+[2026-01-31T22:15:40Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04197.jpg
+[2026-01-31T22:15:40Z INFO  imagestacker::image_io] Loaded A7R04194.jpg in 41.230734ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.230734ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:40Z INFO  imagestacker::image_io] Loaded A7R04195.jpg in 41.856652ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.856652ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:40Z INFO  imagestacker::image_io] Loaded A7R04196.jpg in 41.945513ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.945513ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:40Z INFO  imagestacker::image_io] Loaded A7R04197.jpg in 52.018254ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 52.018254ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:42Z INFO  imagestacker::alignment]   Pairwise[71]: sharp_img[85] -> sharp_img[84] (det=0.9924)
+[2026-01-31T22:15:42Z INFO  imagestacker::alignment]   Pairwise[72]: sharp_img[86] -> sharp_img[85] (det=0.9894)
+[2026-01-31T22:15:42Z INFO  imagestacker::alignment]   Pairwise[73]: sharp_img[87] -> sharp_img[86] (det=0.9938)
+[2026-01-31T22:15:42Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[88] -> sharp_img[87] (det=0.000000, a=0.0000, b=-0.0000, c=0.0000, d=0.0000)
+[2026-01-31T22:15:42Z INFO  imagestacker::alignment] DEBUG: batch_start=88, is_first_batch=false, load_start=89, load_count=4, batch_end=93
+[2026-01-31T22:15:42Z INFO  imagestacker::alignment] Extracting features for batch 89-92 of 138 (batch size: 4)
+Loading image: A7R04198.jpg
+[2026-01-31T22:15:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04198.jpg
+Loading image: A7R04200.jpg
+[2026-01-31T22:15:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04200.jpg
+Loading image: A7R04199.jpg
+[2026-01-31T22:15:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04199.jpg
+Loading image: A7R04201.jpg
+[2026-01-31T22:15:42Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04201.jpg
+[2026-01-31T22:15:42Z INFO  imagestacker::image_io] Loaded A7R04199.jpg in 40.989853ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.989853ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:42Z INFO  imagestacker::image_io] Loaded A7R04200.jpg in 42.690519ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.690519ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:42Z INFO  imagestacker::image_io] Loaded A7R04201.jpg in 43.256193ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.256193ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:42Z INFO  imagestacker::image_io] Loaded A7R04198.jpg in 49.200618ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 49.200618ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:43Z INFO  imagestacker::alignment]   Pairwise[74]: sharp_img[89] -> sharp_img[88] (det=0.9912)
+[2026-01-31T22:15:43Z INFO  imagestacker::alignment]   Pairwise[75]: sharp_img[90] -> sharp_img[89] (det=0.9974)
+[2026-01-31T22:15:43Z INFO  imagestacker::alignment]   Pairwise[76]: sharp_img[91] -> sharp_img[90] (det=0.9951)
+[2026-01-31T22:15:43Z INFO  imagestacker::alignment]   Pairwise[77]: sharp_img[92] -> sharp_img[91] (det=0.9966)
+[2026-01-31T22:15:43Z INFO  imagestacker::alignment] DEBUG: batch_start=92, is_first_batch=false, load_start=93, load_count=4, batch_end=97
+[2026-01-31T22:15:43Z INFO  imagestacker::alignment] Extracting features for batch 93-96 of 138 (batch size: 4)
+Loading image: A7R04202.jpg
+[2026-01-31T22:15:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04202.jpg
+Loading image: A7R04204.jpg
+[2026-01-31T22:15:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04204.jpg
+Loading image: A7R04205.jpg
+[2026-01-31T22:15:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04205.jpg
+Loading image: A7R04203.jpg
+[2026-01-31T22:15:43Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04203.jpg
+[2026-01-31T22:15:43Z INFO  imagestacker::image_io] Loaded A7R04202.jpg in 40.719555ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.719555ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:43Z INFO  imagestacker::image_io] Loaded A7R04204.jpg in 40.782465ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.782465ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:43Z INFO  imagestacker::image_io] Loaded A7R04205.jpg in 40.952731ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.952731ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:43Z INFO  imagestacker::image_io] Loaded A7R04203.jpg in 43.362366ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 43.362366ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:44Z INFO  imagestacker::alignment]   Pairwise[78]: sharp_img[93] -> sharp_img[92] (det=0.9916)
+[2026-01-31T22:15:44Z INFO  imagestacker::alignment]   Pairwise[79]: sharp_img[94] -> sharp_img[93] (det=0.9958)
+[2026-01-31T22:15:44Z INFO  imagestacker::alignment]   Pairwise[80]: sharp_img[95] -> sharp_img[94] (det=0.9978)
+[2026-01-31T22:15:44Z INFO  imagestacker::alignment]   Pairwise[81]: sharp_img[96] -> sharp_img[95] (det=0.9973)
+[2026-01-31T22:15:44Z INFO  imagestacker::alignment] DEBUG: batch_start=96, is_first_batch=false, load_start=97, load_count=4, batch_end=101
+[2026-01-31T22:15:44Z INFO  imagestacker::alignment] Extracting features for batch 97-100 of 138 (batch size: 4)
+Loading image: A7R04206.jpg
+[2026-01-31T22:15:44Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04206.jpg
+Loading image: A7R04208.jpg
+[2026-01-31T22:15:44Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04208.jpg
+Loading image: A7R04209.jpg
+[2026-01-31T22:15:44Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04209.jpg
+Loading image: A7R04207.jpg
+[2026-01-31T22:15:44Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04207.jpg
+[2026-01-31T22:15:45Z INFO  imagestacker::image_io] Loaded A7R04208.jpg in 40.789709ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.789709ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:45Z INFO  imagestacker::image_io] Loaded A7R04207.jpg in 41.605602ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.605602ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:45Z INFO  imagestacker::image_io] Loaded A7R04209.jpg in 44.336ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.336ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:45Z INFO  imagestacker::image_io] Loaded A7R04206.jpg in 46.923115ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 46.923115ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:46Z INFO  imagestacker::alignment]   Pairwise[82]: sharp_img[97] -> sharp_img[96] (det=0.9949)
+[2026-01-31T22:15:46Z INFO  imagestacker::alignment]   Pairwise[83]: sharp_img[98] -> sharp_img[97] (det=0.9956)
+[2026-01-31T22:15:46Z INFO  imagestacker::alignment]   Pairwise[84]: sharp_img[99] -> sharp_img[98] (det=0.9960)
+[2026-01-31T22:15:46Z INFO  imagestacker::alignment]   Pairwise[85]: sharp_img[100] -> sharp_img[99] (det=0.9967)
+[2026-01-31T22:15:46Z INFO  imagestacker::alignment] DEBUG: batch_start=100, is_first_batch=false, load_start=101, load_count=4, batch_end=105
+[2026-01-31T22:15:46Z INFO  imagestacker::alignment] Extracting features for batch 101-104 of 138 (batch size: 4)
+Loading image: A7R04210.jpg
+[2026-01-31T22:15:46Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04210.jpg
+Loading image: A7R04212.jpg
+[2026-01-31T22:15:46Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04212.jpg
+Loading image: A7R04211.jpg
+[2026-01-31T22:15:46Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04211.jpg
+Loading image: A7R04213.jpg
+[2026-01-31T22:15:46Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04213.jpg
+[2026-01-31T22:15:46Z INFO  imagestacker::image_io] Loaded A7R04210.jpg in 40.426704ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.426704ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:46Z INFO  imagestacker::image_io] Loaded A7R04211.jpg in 41.869287ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.869287ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:46Z INFO  imagestacker::image_io] Loaded A7R04212.jpg in 42.648189ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.648189ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:46Z INFO  imagestacker::image_io] Loaded A7R04213.jpg in 42.440189ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.440189ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:47Z INFO  imagestacker::alignment]   Pairwise[86]: sharp_img[101] -> sharp_img[100] (det=0.9981)
+[2026-01-31T22:15:47Z INFO  imagestacker::alignment]   Pairwise[87]: sharp_img[102] -> sharp_img[101] (det=0.9947)
+[2026-01-31T22:15:47Z INFO  imagestacker::alignment]   Pairwise[88]: sharp_img[103] -> sharp_img[102] (det=0.9960)
+[2026-01-31T22:15:47Z INFO  imagestacker::alignment]   Pairwise[89]: sharp_img[104] -> sharp_img[103] (det=0.9969)
+[2026-01-31T22:15:47Z INFO  imagestacker::alignment] DEBUG: batch_start=104, is_first_batch=false, load_start=105, load_count=4, batch_end=109
+[2026-01-31T22:15:47Z INFO  imagestacker::alignment] Extracting features for batch 105-108 of 138 (batch size: 4)
+Loading image: A7R04214.jpg
+[2026-01-31T22:15:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04214.jpg
+Loading image: A7R04216.jpg
+Loading image: A7R04217.jpg
+Loading image: A7R04215.jpg
+[2026-01-31T22:15:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04217.jpg
+[2026-01-31T22:15:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04215.jpg
+[2026-01-31T22:15:47Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04216.jpg
+[2026-01-31T22:15:47Z INFO  imagestacker::image_io] Loaded A7R04217.jpg in 40.033922ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.033922ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:47Z INFO  imagestacker::image_io] Loaded A7R04215.jpg in 40.225369ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.225369ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:47Z INFO  imagestacker::image_io] Loaded A7R04214.jpg in 42.603252ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 42.603252ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:47Z INFO  imagestacker::image_io] Loaded A7R04216.jpg in 50.353755ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 50.353755ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:49Z INFO  imagestacker::alignment]   Pairwise[90]: sharp_img[105] -> sharp_img[104] (det=0.9960)
+[2026-01-31T22:15:49Z INFO  imagestacker::alignment]   Pairwise[91]: sharp_img[106] -> sharp_img[105] (det=0.9984)
+[2026-01-31T22:15:49Z INFO  imagestacker::alignment]   Pairwise[92]: sharp_img[107] -> sharp_img[106] (det=0.9975)
+[2026-01-31T22:15:49Z INFO  imagestacker::alignment]   Pairwise[93]: sharp_img[108] -> sharp_img[107] (det=0.9958)
+[2026-01-31T22:15:49Z INFO  imagestacker::alignment] DEBUG: batch_start=108, is_first_batch=false, load_start=109, load_count=4, batch_end=113
+[2026-01-31T22:15:49Z INFO  imagestacker::alignment] Extracting features for batch 109-112 of 138 (batch size: 4)
+Loading image: A7R04218.jpg
+Loading image: A7R04219.jpg
+[2026-01-31T22:15:49Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04218.jpg
+Loading image: A7R04221.jpg
+[2026-01-31T22:15:49Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04219.jpg
+Loading image: A7R04220.jpg
+[2026-01-31T22:15:49Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04221.jpg
+[2026-01-31T22:15:49Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04220.jpg
+[2026-01-31T22:15:49Z INFO  imagestacker::image_io] Loaded A7R04221.jpg in 39.986681ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 39.986681ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:49Z INFO  imagestacker::image_io] Loaded A7R04220.jpg in 40.323376ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.323376ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:49Z INFO  imagestacker::image_io] Loaded A7R04219.jpg in 40.339216ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.339216ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:49Z INFO  imagestacker::image_io] Loaded A7R04218.jpg in 44.143672ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.143672ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:50Z INFO  imagestacker::alignment]   Pairwise[94]: sharp_img[109] -> sharp_img[108] (det=0.9960)
+[2026-01-31T22:15:50Z INFO  imagestacker::alignment]   Pairwise[95]: sharp_img[110] -> sharp_img[109] (det=0.9974)
+[2026-01-31T22:15:50Z WARN  imagestacker::alignment]   FAILED: sharp_img[111] -> sharp_img[110]
+[2026-01-31T22:15:50Z WARN  imagestacker::alignment]   REJECTED (degenerate): sharp_img[112] -> sharp_img[111] (det=0.000000, a=-0.0000, b=-0.0000, c=0.0000, d=-0.0000)
+[2026-01-31T22:15:50Z INFO  imagestacker::alignment] DEBUG: batch_start=112, is_first_batch=false, load_start=113, load_count=4, batch_end=117
+[2026-01-31T22:15:50Z INFO  imagestacker::alignment] Extracting features for batch 113-116 of 138 (batch size: 4)
+Loading image: A7R04222.jpg
+Loading image: A7R04223.jpg
+[2026-01-31T22:15:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04222.jpg
+[2026-01-31T22:15:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04223.jpg
+Loading image: A7R04224.jpg
+[2026-01-31T22:15:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04224.jpg
+Loading image: A7R04225.jpg
+[2026-01-31T22:15:50Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04225.jpg
+[2026-01-31T22:15:50Z INFO  imagestacker::image_io] Loaded A7R04223.jpg in 40.254394ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.254394ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:50Z INFO  imagestacker::image_io] Loaded A7R04222.jpg in 40.548337ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.548337ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:50Z INFO  imagestacker::image_io] Loaded A7R04225.jpg in 40.980424ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.980424ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:50Z INFO  imagestacker::image_io] Loaded A7R04224.jpg in 44.303218ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 44.303218ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:51Z INFO  imagestacker::alignment]   Pairwise[96]: sharp_img[113] -> sharp_img[112] (det=0.9937)
+[2026-01-31T22:15:51Z INFO  imagestacker::alignment]   Pairwise[97]: sharp_img[114] -> sharp_img[113] (det=0.9949)
+[2026-01-31T22:15:51Z INFO  imagestacker::alignment]   Pairwise[98]: sharp_img[115] -> sharp_img[114] (det=0.9936)
+[2026-01-31T22:15:51Z INFO  imagestacker::alignment]   Pairwise[99]: sharp_img[116] -> sharp_img[115] (det=0.9982)
+[2026-01-31T22:15:51Z INFO  imagestacker::alignment] DEBUG: batch_start=116, is_first_batch=false, load_start=117, load_count=4, batch_end=121
+[2026-01-31T22:15:51Z INFO  imagestacker::alignment] Extracting features for batch 117-120 of 138 (batch size: 4)
+Loading image: A7R04226.jpg
+[2026-01-31T22:15:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04226.jpg
+Loading image: A7R04228.jpg
+[2026-01-31T22:15:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04228.jpg
+Loading image: A7R04229.jpg
+[2026-01-31T22:15:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04229.jpg
+Loading image: A7R04227.jpg
+[2026-01-31T22:15:51Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04227.jpg
+[2026-01-31T22:15:51Z INFO  imagestacker::image_io] Loaded A7R04228.jpg in 40.335479ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.335479ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:51Z INFO  imagestacker::image_io] Loaded A7R04229.jpg in 40.752147ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:51Z INFO  imagestacker::image_io] Loaded A7R04226.jpg in 40.946629ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.752147ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.946629ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:51Z INFO  imagestacker::image_io] Loaded A7R04227.jpg in 41.451556ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.451556ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:53Z INFO  imagestacker::alignment]   Pairwise[100]: sharp_img[117] -> sharp_img[116] (det=0.9936)
+[2026-01-31T22:15:53Z INFO  imagestacker::alignment]   Pairwise[101]: sharp_img[118] -> sharp_img[117] (det=0.9959)
+[2026-01-31T22:15:53Z INFO  imagestacker::alignment]   Pairwise[102]: sharp_img[119] -> sharp_img[118] (det=1.0020)
+[2026-01-31T22:15:53Z INFO  imagestacker::alignment]   Pairwise[103]: sharp_img[120] -> sharp_img[119] (det=1.0150)
+[2026-01-31T22:15:53Z INFO  imagestacker::alignment] DEBUG: batch_start=120, is_first_batch=false, load_start=121, load_count=4, batch_end=125
+[2026-01-31T22:15:53Z INFO  imagestacker::alignment] Extracting features for batch 121-124 of 138 (batch size: 4)
+Loading image: A7R04230.jpg
+[2026-01-31T22:15:53Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04230.jpg
+Loading image: A7R04232.jpg
+[2026-01-31T22:15:53Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04232.jpg
+Loading image: A7R04231.jpg
+[2026-01-31T22:15:53Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04231.jpg
+Loading image: A7R04233.jpg
+[2026-01-31T22:15:53Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Messer/A7R04233.jpg
+[2026-01-31T22:15:53Z INFO  imagestacker::image_io] Loaded A7R04231.jpg in 40.019554ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.019554ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:53Z INFO  imagestacker::image_io] Loaded A7R04230.jpg in 40.148591ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.148591ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:53Z INFO  imagestacker::image_io] Loaded A7R04233.jpg in 40.409952ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 40.409952ms - Size: 3181x2122, Channels: 3
+[2026-01-31T22:15:53Z INFO  imagestacker::image_io] Loaded A7R04232.jpg in 41.578048ms - Size: 3181x2122, Channels: 3
+  ✓ Loaded in 41.578048ms - Size: 3181x2122, Channels: 3

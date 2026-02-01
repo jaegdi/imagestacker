@@ -1,0 +1,76 @@
+use serde::{Deserialize, Serialize};
+use crate::system_info;
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub enum FeatureDetector {
+    ORB,
+    SIFT,
+    AKAZE,
+}
+
+impl std::fmt::Display for FeatureDetector {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            FeatureDetector::ORB => write!(f, "ORB (Fast)"),
+            FeatureDetector::SIFT => write!(f, "SIFT (Best Quality)"),
+            FeatureDetector::AKAZE => write!(f, "AKAZE (Balanced)"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProcessingConfig {
+    pub sharpness_threshold: f32,
+    pub sharpness_grid_size: i32,  // Grid size for regional sharpness detection (4-16)
+    pub sharpness_iqr_multiplier: f32,  // IQR multiplier for outlier detection (1.5 = standard, 3.0 = very permissive)
+    pub use_adaptive_batches: bool,
+    pub use_clahe: bool,
+    pub feature_detector: FeatureDetector,
+    pub batch_config: system_info::BatchSizeConfig,
+    // Advanced processing options
+    pub enable_noise_reduction: bool,
+    pub noise_reduction_strength: f32,
+    pub enable_sharpening: bool,
+    pub sharpening_strength: f32,
+    pub enable_color_correction: bool,
+    pub contrast_boost: f32,
+    pub brightness_boost: f32,
+    pub saturation_boost: f32,
+    // Preview settings
+    pub use_internal_preview: bool,
+    pub preview_max_width: f32,
+    pub preview_max_height: f32,
+    // External applications
+    pub external_viewer_path: String,  // For left-click when use_internal_preview is false
+    pub external_editor_path: String,  // For right-click
+}
+
+impl Default for ProcessingConfig {
+    fn default() -> Self {
+        Self {
+            sharpness_threshold: 30.0,
+            sharpness_grid_size: 4,  // Default 4x4 grid
+            sharpness_iqr_multiplier: 1.5,  // Standard outlier detection
+            use_adaptive_batches: true,
+            use_clahe: true,
+            feature_detector: FeatureDetector::ORB,
+            batch_config: system_info::BatchSizeConfig::default_config(),
+            // Advanced processing defaults
+            enable_noise_reduction: false,
+            noise_reduction_strength: 3.0,
+            enable_sharpening: false,
+            sharpening_strength: 1.0,
+            enable_color_correction: false,
+            contrast_boost: 1.0,
+            brightness_boost: 0.0,
+            saturation_boost: 1.0,
+            // Preview settings
+            use_internal_preview: true,
+            preview_max_width: 900.0,
+            preview_max_height: 700.0,
+            // External applications (empty = use system default)
+            external_viewer_path: String::new(),
+            external_editor_path: String::new(),
+        }
+    }
+}
