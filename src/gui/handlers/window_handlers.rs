@@ -24,12 +24,36 @@ impl ImageStacker {
     pub fn handle_toggle_help(&mut self) -> Task<Message> {
         Task::perform(
             async {
-                // Read markdown file
-                let markdown = match fs::read_to_string("USER_MANUAL.md") {
-                    Ok(content) => content,
-                    Err(e) => {
-                        log::error!("Failed to read USER_MANUAL.md: {}", e);
-                        return Err(format!("Failed to read USER_MANUAL.md: {}", e));
+                // Try multiple locations for USER_MANUAL.md
+                let help_paths = [
+                    "USER_MANUAL.md",                                    // Current directory (development)
+                    "/usr/share/doc/imagestacker/USER_MANUAL.md",       // System installation (Linux)
+                    "/usr/local/share/doc/imagestacker/USER_MANUAL.md", // Local installation
+                ];
+                
+                let mut last_error = String::new();
+                let markdown = help_paths.iter()
+                    .find_map(|path| {
+                        log::info!("Trying to load USER_MANUAL from: {}", path);
+                        match fs::read_to_string(path) {
+                            Ok(content) => {
+                                log::info!("✓ Successfully loaded USER_MANUAL from: {}", path);
+                                Some(content)
+                            }
+                            Err(e) => {
+                                log::warn!("✗ Failed to load from {}: {}", path, e);
+                                last_error = format!("{}: {}", path, e);
+                                None
+                            }
+                        }
+                    });
+                
+                let markdown = match markdown {
+                    Some(content) => content,
+                    None => {
+                        log::error!("Failed to read USER_MANUAL.md from any location. Last error: {}", last_error);
+                        return Err(format!("Failed to read USER_MANUAL.md from any of these locations:\n{}\n\nLast error: {}", 
+                            help_paths.join("\n"), last_error));
                     }
                 };
 
