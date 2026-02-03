@@ -108,7 +108,9 @@ jobs:
       image: opensuse/tumbleweed:latest
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          fetch-depth: 0
+          
       - name: Install git
         run: |
           zypper --non-interactive install -y git
