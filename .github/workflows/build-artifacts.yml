@@ -26,6 +26,12 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install LLVM
+        shell: pwsh
+        run: |
+          choco install llvm -y
+          echo "LIBCLANG_PATH=C:\\Program Files\\LLVM\\bin" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Build (release)
         run: cargo build --release
 
@@ -66,9 +72,19 @@ jobs:
           brew update
           brew install opencv pkg-config || true
 
+      - name: Install dependencies (Homebrew)
+        run: |
+          brew update
+          brew install opencv pkg-config llvm
+
+      - name: Set LLVM environment variables
+        run: |
+          echo "LIBCLANG_PATH=$(brew --prefix llvm)/lib" >> $GITHUB_ENV
+          echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-
+         
       - name: Build .app + zip
         run: |
           chmod +x packaging/macos/build.sh
