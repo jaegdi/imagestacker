@@ -29,7 +29,7 @@ jobs:
       - name: Install OpenCV (vcpkg)
         shell: pwsh
         run: |
-          vcpkg install opencv4[core,features2d,calib3d,dnn,imgcodecs]:x64-windows
+          vcpkg install opencv4[core,features2d,calib3d,dnn]:x64-windows
           # Expose vcpkg integration for CMake/pkg-config discovery where applicable
           "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
           "VCPKGRS_DYNAMIC=1" | Out-File -FilePath $env:GITHUB_ENV -Append
