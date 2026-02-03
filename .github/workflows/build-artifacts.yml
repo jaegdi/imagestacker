@@ -26,6 +26,15 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install OpenCV (vcpkg)
+        shell: pwsh
+        run: |
+          vcpkg install opencv4[core,imgproc,features2d,calib3d,dnn,imgcodecs]:x64-windows
+          # Expose vcpkg integration for CMake/pkg-config discovery where applicable
+          "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "VCPKGRS_DYNAMIC=1" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "VCPKGRS_TRIPLET=x64-windows" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Install LLVM
         shell: pwsh
         run: |
@@ -70,12 +79,9 @@ jobs:
       - name: Install dependencies (Homebrew)
         run: |
           brew update
-          brew install opencv pkg-config || true
-
-      - name: Install dependencies (Homebrew)
-        run: |
-          brew update
           brew install opencv pkg-config llvm
+          # Help pkg-config find Homebrew OpenCV
+          echo "PKG_CONFIG_PATH=$(brew --prefix)/lib/pkgconfig:$(brew --prefix opencv)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
 
       - name: Set LLVM environment variables
         run: |
@@ -114,12 +120,6 @@ jobs:
           TAG_SHA=$(git rev-list -n 1 "$GITHUB_REF")
           git merge-base --is-ancestor "$TAG_SHA" origin/master
 
-      - name: Ensure tag is on master
-        run: |
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
-          TAG_SHA=$(git rev-list -n 1 "$GITHUB_REF")
-          git merge-base --is-ancestor "$TAG_SHA" origin/master
-
       - name: Install dependencies (zypper)
         run: |
           zypper --non-interactive ref
@@ -128,6 +128,10 @@ jobs:
             gcc gcc-c++ cmake pkgconf-pkg-config \
             opencv-devel gtk3-devel ImageMagick \
             curl tar gzip
+
+      - name: Verify OpenCV via pkg-config
+        run: |
+          pkg-config --modversion opencv4
 
       - name: Install Rust (rustup)
         run: |
