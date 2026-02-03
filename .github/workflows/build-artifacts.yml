@@ -87,6 +87,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install git
+        run: |
+          zypper --non-interactive install -y \
+            git
+        
       - name: Ensure tag is on master
         run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
