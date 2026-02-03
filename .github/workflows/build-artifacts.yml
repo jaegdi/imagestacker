@@ -1,0 +1,145 @@
+name: build-artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    name: Windows (x86_64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure tag is on master
+        shell: pwsh
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
+          $sha = (git rev-list -n 1 $env:GITHUB_REF)
+          git merge-base --is-ancestor $sha origin/master
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build (release)
+        run: cargo build --release
+
+      - name: Assemble dist
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/windows/bin | Out-Null
+          New-Item -ItemType Directory -Force -Path dist/windows/doc | Out-Null
+          Copy-Item -Force target/release/imagestacker.exe dist/windows/bin/
+          if (Test-Path USER_MANUAL.md) { Copy-Item -Force USER_MANUAL.md dist/windows/doc/ }
+          if (Test-Path README.md) { Copy-Item -Force README.md dist/windows/doc/ }
+
+      - name: Zip
+        shell: pwsh
+        run: |
+          if (Test-Path dist/imagestacker-windows-x86_64.zip) { Remove-Item -Force dist/imagestacker-windows-x86_64.zip }
+          Compress-Archive -Path dist/windows/* -DestinationPath dist/imagestacker-windows-x86_64.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: imagestacker-windows-x86_64
+          path: dist/imagestacker-windows-x86_64.zip
+
+  macos_arm64:
+    name: macOS (arm64)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure tag is on master
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
+          TAG_SHA=$(git rev-list -n 1 "$GITHUB_REF")
+          git merge-base --is-ancestor "$TAG_SHA" origin/master
+
+      - name: Install dependencies (Homebrew)
+        run: |
+          brew update
+          brew install opencv pkg-config || true
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build .app + zip
+        run: |
+          chmod +x packaging/macos/build.sh
+          ./packaging/macos/build.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: imagestacker-macos-arm64
+          path: dist/imagestacker-macos-arm64.zip
+
+  linux_rpm:
+    name: Linux RPM (openSUSE Tumbleweed)
+    runs-on: ubuntu-latest
+    container:
+      image: opensuse/tumbleweed:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure tag is on master
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
+          TAG_SHA=$(git rev-list -n 1 "$GITHUB_REF")
+          git merge-base --is-ancestor "$TAG_SHA" origin/master
+
+      - name: Install dependencies (zypper)
+        run: |
+          zypper --non-interactive ref
+          zypper --non-interactive install -y \
+            rpm-build rpmdevtools \
+            gcc gcc-c++ cmake pkgconf-pkg-config \
+            opencv-devel gtk3-devel ImageMagick \
+            curl tar gzip
+
+      - name: Install Rust (rustup)
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source "$HOME/.cargo/env"
+          rustup toolchain install stable
+          rustup default stable
+
+      - name: Build RPM
+        run: |
+          source "$HOME/.cargo/env"
+          chmod +x packaging/linux/build-rpm.sh
+          packaging/linux/build-rpm.sh
+
+      - name: Collect RPM artifacts
+        run: |
+          mkdir -p dist/rpm
+          find "$HOME/rpmbuild/RPMS" -name 'imagestacker-*.rpm' -maxdepth 3 -type f -print -exec cp -v {} dist/rpm/ \;
+          find "$HOME/rpmbuild/SRPMS" -name 'imagestacker-*.src.rpm' -maxdepth 2 -type f -print -exec cp -v {} dist/rpm/ \;
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: imagestacker-rpm
+          path: dist/rpm/
+
+  release:
+    name: Create/Update GitHub Release
+    runs-on: ubuntu-latest
+    needs: [windows, macos_arm64, linux_rpm]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist-artifacts
+
+      - name: Create release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist-artifacts/**/imagestacker-*.zip
+            dist-artifacts/**/imagestacker-*.rpm
+            dist-artifacts/**/imagestacker-*.src.rpm
