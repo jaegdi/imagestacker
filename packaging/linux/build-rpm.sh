@@ -2,7 +2,7 @@
 # Build RPM package for ImageStacker on SUSE Tumbleweed
 # Usage: ./build-rpm.sh
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
@@ -100,7 +100,7 @@ cp "$PROJECT_ROOT/icons/imagestacker_icon.png" "$SOURCE_DIR/icons/" 2>/dev/null 
 }
 
 # Create tarball
-cd "$TEMP_DIR"
+cd "$RPMBUILD_DIR"
 tar czf "${PACKAGE_NAME}-${VERSION}.tar.gz" "${PACKAGE_NAME}-${VERSION}"
 mv "${PACKAGE_NAME}-${VERSION}.tar.gz" "$RPMBUILD_DIR/SOURCES/"
 
@@ -113,7 +113,11 @@ cp "$SCRIPT_DIR/imagestacker.spec" "$RPMBUILD_DIR/SPECS/"
 echo ""
 echo "Building RPM package..."
 cd "$RPMBUILD_DIR/SPECS"
-rpmbuild -ba imagestacker.spec
+rpmbuild -v -bb -ba \
+  --define "__sourcedir $SOURCE_DIR " \
+  --define "_builddir $RPMBUILD_DIR " \
+  --buildroot="$TEMP_DIR" \
+  imagestacker.spec
 
 echo ""
 echo "================================================"
