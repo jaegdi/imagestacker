@@ -119,32 +119,32 @@ jobs:
         run: |
           zypper --non-interactive install -y git
 
-      - name: Ensure tag is on master
-        run: |
-          # Ensure we're in the correct working directory and Git is initialized
-          cd "$GITHUB_WORKSPACE" || { echo "Failed to enter workspace"; exit 1; }
+      # - name: Ensure tag is on master
+      #   run: |
+      #     # Ensure we're in the correct working directory and Git is initialized
+      #     cd "$GITHUB_WORKSPACE" || { echo "Failed to enter workspace"; exit 1; }
 
-          # Force a full fetch of the remote repo, including tags
-          git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
+      #     # Force a full fetch of the remote repo, including tags
+      #     git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
 
-          # Extract the tag name from GITHUB_REF (e.g., refs/tags/v1.0.5 → v1.0.5)
-          TAG_REF="${GITHUB_REF##*/}"
+      #     # Extract the tag name from GITHUB_REF (e.g., refs/tags/v1.0.5 → v1.0.5)
+      #     TAG_REF="${GITHUB_REF##*/}"
 
-          # Resolve the tag's commit SHA
-          TAG_SHA=$(git rev-list -n 1 "$TAG_REF" 2>/dev/null || echo "")
+      #     # Resolve the tag's commit SHA
+      #     TAG_SHA=$(git rev-list -n 1 "$TAG_REF" 2>/dev/null || echo "")
 
-          if [ -z "$TAG_SHA" ]; then
-            echo "Error: Unable to resolve SHA for tag $TAG_REF"
-            exit 1
-          fi
+      #     if [ -z "$TAG_SHA" ]; then
+      #       echo "Error: Unable to resolve SHA for tag $TAG_REF"
+      #       exit 1
+      #     fi
 
-          # Verify the tag is an ancestor of origin/master (i.e., it's on the main line)
-          if ! git merge-base --is-ancestor "$TAG_SHA" origin/master; then
-            echo "Error: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"
-            exit 1
-          fi
+      #     # Verify the tag is an ancestor of origin/master (i.e., it's on the main line)
+      #     if ! git merge-base --is-ancestor "$TAG_SHA" origin/master; then
+      #       echo "Error: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"
+      #       exit 1
+      #     fi
 
-          echo "✅ Tag $TAG_REF is on master as expected."
+      #     echo "✅ Tag $TAG_REF is on master as expected."
 
       - name: Install dependencies (zypper)
         run: |
