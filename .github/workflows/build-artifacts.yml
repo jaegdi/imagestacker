@@ -154,7 +154,21 @@ jobs:
             gcc gcc-c++ cmake pkgconf-pkg-config \
             opencv-devel gtk3-devel ImageMagick \
             curl tar gzip rsync clang \
-            clang-devel llvm-devel libstdc++-devel
+            clang-devel llvm-devel libstdc++-devel \
+            libclang13
+
+      - name: Configure libclang for clang-sys
+        run: |
+          set -euo pipefail
+          LIBDIR="$(llvm-config --libdir 2>/dev/null || true)"
+          if [ -n "${LIBDIR}" ] && [ -d "${LIBDIR}" ]; then
+            echo "LIBCLANG_PATH=${LIBDIR}" >> "$GITHUB_ENV"
+          fi
+
+          echo "LIBCLANG_PATH=${LIBCLANG_PATH:-}" 
+          if [ -n "${LIBCLANG_PATH:-}" ]; then
+            ls -la "${LIBCLANG_PATH}" | head -n 200
+          fi
 
       - name: Verify OpenCV via pkg-config
         run: |
@@ -176,8 +190,11 @@ jobs:
       - name: Collect RPM artifacts
         run: |
           mkdir -p dist/rpm
-          find "$HOME/rpmbuild/RPMS" -name 'imagestacker-*.rpm' -maxdepth 3 -type f -print -exec cp -v {} dist/rpm/ \;
-          find "$HOME/rpmbuild/SRPMS" -name 'imagestacker-*.src.rpm' -maxdepth 2 -type f -print -exec cp -v {} dist/rpm/ \;
+          # build-rpm.sh uses a temp rpmbuild directory, so collect from both the default and temp locations.
+          find /tmp -path '*/rpmbuild/RPMS/*' -name 'imagestacker-*.rpm' -type f -print -exec cp -v {} dist/rpm/ \; || true
+          find /tmp -path '*/rpmbuild/SRPMS/*' -name 'imagestacker-*.src.rpm' -type f -print -exec cp -v {} dist/rpm/ \; || true
+          find "$HOME/rpmbuild/RPMS" -name 'imagestacker-*.rpm' -maxdepth 3 -type f -print -exec cp -v {} dist/rpm/ \; || true
+          find "$HOME/rpmbuild/SRPMS" -name 'imagestacker-*.src.rpm' -maxdepth 2 -type f -print -exec cp -v {} dist/rpm/ \; || true
 
       - uses: actions/upload-artifact@v4
         with:

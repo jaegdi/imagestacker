@@ -17,6 +17,9 @@ BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(opencv4)
 BuildRequires:  gtk3-devel
 BuildRequires:  ImageMagick
+BuildRequires:  clang
+BuildRequires:  clang-devel
+BuildRequires:  libclang13
 
 Requires:       opencv >= 4.5
 Requires:       gtk3
