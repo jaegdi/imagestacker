@@ -154,7 +154,7 @@ jobs:
             gcc gcc-c++ cmake pkgconf-pkg-config \
             opencv-devel gtk3-devel ImageMagick \
             curl tar gzip rsync clang \
-            libclang10-dev libllvm14-dev libstdc++-devel
+            libclang-devel libllvm14-devel libstdc++-devel
 
       - name: Verify OpenCV via pkg-config
         run: |
