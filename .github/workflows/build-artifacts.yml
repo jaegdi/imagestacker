@@ -153,7 +153,8 @@ jobs:
             rpm-build rpmdevtools \
             gcc gcc-c++ cmake pkgconf-pkg-config \
             opencv-devel gtk3-devel ImageMagick \
-            curl tar gzip rsync
+            curl tar gzip rsync clang \
+            libclang10-dev libllvm14-dev libstdc++-devel
 
       - name: Verify OpenCV via pkg-config
         run: |
