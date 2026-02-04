@@ -121,21 +121,30 @@ jobs:
 
       - name: Ensure tag is on master
         run: |
-          cd "$GITHUB_WORKSPACE"
-          export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
-          if [ ! -d .git ]; then
-            echo "ERROR: .git not found in $PWD" >&2
-            ls -la
-            exit 2
-          fi
+          # Ensure we're in the correct working directory and Git is initialized
+          cd "$GITHUB_WORKSPACE" || { echo "Failed to enter workspace"; exit 1; }
+
+          # Force a full fetch of the remote repo, including tags
           git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
-          TAG_REF="${GITHUB_REF##*/}"            # Extract just the tag name from GITHUB_REF
+
+          # Extract the tag name from GITHUB_REF (e.g., refs/tags/v1.0.5 → v1.0.5)
+          TAG_REF="${GITHUB_REF##*/}"
+
+          # Resolve the tag's commit SHA
           TAG_SHA=$(git rev-list -n 1 "$TAG_REF" 2>/dev/null || echo "")
+
           if [ -z "$TAG_SHA" ]; then
-            echo "ERROR: Unable to resolve tag SHA for $TAG_REF" >&2
+            echo "Error: Unable to resolve SHA for tag $TAG_REF"
             exit 1
           fi
-          git merge-base --is-ancestor "$TAG_SHA" origin/master || { echo "ERROR: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"; exit 1; }
+
+          # Verify the tag is an ancestor of origin/master (i.e., it's on the main line)
+          if ! git merge-base --is-ancestor "$TAG_SHA" origin/master; then
+            echo "Error: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"
+            exit 1
+          fi
+
+          echo "✅ Tag $TAG_REF is on master as expected."
 
       - name: Install dependencies (zypper)
         run: |
