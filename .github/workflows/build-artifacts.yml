@@ -17,11 +17,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Ensure tag is on master
-        shell: pwsh
         run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
-          $sha = (git rev-list -n 1 $env:GITHUB_REF)
-          git merge-base --is-ancestor $sha origin/master
+          TAG_REF="${GITHUB_REF##*/}"            # Extract just the tag name from GITHUB_REF
+          TAG_SHA=$(git rev-list -n 1 "$TAG_REF" 2>/dev/null || echo "")
+          if [ -z "$TAG_SHA" ]; then
+            echo "ERROR: Unable to resolve tag SHA for $TAG_REF" >&2
+            exit 1
+          fi
+          git merge-base --is-ancestor "$TAG_SHA" origin/master || { echo "ERROR: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"; exit 1; }
+
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -73,8 +78,13 @@ jobs:
       - name: Ensure tag is on master
         run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
-          TAG_SHA=$(git rev-list -n 1 "$GITHUB_REF")
-          git merge-base --is-ancestor "$TAG_SHA" origin/master
+          TAG_REF="${GITHUB_REF##*/}"            # Extract just the tag name from GITHUB_REF
+          TAG_SHA=$(git rev-list -n 1 "$TAG_REF" 2>/dev/null || echo "")
+          if [ -z "$TAG_SHA" ]; then
+            echo "ERROR: Unable to resolve tag SHA for $TAG_REF" >&2
+            exit 1
+          fi
+          git merge-base --is-ancestor "$TAG_SHA" origin/master || { echo "ERROR: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"; exit 1; }
 
       - name: Install dependencies (Homebrew)
         run: |
@@ -125,9 +135,14 @@ jobs:
             exit 2
           fi
           git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
-          TAG_SHA=$(git rev-list -n 1 "$GITHUB_REF")
-          git merge-base --is-ancestor "$TAG_SHA" origin/master
-
+          TAG_REF="${GITHUB_REF##*/}"            # Extract just the tag name from GITHUB_REF
+          TAG_SHA=$(git rev-list -n 1 "$TAG_REF" 2>/dev/null || echo "")
+          if [ -z "$TAG_SHA" ]; then
+            echo "ERROR: Unable to resolve tag SHA for $TAG_REF" >&2
+            exit 1
+          fi
+          git merge-base --is-ancestor "$TAG_SHA" origin/master || { echo "ERROR: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"; exit 1; }
+          
       - name: Install dependencies (zypper)
         run: |
           zypper --non-interactive ref
