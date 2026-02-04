@@ -15,7 +15,7 @@ echo "================================================"
 RPMBUILD_TEMP_DIR=$(mktemp -d)
 echo "# Use local sources dir, no sudo needed"
 RPMBUILD_DIR="/$RPMBUILD_TEMP_DIR/rpmbuild"
-mkdir -p "$RPMBUILD_DIR/{BUILD,RPMS,SOURCES,SPECS,SRPMS}"
+mkdir -p $RPMBUILD_DIR/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 echo "# Define the final archive path"
 TAR_GZ_NAME="${PACKAGE_NAME}-${VERSION}.tar.gz"
