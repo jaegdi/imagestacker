@@ -12,8 +12,9 @@ echo "================================================"
 echo "Building RPM package for ImageStacker v${VERSION}"
 echo "================================================"
 
+RPMBUILD_TEMP_DIR=$(mktemp -d)
 # Use local sources dir, no sudo needed
-RPMBUILD_DIR="/tmp/rpmbuild"
+RPMBUILD_DIR="/$RPMBUILD_TEMP_DIR/rpmbuild"
 mkdir -p "$RPMBUILD_DIR/{BUILD,RPMS,SOURCES,SPECS,SRPMS}"
 
 # Define the final archive path
