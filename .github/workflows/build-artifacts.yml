@@ -212,6 +212,16 @@ jobs:
         with:
           path: dist-artifacts
 
+      - name: Show downloaded artifacts (debug)
+        run: |
+          echo "Contents of dist-artifacts (top-level):"
+          ls -la dist-artifacts || true
+          echo "Full tree (for debugging):"
+          find dist-artifacts -maxdepth 5 -type f -print || true
+          echo
+          echo "List candidate files that match RPM/ZIP/TAR patterns:"
+          find dist-artifacts -type f \( -name 'imagestacker-*.rpm' -o -name 'imagestacker-*.src.rpm' -o -name 'imagestacker-*.zip' -o -name 'imagestacker-*.tar.gz' \) -print || true
+
       - name: Create release and upload assets
         uses: softprops/action-gh-release@v2
         with:

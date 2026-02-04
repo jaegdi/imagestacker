@@ -91,3 +91,22 @@ echo "================================================"
 
 ls -lh "$RPMBUILD_DIR/RPMS/"*/*.rpm 2>/dev/null || echo "No RPMs found"
 ls -lh "$RPMBUILD_DIR/SRPMS/"*.rpm 2>/dev/null || echo "No SRPMs found"
+
+# Copy produced RPMs/SRPMs back into the project tree so the workflow
+# can reliably upload them as artifacts (dist/rpm).
+OUT_DIR="$PROJECT_ROOT/dist/rpm"
+mkdir -p "$OUT_DIR"
+
+echo "Copying RPMs/SRPMs to $OUT_DIR"
+shopt -s nullglob || true
+for f in "$RPMBUILD_DIR"/RPMS/*/*.rpm; do
+    echo "Copying: $f -> $OUT_DIR/"
+    cp -v "$f" "$OUT_DIR/"
+done
+for f in "$RPMBUILD_DIR"/SRPMS/*.rpm; do
+    echo "Copying: $f -> $OUT_DIR/"
+    cp -v "$f" "$OUT_DIR/"
+done
+
+echo "Final artifact list in $OUT_DIR:"
+ls -lh "$OUT_DIR" || echo "(empty)"
