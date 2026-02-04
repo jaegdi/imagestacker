@@ -13,24 +13,24 @@ echo "Building RPM package for ImageStacker v${VERSION}"
 echo "================================================"
 
 RPMBUILD_TEMP_DIR=$(mktemp -d)
-# Use local sources dir, no sudo needed
+echo "# Use local sources dir, no sudo needed"
 RPMBUILD_DIR="/$RPMBUILD_TEMP_DIR/rpmbuild"
 mkdir -p "$RPMBUILD_DIR/{BUILD,RPMS,SOURCES,SPECS,SRPMS}"
 
-# Define the final archive path
+echo "# Define the final archive path"
 TAR_GZ_NAME="${PACKAGE_NAME}-${VERSION}.tar.gz"
 TAR_PATH="$RPMBUILD_DIR/SOURCES/$TAR_GZ_NAME"
 
-# Output info
+echo "# Output info"
 echo "Creating source tarball: $TAR_PATH ...."
 cd "$PROJECT_ROOT"
 
-# Step 1: Create a clean copy of the source tree in temp dir
+echo "# Step 1: Create a clean copy of the source tree in temp dir"
 TEMP_DIR=$(mktemp -d)
 SOURCE_DIR="$TEMP_DIR/${PACKAGE_NAME}-${VERSION}"
 mkdir -p "$SOURCE_DIR"
 
-# Copy all files except known irrelevant ones
+echo "# Copy all files except known irrelevant ones"
 rsync -a \
     --exclude='target/' \
     --exclude='.git/' \
@@ -44,7 +44,7 @@ rsync -a \
     --exclude='*~' \
     "$PROJECT_ROOT/" "$SOURCE_DIR/"
 
-# Ensure icon exists
+echo "# Ensure icon exists"
 ICON_PATH="$SOURCE_DIR/icons/imagestacker_icon.png"
 if [ ! -f "$ICON_PATH" ]; then
     echo "Creating placeholder icon..."
@@ -52,11 +52,15 @@ if [ ! -f "$ICON_PATH" ]; then
         -annotate +0+0 "IS" "$ICON_PATH"
 fi
 
-# Step 2: Create the tarball **from the correct path**
+echo "# Step 2: Create the tarball **from the correct path**"
 cd "$TEMP_DIR"
+echo "# check $RPMBUILD_DIR ..."
+ls -l "$RPMBUILD_DIR"
+echo "# check $RPMBUILD_DIR/SOURCES ..."
+ls -R "$RPMBUILD_DIR/SOURCES"
 tar czf "$TAR_PATH" "${PACKAGE_NAME}-${VERSION}"
 
-# Step 3: Verify the tarball exists
+echo "# Step 3: Verify the tarball exists"
 if [ ! -f "$TAR_PATH" ]; then
     echo "ERROR: Tarball not created! Path: $TAR_PATH"
     exit 1
@@ -64,14 +68,14 @@ fi
 
 echo "✅ Source tarball created successfully: $TAR_PATH"
 
-# Step 4: Copy the .spec file to SPECS
+echo "# Step 4: Copy the .spec file to SPECS"
 SPEC_SOURCE="$SCRIPT_DIR/imagestacker.spec"
 SPEC_DEST="$RPMBUILD_DIR/SPECS/${PACKAGE_NAME}.spec"
 
 cp "$SPEC_SOURCE" "$SPEC_DEST"
 echo "Copied spec file to: $SPEC_DEST"
 
-# Step 5: Build RPM using rpmbuild (without sudo)
+echo "# Step 5: Build RPM using rpmbuild (without sudo)"
 cd "$RPMBUILD_DIR/SPECS"
 echo "Building RPM package..."
 rpmbuild -v -bb \
