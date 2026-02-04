@@ -13,7 +13,7 @@ echo "Building RPM package for ImageStacker v${VERSION}"
 echo "================================================"
 
 # Use local sources dir, no sudo needed
-RPMBUILD_DIR="$HOME/rpmbuild"
+RPMBUILD_DIR="/tmp/rpmbuild"
 mkdir -p "$RPMBUILD_DIR/{BUILD,RPMS,SOURCES,SPECS,SRPMS}"
 
 # Define the final archive path
@@ -21,7 +21,7 @@ TAR_GZ_NAME="${PACKAGE_NAME}-${VERSION}.tar.gz"
 TAR_PATH="$RPMBUILD_DIR/SOURCES/$TAR_GZ_NAME"
 
 # Output info
-echo "Creating source tarball: $TAR_PATH"
+echo "Creating source tarball: $TAR_PATH ...."
 cd "$PROJECT_ROOT"
 
 # Step 1: Create a clean copy of the source tree in temp dir
