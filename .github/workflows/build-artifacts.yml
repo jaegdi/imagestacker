@@ -191,10 +191,23 @@ jobs:
         run: |
           mkdir -p dist/rpm
           # build-rpm.sh uses a temp rpmbuild directory, so collect from both the default and temp locations.
-          find /tmp -path '*/rpmbuild/RPMS/*' -name 'imagestacker-*.rpm' -type f -print -exec cp -v {} dist/rpm/ \; || true
-          find /tmp -path '*/rpmbuild/SRPMS/*' -name 'imagestacker-*.src.rpm' -type f -print -exec cp -v {} dist/rpm/ \; || true
-          find "$HOME/rpmbuild/RPMS" -name 'imagestacker-*.rpm' -maxdepth 3 -type f -print -exec cp -v {} dist/rpm/ \; || true
-          find "$HOME/rpmbuild/SRPMS" -name 'imagestacker-*.src.rpm' -maxdepth 2 -type f -print -exec cp -v {} dist/rpm/ \; || true
+          find /tmp -path '*/rpmbuild/RPMS/*' -name 'imagestacker-*.rpm' -type f -print -exec cp -v {} dist/rpm/ \; 2>/dev/null || true
+          find /tmp -path '*/rpmbuild/SRPMS/*' -name 'imagestacker-*.src.rpm' -type f -print -exec cp -v {} dist/rpm/ \; 2>/dev/null || true
+          # openSUSE rpmbuild default output location
+          find /usr/src/packages/RPMS -name 'imagestacker-*.rpm' -maxdepth 3 -type f -print -exec cp -v {} dist/rpm/ \; 2>/dev/null || true
+          find /usr/src/packages/SRPMS -name 'imagestacker-*.src.rpm' -maxdepth 2 -type f -print -exec cp -v {} dist/rpm/ \; 2>/dev/null || true
+          # Safety net (older layouts)
+          find "$HOME/rpmbuild/RPMS" -name 'imagestacker-*.rpm' -maxdepth 3 -type f -print -exec cp -v {} dist/rpm/ \; 2>/dev/null || true
+          find "$HOME/rpmbuild/SRPMS" -name 'imagestacker-*.src.rpm' -maxdepth 2 -type f -print -exec cp -v {} dist/rpm/ \; 2>/dev/null || true
+
+          echo "Collected artifacts in dist/rpm:"
+          ls -la dist/rpm || true
+
+          # Fail the job if nothing was collected, so we don't create an empty release.
+          if ! ls dist/rpm/*.rpm >/dev/null 2>&1; then
+            echo "ERROR: No RPMs found in dist/rpm; refusing to upload empty artifact." >&2
+            exit 1
+          fi
 
       - uses: actions/upload-artifact@v4
         with:

@@ -108,5 +108,21 @@ for f in "$RPMBUILD_DIR"/SRPMS/*.rpm; do
     cp -v "$f" "$OUT_DIR/"
 done
 
+# On openSUSE, rpmbuild defaults to writing results under /usr/src/packages
+# (unless _rpmdir/_srcrpmdir are overridden). In CI, this is where the RPMs end
+# up, so also collect from there.
+for f in /usr/src/packages/RPMS/*/"${PACKAGE_NAME}"-*.rpm; do
+    if [ -f "$f" ]; then
+        echo "Copying (openSUSE rpmbuild output): $f -> $OUT_DIR/"
+        cp -v "$f" "$OUT_DIR/"
+    fi
+done
+for f in /usr/src/packages/SRPMS/"${PACKAGE_NAME}"-*.src.rpm /usr/src/packages/SRPMS/"${PACKAGE_NAME}"-*.rpm; do
+    if [ -f "$f" ]; then
+        echo "Copying (openSUSE rpmbuild output): $f -> $OUT_DIR/"
+        cp -v "$f" "$OUT_DIR/"
+    fi
+done
+
 echo "Final artifact list in $OUT_DIR:"
 ls -lh "$OUT_DIR" || echo "(empty)"
