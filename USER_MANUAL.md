@@ -255,7 +255,52 @@ Contrast Limited Adaptive Histogram Equalization
 - **ORB (Fast):** Quick alignment, good for most cases
 - **SIFT (Best Quality):** Slower but more accurate
 - **AKAZE (Balanced):** Good compromise
-- **Recommended:** ORB for speed, SIFT for quality
+- **ECC (Precision):** Sub-pixel accuracy for macro focus stacking
+- **Recommended:** ORB for speed, SIFT for quality, ECC for macro
+
+### ECC Parameters (when ECC detector selected)
+
+**Motion Type:**
+- **Translation (2-DOF):** X/Y shifts only - fastest, use for minimal movement
+- **Euclidean (3-DOF):** Shifts + rotation - good for tripod shots with slight rotation
+- **Affine (6-DOF):** Shifts + rotation + scaling + shear - handles lens distortion
+- **Homography (8-DOF):** Full perspective transform - best for macro (default)
+
+**Max Iterations (3000-30000):**
+- Higher = more precise but slower
+- Default: 10000 (good for most cases)
+- Macro shots: 15000-20000 for ultimate precision
+- Test shots: 5000-7000 for faster preview
+
+**Epsilon (1e-8 to 1e-4):**
+- Convergence threshold (when to stop iterating)
+- Lower = more precise (longer processing)
+- Default: 1e-6 (balanced)
+- Ultra-precision: 1e-7 or 1e-8
+- Quick preview: 1e-5
+
+**Gaussian Filter Size (3x3 to 15x15):**
+- Pre-blur kernel to reduce noise before alignment
+- Must be odd number (3, 5, 7, 9, 11, 13, 15)
+- Default: 7x7 (good for macro)
+- Noisy images: 9x9 or 11x11
+- Clean images: 5x5 or 3x3
+
+**Parallel Chunk Size (4-24):**
+- Number of images to align in parallel
+- Higher = faster but more RAM
+- Default: 12
+- Large images (>30MP): 6-8
+- Small images (<10MP): 16-20
+
+**When to use ECC:**
+- ✅ Macro focus stacking with static subject
+- ✅ Tripod-mounted camera with minimal movement
+- ✅ Need sub-pixel (0.01-0.001px) accuracy
+- ✅ Images have good correlation (similar brightness/contrast)
+- ❌ Handheld shots with large motion (use SIFT instead)
+- ❌ Scenes with moving elements (use ORB/SIFT)
+- ❌ Very different exposures between frames
 
 ---
 

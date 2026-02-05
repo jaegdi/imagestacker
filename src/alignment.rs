@@ -1,12 +1,12 @@
 use anyhow::Result;
 use opencv::prelude::*;
-use opencv::{calib3d, core, features2d, imgproc};
+use opencv::{calib3d, core, features2d, imgproc, video};
 use rayon::prelude::*;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, OnceLock};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use crate::config::{FeatureDetector, ProcessingConfig};
+use crate::config::{EccMotionType, FeatureDetector, ProcessingConfig};
 use crate::image_io::load_image;
 use crate::sharpness;
 
@@ -30,6 +30,11 @@ pub fn extract_features(
     let mut descriptors = core::Mat::default();
 
     match detector_type {
+        FeatureDetector::ECC => {
+            // ECC doesn't use feature detection - it works on full image correlation
+            // Return empty keypoints and descriptors
+            return Ok((keypoints, descriptors));
+        }
         FeatureDetector::ORB => {
             let mut orb = features2d::ORB::create(
                 5000, // Increased from 3000 for more features and better alignment
@@ -125,6 +130,226 @@ pub fn extract_features(
     Ok((keypoints, descriptors))
 }
 
+/// Convert EccMotionType to OpenCV video::MOTION_* constant
+fn ecc_motion_to_opencv(motion: EccMotionType) -> i32 {
+    match motion {
+        EccMotionType::Translation => video::MOTION_TRANSLATION,
+        EccMotionType::Euclidean => video::MOTION_EUCLIDEAN,
+        EccMotionType::Affine => video::MOTION_AFFINE,
+        EccMotionType::Homography => video::MOTION_HOMOGRAPHY,
+    }
+}
+
+/// Compute ECC-based transformation matrix between two grayscale images
+fn compute_ecc_transform(
+    reference: &Mat,
+    target: &Mat,
+    config: &ProcessingConfig,
+) -> Result<Mat> {
+    // 1. Convert to grayscale if needed
+    let ref_gray = if reference.channels() == 1 {
+        reference.clone()
+    } else {
+        let mut gray = Mat::default();
+        imgproc::cvt_color(reference, &mut gray, imgproc::COLOR_BGR2GRAY, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+        gray
+    };
+    
+    let tgt_gray = if target.channels() == 1 {
+        target.clone()
+    } else {
+        let mut gray = Mat::default();
+        imgproc::cvt_color(target, &mut gray, imgproc::COLOR_BGR2GRAY, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+        gray
+    };
+    
+    // 2. Apply Gaussian blur to reduce noise
+    let mut ref_blurred = Mat::default();
+    let mut tgt_blurred = Mat::default();
+    
+    let kernel_size = core::Size::new(config.ecc_gauss_filter_size, config.ecc_gauss_filter_size);
+    imgproc::gaussian_blur(&ref_gray, &mut ref_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+    imgproc::gaussian_blur(&tgt_gray, &mut tgt_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+    
+    // 3. Initialize warp matrix based on motion type
+    let motion_type = ecc_motion_to_opencv(config.ecc_motion_type);
+    let rows = if motion_type == video::MOTION_HOMOGRAPHY { 3 } else { 2 };
+    let mut warp_matrix = Mat::eye(rows, 3, core::CV_32F)?.to_mat()?;
+    
+    // 4. Define termination criteria
+    let criteria = core::TermCriteria {
+        typ: core::TermCriteria_COUNT + core::TermCriteria_EPS,
+        max_count: config.ecc_max_iterations,
+        epsilon: config.ecc_epsilon,
+    };
+    
+    // 5. Compute ECC transformation
+    video::find_transform_ecc(
+        &tgt_blurred,
+        &ref_blurred,
+        &mut warp_matrix,
+        motion_type,
+        criteria,
+        &Mat::default(),  // inputMask
+        5,                // gaussFiltSize (internal, additional to our pre-blur)
+    )?;
+    
+    Ok(warp_matrix)
+}
+
+/// Align images using ECC method (for macro/precision focus stacking)
+fn align_images_ecc(
+    image_paths: &[PathBuf],
+    output_dir: &std::path::Path,
+    config: &ProcessingConfig,
+    progress_cb: Option<ProgressCallback>,
+    cancel_flag: Option<Arc<AtomicBool>>,
+) -> Result<core::Rect> {
+    let report_progress = |msg: &str, pct: f32| {
+        if let Some(ref cb) = progress_cb {
+            if let Ok(mut cb_lock) = cb.lock() {
+                cb_lock(msg.to_string(), pct);
+            }
+        }
+    };
+
+    report_progress("Starting ECC alignment...", 0.0);
+    log::info!("🔬 ECC Alignment starting with {} images", image_paths.len());
+    log::info!("   Motion: {:?}, Iterations: {}, Epsilon: {:.1e}, Kernel: {}x{}",
+               config.ecc_motion_type, config.ecc_max_iterations, 
+               config.ecc_epsilon, config.ecc_gauss_filter_size, config.ecc_gauss_filter_size);
+
+    if image_paths.len() < 2 {
+        let first_img = load_image(&image_paths[0])?;
+        return Ok(core::Rect::new(0, 0, first_img.cols(), first_img.rows()));
+    }
+
+    let aligned_dir = output_dir.join("aligned");
+    std::fs::create_dir_all(&aligned_dir)?;
+
+    // Step 1: Load all images and compute sharpness scores
+    report_progress("Computing sharpness scores...", 5.0);
+    log::info!("Step 1: Computing sharpness for {} images", image_paths.len());
+    
+    let mut image_data: Vec<(usize, PathBuf, Mat, f64)> = Vec::new();
+    
+    for (idx, path) in image_paths.iter().enumerate() {
+        // Check cancellation
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                log::info!("✋ ECC alignment cancelled by user");
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
+        
+        let img = load_image(path)?;
+        
+        // Compute sharpness using regional analysis
+        let _lock = opencl_mutex().lock().unwrap();
+        let (max_regional, _, _) = sharpness::compute_regional_sharpness_auto(&img, config.sharpness_grid_size)?;
+        drop(_lock);
+        
+        image_data.push((idx, path.clone(), img, max_regional));
+        
+        let progress = 5.0 + (idx as f32 / image_paths.len() as f32) * 10.0;
+        report_progress(&format!("Computing sharpness: {}/{}", idx + 1, image_paths.len()), progress);
+    }
+    
+    // Step 2: Sort by sharpness - use middle image as reference (most stable)
+    image_data.sort_by(|a, b| b.3.partial_cmp(&a.3).unwrap_or(std::cmp::Ordering::Equal));
+    let ref_idx = image_data.len() / 2;  // Middle sharpness image
+    let reference_img = &image_data[ref_idx].2;
+    let reference_path = &image_data[ref_idx].1;
+    
+    log::info!("Using image {} as reference (sharpness: {:.2})", 
+               reference_path.display(), image_data[ref_idx].3);
+    
+    // Save reference image
+    let ref_filename = reference_path.file_name().unwrap().to_string_lossy();
+    let ref_output = aligned_dir.join(format!("aligned_{:04}_{}", image_data[ref_idx].0, ref_filename));
+    opencv::imgcodecs::imwrite(ref_output.to_str().unwrap(), reference_img, &core::Vector::new())?;
+    
+    report_progress("Aligning images with ECC...", 15.0);
+    
+    // Step 3: Process images in parallel (excluding reference)
+    let total_to_align = image_data.len() - 1;
+    let aligned_count = Arc::new(Mutex::new(0_usize));
+    
+    // Calculate common bounding box for all aligned images
+    let bbox = Arc::new(Mutex::new(core::Rect::new(0, 0, reference_img.cols(), reference_img.rows())));
+    
+    image_data.par_iter().enumerate().try_for_each(|(list_idx, (orig_idx, path, img, _sharpness))| -> Result<()> {
+        // Skip reference image
+        if list_idx == ref_idx {
+            return Ok(());
+        }
+        
+        // Check cancellation
+        if let Some(ref flag) = cancel_flag {
+            if flag.load(Ordering::Relaxed) {
+                return Err(anyhow::anyhow!("Operation cancelled by user"));
+            }
+        }
+        
+        // Serialize OpenCL operations for thread safety
+        let _lock = opencl_mutex().lock().unwrap();
+        
+        // Compute ECC transform
+        let warp_matrix = compute_ecc_transform(reference_img, img, config)?;
+        
+        // Apply transformation
+        let mut aligned = Mat::default();
+        let img_size = reference_img.size()?;
+        
+        if config.ecc_motion_type == EccMotionType::Homography {
+            // Use perspective warp for homography
+            imgproc::warp_perspective(
+                img,
+                &mut aligned,
+                &warp_matrix,
+                img_size,
+                imgproc::INTER_LINEAR,
+                core::BORDER_CONSTANT,
+                core::Scalar::default(),
+            )?;
+        } else {
+            // Use affine warp for other motion types
+            imgproc::warp_affine(
+                img,
+                &mut aligned,
+                &warp_matrix,
+                img_size,
+                imgproc::INTER_LINEAR,
+                core::BORDER_CONSTANT,
+                core::Scalar::default(),
+            )?;
+        }
+        
+        drop(_lock);
+        
+        // Save aligned image
+        let filename = path.file_name().unwrap().to_string_lossy();
+        let output_path = aligned_dir.join(format!("aligned_{:04}_{}", orig_idx, filename));
+        opencv::imgcodecs::imwrite(output_path.to_str().unwrap(), &aligned, &core::Vector::new())?;
+        
+        // Update progress
+        let mut count = aligned_count.lock().unwrap();
+        *count += 1;
+        let progress = 15.0 + (*count as f32 / total_to_align as f32) * 80.0;
+        drop(count);
+        
+        report_progress(&format!("ECC aligned: {}/{}", *aligned_count.lock().unwrap(), total_to_align), progress);
+        
+        Ok(())
+    })?;
+    
+    report_progress("ECC alignment complete", 100.0);
+    log::info!("✅ ECC alignment completed successfully");
+    
+    let final_bbox = bbox.lock().unwrap().clone();
+    Ok(final_bbox)
+}
+
 pub fn align_images(
     image_paths: &[PathBuf],
     output_dir: &std::path::Path,
@@ -132,6 +357,11 @@ pub fn align_images(
     progress_cb: Option<ProgressCallback>,
     cancel_flag: Option<Arc<AtomicBool>>,
 ) -> Result<core::Rect> {
+    // Route to ECC-based alignment if selected
+    if config.feature_detector == FeatureDetector::ECC {
+        return align_images_ecc(image_paths, output_dir, config, progress_cb, cancel_flag);
+    }
+    
     // Log OpenCL state at function entry
     let opencl_at_start = opencv::core::use_opencl().unwrap_or(false);
     log::info!("🔍 align_images() called - OpenCL enabled at entry: {}", opencl_at_start);
@@ -371,6 +601,7 @@ pub fn align_images(
     );
     println!("\nExtracting features and matching {} image pairs...", sharp_image_paths.len() - 1);
     println!("Using {} feature detector", match config.feature_detector {
+        FeatureDetector::ECC => "ECC (Precision)",
         FeatureDetector::ORB => "ORB (Fast)",
         FeatureDetector::SIFT => "SIFT (Best Quality)",
         FeatureDetector::AKAZE => "AKAZE (Balanced)",
@@ -398,12 +629,14 @@ pub fn align_images(
         // For very large images (>30MP), use minimal batches to prevent OOM
         // With reduced SIFT features (2000), we can safely process 3 images at once
         match config.feature_detector {
+            FeatureDetector::ECC => 1,                               // ECC: serial (parallelizes internally)
             FeatureDetector::ORB => 3.min(base_feature_batch_size),     // ORB: max 3 images
             FeatureDetector::SIFT => 3,                                  // SIFT: max 3 images (increased from 2)
             FeatureDetector::AKAZE => 2,                                 // AKAZE: max 2 images
         }
     } else {
         match config.feature_detector {
+            FeatureDetector::ECC => config.ecc_chunk_size,          // ECC: use configured chunk size
             FeatureDetector::ORB => base_feature_batch_size,
             FeatureDetector::SIFT => (base_feature_batch_size / 4).max(3),
             FeatureDetector::AKAZE => (base_feature_batch_size / 4).max(3),
@@ -413,6 +646,7 @@ pub fn align_images(
     log::info!(
         "Using {} detector with batch size {} (base: {}, image size: {:.1}MP)",
         match config.feature_detector {
+            FeatureDetector::ECC => "ECC",
             FeatureDetector::ORB => "ORB",
             FeatureDetector::SIFT => "SIFT",
             FeatureDetector::AKAZE => "AKAZE",
@@ -626,6 +860,7 @@ pub fn align_images(
             } else {
                 // Choose matcher based on feature detector type
                 let norm_type = match config.feature_detector {
+                    FeatureDetector::ECC => core::NORM_L2,           // ECC uses full images, not descriptors
                     FeatureDetector::ORB => core::NORM_HAMMING,      // Binary descriptors
                     FeatureDetector::SIFT => core::NORM_L2,          // Float descriptors
                     FeatureDetector::AKAZE => core::NORM_HAMMING,    // Binary descriptors

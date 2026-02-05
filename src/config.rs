@@ -6,6 +6,7 @@ pub enum FeatureDetector {
     ORB,
     SIFT,
     AKAZE,
+    ECC,  // Enhanced Correlation Coefficient - best for macro/focus stacking
 }
 
 impl std::fmt::Display for FeatureDetector {
@@ -14,6 +15,26 @@ impl std::fmt::Display for FeatureDetector {
             FeatureDetector::ORB => write!(f, "ORB (Fast)"),
             FeatureDetector::SIFT => write!(f, "SIFT (Best Quality)"),
             FeatureDetector::AKAZE => write!(f, "AKAZE (Balanced)"),
+            FeatureDetector::ECC => write!(f, "ECC (Macro/Precision)"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub enum EccMotionType {
+    Translation,   // 2 DOF: x, y translation only
+    Euclidean,     // 3 DOF: translation + rotation
+    Affine,        // 6 DOF: translation, rotation, scale, shear
+    Homography,    // 8 DOF: full perspective transform (best for macro rails)
+}
+
+impl std::fmt::Display for EccMotionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            EccMotionType::Translation => write!(f, "Translation"),
+            EccMotionType::Euclidean => write!(f, "Euclidean (Rotation)"),
+            EccMotionType::Affine => write!(f, "Affine (Scale/Shear)"),
+            EccMotionType::Homography => write!(f, "Homography (Perspective)"),
         }
     }
 }
@@ -27,6 +48,12 @@ pub struct ProcessingConfig {
     pub use_clahe: bool,
     pub feature_detector: FeatureDetector,
     pub batch_config: system_info::BatchSizeConfig,
+    // ECC-specific parameters (only used when feature_detector == ECC)
+    pub ecc_motion_type: EccMotionType,
+    pub ecc_max_iterations: i32,      // Maximum iterations (3000-30000, default 10000)
+    pub ecc_epsilon: f64,              // Convergence threshold (1e-8 to 1e-4, default 1e-6)
+    pub ecc_gauss_filter_size: i32,   // Gaussian blur kernel size (3-15, odd, default 7)
+    pub ecc_chunk_size: usize,         // Images per parallel chunk (8-16, default 12)
     // Advanced processing options
     pub enable_noise_reduction: bool,
     pub noise_reduction_strength: f32,
@@ -55,6 +82,12 @@ impl Default for ProcessingConfig {
             use_clahe: true,
             feature_detector: FeatureDetector::ORB,
             batch_config: system_info::BatchSizeConfig::default_config(),
+            // ECC defaults (optimized for macro focus stacking)
+            ecc_motion_type: EccMotionType::Homography,  // Best for focus rails with slight camera movement
+            ecc_max_iterations: 10000,                   // Standard precision
+            ecc_epsilon: 1e-6,                           // Sub-pixel accuracy
+            ecc_gauss_filter_size: 7,                    // Smooth focus gradients
+            ecc_chunk_size: 12,                          // Optimal for 4-8 core systems
             // Advanced processing defaults
             enable_noise_reduction: false,
             noise_reduction_strength: 3.0,

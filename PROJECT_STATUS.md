@@ -52,6 +52,21 @@ Rust-basierte Focus-Stacking-Anwendung mit OpenCV für die Verarbeitung von Foto
 - **Erwarteter Speedup**: 191s → 130-140s (30-35% Verbesserung)
 - **Qualitäts-Impact**: Minimal - 2000 Features reichen für excellentes Alignment
 
+#### ECC Precision Alignment (NEU!)
+- **Sub-Pixel Genauigkeit**: Enhanced Correlation Coefficient für höchste Präzision
+- **4 Motion-Modelle**: Translation (2-DOF), Euclidean (3-DOF), Affine (6-DOF), Homography (8-DOF)
+- **Iterative Optimierung**: Bis zu 30.000 Iterationen für 0.01-0.001px Genauigkeit
+- **Perfekt für Makro-Focus-Stacking**: Übertrifft Feature-Detektoren bei statischen Motiven
+- **Konfigurierbare Parameter**:
+  - `ecc_motion_type`: Transformation model (Standard: Homography)
+  - `ecc_max_iterations`: 3000-30000 (Standard: 10000)
+  - `ecc_epsilon`: 1e-8 bis 1e-4 Konvergenz-Schwellwert (Standard: 1e-6)
+  - `ecc_gauss_filter_size`: 3x3 bis 15x15 Pre-Blur Kernel (Standard: 7x7)
+  - `ecc_chunk_size`: 4-24 Bilder für parallele Verarbeitung (Standard: 12)
+- **GPU-beschleunigt**: Nutzt OpenCV's optimierte `find_transform_ecc()` via OpenCL
+- **Automatisches Sharpness-Ranking**: Wählt mittelscharfes Bild als Referenz (stabil)
+- **Datei**: `src/alignment.rs` `align_images_ecc()`
+
 ### Erfolgreich implementierte Optimierungen
 
 #### 1. Regionale Schärfe-Erkennung (Regional Sharpness Detection)

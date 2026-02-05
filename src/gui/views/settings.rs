@@ -7,7 +7,7 @@ use iced::widget::{
 };
 use iced::{Element, Length};
 
-use crate::config::FeatureDetector;
+use crate::config::{EccMotionType, FeatureDetector};
 use crate::messages::Message;
 use super::super::state::ImageStacker;
 
@@ -153,6 +153,25 @@ impl ImageStacker {
         })
         .on_press(Message::FeatureDetectorChanged(FeatureDetector::AKAZE));
 
+        let ecc_button = button(text("ECC").size(14))
+        .style(move |theme, status| {
+            if self.config.feature_detector == FeatureDetector::ECC {
+                button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.4, 0.6))),
+                    text_color: iced::Color::WHITE,
+                    border: iced::Border {
+                        color: iced::Color::from_rgb(0.4, 0.5, 0.8),
+                        width: 2.0,
+                        radius: 4.0.into(),
+                    },
+                    ..Default::default()
+                }
+            } else {
+                button::secondary(theme, status)
+            }
+        })
+        .on_press(Message::FeatureDetectorChanged(FeatureDetector::ECC));
+
         // Feature detector layout: vertical when horizontal pane layout, horizontal when vertical pane layout
         let feature_layout: Element<'_, Message> = if use_horizontal_layout {
             // Horizontal layout -> stack detector buttons vertically
@@ -161,6 +180,7 @@ impl ImageStacker {
                 orb_button.width(Length::Fixed(160.0)),
                 sift_button.width(Length::Fixed(160.0)),
                 akaze_button.width(Length::Fixed(160.0)),
+                ecc_button.width(Length::Fixed(160.0)),
             ]
             .spacing(5)
             .into()
@@ -171,9 +191,139 @@ impl ImageStacker {
                 orb_button,
                 sift_button,
                 akaze_button,
+                ecc_button,
             ]
             .spacing(10)
             .into()
+        };
+
+        // ECC-specific parameters (conditionally shown)
+        let ecc_params_ui: Element<'_, Message> = if self.config.feature_detector == FeatureDetector::ECC {
+            // Motion Type buttons
+            let translation_selected = self.config.ecc_motion_type == EccMotionType::Translation;
+            let euclidean_selected = self.config.ecc_motion_type == EccMotionType::Euclidean;
+            let affine_selected = self.config.ecc_motion_type == EccMotionType::Affine;
+            let homography_selected = self.config.ecc_motion_type == EccMotionType::Homography;
+            
+            // Parameters sliders
+            let iterations_slider = column![
+                text(format!("Max Iterations: {}", self.config.ecc_max_iterations)).size(12),
+                slider(3000.0..=30000.0, self.config.ecc_max_iterations as f32, Message::EccMaxIterationsChanged)
+                    .step(1000.0)
+            ].spacing(3);
+
+            // Epsilon uses logarithmic scale: slider shows exponent, actual value is 10^x
+            let epsilon_exponent = self.config.ecc_epsilon.log10();
+            let epsilon_slider = column![
+                text(format!("Epsilon: {:.1e} (convergence threshold)", self.config.ecc_epsilon)).size(12),
+                slider(-8.0..=-4.0, epsilon_exponent as f32, Message::EccEpsilonChanged)
+                    .step(0.5)
+            ].spacing(3);
+
+            let filter_slider = column![
+                text(format!("Gaussian Filter Size: {}x{}", self.config.ecc_gauss_filter_size, self.config.ecc_gauss_filter_size)).size(12),
+                slider(3.0..=15.0, self.config.ecc_gauss_filter_size as f32, Message::EccGaussFilterSizeChanged)
+                    .step(2.0)  // Ensures odd values
+            ].spacing(3);
+
+            let chunk_slider = column![
+                text(format!("Parallel Chunk Size: {} images", self.config.ecc_chunk_size)).size(12),
+                slider(4.0..=24.0, self.config.ecc_chunk_size as f32, Message::EccChunkSizeChanged)
+                    .step(2.0)
+            ].spacing(3);
+
+            column![
+                text("ECC Parameters:").size(13).style(|_| text::Style {
+                    color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
+                }),
+                text("Motion Type:").size(12),
+                row![
+                    button(text("Translation (2-DOF)").size(12))
+                        .style(move |theme, status| {
+                            if translation_selected {
+                                button::Style {
+                                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.6))),
+                                    text_color: iced::Color::WHITE,
+                                    border: iced::Border {
+                                        color: iced::Color::from_rgb(0.4, 0.7, 0.8),
+                                        width: 2.0,
+                                        radius: 3.0.into(),
+                                    },
+                                    ..Default::default()
+                                }
+                            } else {
+                                button::secondary(theme, status)
+                            }
+                        })
+                        .on_press(Message::EccMotionTypeChanged(EccMotionType::Translation)),
+                    button(text("Euclidean (3-DOF)").size(12))
+                        .style(move |theme, status| {
+                            if euclidean_selected {
+                                button::Style {
+                                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.6))),
+                                    text_color: iced::Color::WHITE,
+                                    border: iced::Border {
+                                        color: iced::Color::from_rgb(0.4, 0.7, 0.8),
+                                        width: 2.0,
+                                        radius: 3.0.into(),
+                                    },
+                                    ..Default::default()
+                                }
+                            } else {
+                                button::secondary(theme, status)
+                            }
+                        })
+                        .on_press(Message::EccMotionTypeChanged(EccMotionType::Euclidean)),
+                ].spacing(5),
+                row![
+                    button(text("Affine (6-DOF)").size(12))
+                        .style(move |theme, status| {
+                            if affine_selected {
+                                button::Style {
+                                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.6))),
+                                    text_color: iced::Color::WHITE,
+                                    border: iced::Border {
+                                        color: iced::Color::from_rgb(0.4, 0.7, 0.8),
+                                        width: 2.0,
+                                        radius: 3.0.into(),
+                                    },
+                                    ..Default::default()
+                                }
+                            } else {
+                                button::secondary(theme, status)
+                            }
+                        })
+                        .on_press(Message::EccMotionTypeChanged(EccMotionType::Affine)),
+                    button(text("Homography (8-DOF)").size(12))
+                        .style(move |theme, status| {
+                            if homography_selected {
+                                button::Style {
+                                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.6))),
+                                    text_color: iced::Color::WHITE,
+                                    border: iced::Border {
+                                        color: iced::Color::from_rgb(0.4, 0.7, 0.8),
+                                        width: 2.0,
+                                        radius: 3.0.into(),
+                                    },
+                                    ..Default::default()
+                                }
+                            } else {
+                                button::secondary(theme, status)
+                            }
+                        })
+                        .on_press(Message::EccMotionTypeChanged(EccMotionType::Homography)),
+                ].spacing(5),
+                iterations_slider,
+                epsilon_slider,
+                filter_slider,
+                chunk_slider,
+            ]
+            .spacing(8)
+            .padding(10)
+            .into()
+        } else {
+            // Empty column when ECC not selected
+            column![].into()
         };
 
         let batch_info = if self.config.use_adaptive_batches {
@@ -200,6 +350,7 @@ impl ImageStacker {
                 batch_info,
                 clahe_checkbox,
                 feature_layout,
+                ecc_params_ui,
             ]
             .spacing(10)
         )

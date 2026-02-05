@@ -52,6 +52,12 @@ pub enum Message {
     UseAdaptiveBatchSizes(bool),
     UseCLAHE(bool),
     FeatureDetectorChanged(crate::config::FeatureDetector),
+    // ECC-specific parameters
+    EccMotionTypeChanged(crate::config::EccMotionType),
+    EccMaxIterationsChanged(f32),
+    EccEpsilonChanged(f32),
+    EccGaussFilterSizeChanged(f32),
+    EccChunkSizeChanged(f32),
     ProgressUpdate(String, f32),
     // Advanced processing options
     EnableNoiseReduction(bool),

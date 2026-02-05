@@ -4,7 +4,7 @@
 
 use iced::Task;
 
-use crate::config::{FeatureDetector, ProcessingConfig};
+use crate::config::{EccMotionType, FeatureDetector, ProcessingConfig};
 use crate::messages::Message;
 use crate::settings::save_settings;
 use crate::system_info;
@@ -65,6 +65,43 @@ impl ImageStacker {
     /// Handle FeatureDetectorChanged
     pub fn handle_feature_detector_changed(&mut self, detector: FeatureDetector) -> Task<Message> {
         self.config.feature_detector = detector;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccMotionTypeChanged
+    pub fn handle_ecc_motion_type_changed(&mut self, motion_type: EccMotionType) -> Task<Message> {
+        self.config.ecc_motion_type = motion_type;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccMaxIterationsChanged
+    pub fn handle_ecc_max_iterations_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_max_iterations = value as i32;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccEpsilonChanged (logarithmic slider: -8 to -4 maps to 1e-8 to 1e-4)
+    pub fn handle_ecc_epsilon_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_epsilon = 10_f64.powf(value as f64);
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccGaussFilterSizeChanged
+    pub fn handle_ecc_gauss_filter_size_changed(&mut self, value: f32) -> Task<Message> {
+        // Ensure odd number (3, 5, 7, 9, 11, 13, 15)
+        let size = (value as i32) | 1;  // Make odd by setting lowest bit
+        self.config.ecc_gauss_filter_size = size;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccChunkSizeChanged
+    pub fn handle_ecc_chunk_size_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_chunk_size = value as usize;
         let _ = save_settings(&self.config);
         Task::none()
     }
