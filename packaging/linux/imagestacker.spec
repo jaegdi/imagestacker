@@ -13,13 +13,14 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  cmake
-BuildRequires:  pkgconfig
 BuildRequires:  pkgconfig(opencv4)
 BuildRequires:  gtk3-devel
 BuildRequires:  ImageMagick
 BuildRequires:  clang
 BuildRequires:  clang-devel
 BuildRequires:  libclang13
++BuildRequires:  clang-devel      # For RHEL/Fedora/CentOS/SUSE
++BuildRequires:  libclang-dev     # For Debian/Ubuntu
 
 Requires:       opencv >= 4.5
 Requires:       gtk3
