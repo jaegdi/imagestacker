@@ -1,6 +1,6 @@
 # 📖 Rust Image Stacker - User Manual
 
-**Version 0.1.0 - Focus Stacking Application**
+**Version 1.0.0 - Focus Stacking Application**
 
 ---
 
@@ -386,7 +386,34 @@ The application automatically manages memory for large images:
 
 ---
 
-## 💡 Usage Tips
+## � Transparency & Alpha Channel Handling
+
+### How It Works
+When stacking images with transparent areas (e.g., aligned PNGs with black/transparent borders), ImageStacker handles the alpha channel separately from the color data:
+
+1. **BGR-only Pyramid**: Only the color channels (BGR) go through the Laplacian pyramid. The alpha channel is never blended through the pyramid, preventing edge artifacts.
+
+2. **Alpha-weighted Energy**: When selecting the "winner" pixel at each pyramid level, transparent pixels are suppressed: `energy × (alpha / 255)`. This prevents transparent or border regions from incorrectly winning over sharp, opaque content.
+
+3. **AND-combined Alpha**: The final alpha channel is the intersection (AND) of all input alpha channels. Only pixels that are opaque in **all** input images remain opaque in the result.
+
+4. **Erosion (5px)**: A 5-pixel morphological erosion is applied to the final alpha mask, removing any residual artifacts at the transition between opaque and transparent regions.
+
+### What This Means for Your Results
+
+- **Clean transparent edges**: No white lines, bright halos, or blending artifacts at transparency borders
+- **Slightly more cropping**: Because AND-alpha uses the smallest common opaque area plus erosion, the result may be slightly more cropped than any single input image
+- **Perfect for aligned images**: Aligned images typically have small transparent borders from geometric correction — these are handled cleanly
+
+### Tips
+
+- If the final image appears more cropped than expected, this is normal behavior from AND-alpha + erosion
+- The trade-off (slightly more cropping vs. artifact-free edges) is intentional
+- For images without transparency (e.g., JPEG sources), the alpha handling has no effect — all pixels are treated as fully opaque
+
+---
+
+## �💡 Usage Tips
 
 ### Creating Multiple Variants
 - Stack different selections of aligned images for comparison
@@ -418,10 +445,12 @@ The application automatically manages memory for large images:
 
 ### Stacking Algorithm:
 - Laplacian pyramid decomposition (7 levels)
-- Winner-take-all selection at each pyramid level
-- Sharpness measured using Laplacian variance
-- Energy-based masking for region selection
-- Gaussian blur for smooth energy maps
+- Winner-take-all selection at each pyramid level (no averaging → no ghosting)
+- Sharpness energy: Laplacian → AbsDiff → GaussianBlur(3×3)
+- Alpha-weighted energy: transparent pixels suppressed during selection
+- BGR channels processed through pyramid separately from alpha
+- AND-combined alpha channel across all input images
+- 5px morphological erosion for clean transparency edges
 
 ### Sharpness Detection:
 - Regional analysis using configurable grid (4x4 to 16x16)

@@ -231,9 +231,9 @@ impl ImageStacker {
             .height(Length::Fill)
             .padding(10)
             .style(|_| container::Style::default()
-                .background(iced::Color::from_rgb(0.15, 0.15, 0.2))
+                .background(iced::Color::from_rgb(0.14, 0.18, 0.28))
                 .border(iced::Border {
-                    color: iced::Color::from_rgb(0.5, 0.5, 0.6),
+                    color: iced::Color::from_rgb(0.35, 0.50, 0.70),
                     width: 2.0,
                     radius: 4.0.into(),
                 }))
