@@ -7,6 +7,7 @@ mod messages;
 mod post_processing;
 mod settings;
 mod sharpness;
+mod sharpness_cache;
 mod stacking;
 mod system_info;
 mod thumbnail;
@@ -53,11 +54,11 @@ pub fn main() -> iced::Result {
     // Parse command line arguments
     let args = Args::parse();
     
-    // Calculate initial window size as 2/3 of typical screen width
-    // Common screen resolutions: 1920x1080, 2560x1440, 3840x2160
-    // We'll use 2/3 of 1920 = 1280 as a safe default for most displays
+    // Calculate initial window size to comfortably fit all 5 panes
+    // Each pane needs ~280-300px width + spacing
+    // 5 panes * 300px + spacing = ~1600px minimum
     // Height maintains a good aspect ratio for the 4-pane layout
-    let window_width = 1280.0;  // 2/3 of 1920px (Full HD)
+    let window_width = 1600.0;  // Wide enough for all 5 panes without scrolling
     let window_height = 900.0;   // Maintains good aspect ratio
     
     daemon(ImageStacker::title, ImageStacker::update, ImageStacker::view)

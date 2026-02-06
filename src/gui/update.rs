@@ -20,9 +20,11 @@ impl ImageStacker {
             Message::LoadFolder(path) => self.handle_load_folder(path),
             Message::ImagesSelected(paths) => self.handle_images_selected(paths),
             Message::ThumbnailUpdated(path, _handle) => self.handle_thumbnail_updated(path),
-            Message::InternalPathsScanned(aligned, bunches, final_imgs, paths) => {
-                self.handle_internal_paths_scanned(aligned, bunches, final_imgs, paths)
+            Message::InternalPathsScanned(paths, sharpness, aligned, bunches, final_imgs) => {
+                self.handle_internal_paths_scanned(paths, sharpness, aligned, bunches, final_imgs)
             }
+            Message::DetectSharpness => self.handle_detect_sharpness(),
+            Message::SharpnessDetectionDone(result) => self.handle_sharpness_detection_done(result),
 
             // Alignment handlers (handlers/alignment_handlers.rs)
             Message::AlignImages => self.handle_align_images(),
@@ -31,11 +33,23 @@ impl ImageStacker {
 
             // Stacking handlers (handlers/stacking_handlers.rs)
             Message::StackImages => self.handle_stack_images(),
+            Message::StackImported => self.handle_stack_imported(),
+            Message::StackSharpness => self.handle_stack_sharpness(),
             Message::CancelAlignedSelection => self.handle_cancel_aligned_selection(),
             Message::ToggleAlignedImage(path) => self.handle_toggle_aligned_image(path),
             Message::SelectAllAligned => self.handle_select_all_aligned(),
             Message::DeselectAllAligned => self.handle_deselect_all_aligned(),
             Message::StackSelectedAligned => self.handle_stack_selected_aligned(),
+            Message::CancelImportedSelection => self.handle_cancel_imported_selection(),
+            Message::ToggleImportedImage(path) => self.handle_toggle_imported_image(path),
+            Message::SelectAllImported => self.handle_select_all_imported(),
+            Message::DeselectAllImported => self.handle_deselect_all_imported(),
+            Message::StackSelectedImported => self.handle_stack_selected_imported(),
+            Message::CancelSharpnessSelection => self.handle_cancel_sharpness_selection(),
+            Message::ToggleSharpnessImage(path) => self.handle_toggle_sharpness_image(path),
+            Message::SelectAllSharpness => self.handle_select_all_sharpness(),
+            Message::DeselectAllSharpness => self.handle_deselect_all_sharpness(),
+            Message::StackSelectedSharpness => self.handle_stack_selected_sharpness(),
             Message::StackBunches => self.handle_stack_bunches(),
             Message::CancelBunchSelection => self.handle_cancel_bunch_selection(),
             Message::ToggleBunchImage(path) => self.handle_toggle_bunch_image(path),
@@ -52,11 +66,18 @@ impl ImageStacker {
                 self.handle_image_preview_loaded(path, handle, is_thumbnail)
             }
             Message::LoadFullImage(path) => self.handle_load_full_image(path),
-            Message::CloseImagePreview => self.handle_close_image_preview(),
+            Message::CloseImagePreview => {
+                // Delegate to handler which has correct priority:
+                // 1. If preview is open → close preview (background process keeps running)
+                // 2. If no preview but process running → cancel background process
+                // 3. Otherwise → no-op
+                self.handle_close_image_preview()
+            }
             Message::NextImageInPreview => self.handle_next_image_in_preview(),
             Message::PreviousImageInPreview => self.handle_previous_image_in_preview(),
             Message::NavigationThrottleReset => self.handle_navigation_throttle_reset(),
             Message::ImportedScrollChanged(offset) => self.handle_imported_scroll_changed(offset),
+            Message::SharpnessScrollChanged(offset) => self.handle_sharpness_scroll_changed(offset),
             Message::AlignedScrollChanged(offset) => self.handle_aligned_scroll_changed(offset),
             Message::BunchesScrollChanged(offset) => self.handle_bunches_scroll_changed(offset),
             Message::FinalScrollChanged(offset) => self.handle_final_scroll_changed(offset),
@@ -65,6 +86,7 @@ impl ImageStacker {
             Message::RefreshPanes => self.handle_refresh_panes(),
             Message::AutoRefreshTick => self.handle_auto_refresh_tick(),
             Message::RefreshImportedPane => self.handle_refresh_imported_pane(),
+            Message::RefreshSharpnessPane => self.handle_refresh_sharpness_pane(),
             Message::RefreshAlignedPane => self.handle_refresh_aligned_pane(),
             Message::RefreshBunchesPane => self.handle_refresh_bunches_pane(),
             Message::RefreshFinalPane => self.handle_refresh_final_pane(),
@@ -90,6 +112,11 @@ impl ImageStacker {
             Message::EccEpsilonChanged(value) => self.handle_ecc_epsilon_changed(value),
             Message::EccGaussFilterSizeChanged(value) => self.handle_ecc_gauss_filter_size_changed(value),
             Message::EccChunkSizeChanged(value) => self.handle_ecc_chunk_size_changed(value),
+            Message::EccBatchSizeChanged(value) => self.handle_ecc_batch_size_changed(value),
+            Message::EccUseHybridChanged(enabled) => self.handle_ecc_use_hybrid_changed(enabled),
+            Message::MaxTransformScaleChanged(value) => self.handle_max_transform_scale_changed(value),
+            Message::MaxTransformTranslationChanged(value) => self.handle_max_transform_translation_changed(value),
+            Message::MaxTransformDeterminantChanged(value) => self.handle_max_transform_determinant_changed(value),
             Message::ProgressUpdate(msg, value) => self.handle_progress_update(msg, value),
             Message::EnableNoiseReduction(enabled) => self.handle_enable_noise_reduction(enabled),
             Message::NoiseReductionStrengthChanged(value) => self.handle_noise_reduction_strength_changed(value),

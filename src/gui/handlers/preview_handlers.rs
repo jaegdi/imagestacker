@@ -24,6 +24,24 @@ impl ImageStacker {
         self.preview_current_pane = pane_images;
         self.preview_loading = true;
         self.preview_is_thumbnail = true; // Start with thumbnail
+        
+        // Try to load sharpness info if available
+        if let Some(first_img) = self.images.first() {
+            let sharpness_dir = first_img.parent()
+                .unwrap_or(std::path::Path::new("."))
+                .join("sharpness");
+            
+            let yaml_name = path.file_stem()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string() + ".yml";
+            let yaml_path = sharpness_dir.join(yaml_name);
+            
+            self.preview_sharpness_info = crate::sharpness_cache::SharpnessInfo::load_from_file(&yaml_path).ok();
+        } else {
+            self.preview_sharpness_info = None;
+        }
+        
         // Load a scaled-down preview image asynchronously
         Task::perform(
             async move {
@@ -88,7 +106,37 @@ impl ImageStacker {
 
     /// Handle CloseImagePreview - close preview or cancel processing
     pub fn handle_close_image_preview(&mut self) -> Task<Message> {
-        // If we're processing, ESC should cancel the operation instead
+        // If a preview is open, close it first (don't cancel background processing)
+        if self.preview_image_path.is_some() {
+            self.preview_image_path = None;
+            self.preview_handle = None;
+            self.preview_loading = false;
+            self.preview_is_thumbnail = false;
+            self.preview_sharpness_info = None;
+            self.preview_current_pane.clear();
+            self.preview_navigation_throttle = false;
+            // Restore scroll positions after closing preview
+            return Task::batch(vec![
+                iced::widget::scrollable::scroll_to(
+                    iced::widget::scrollable::Id::new("imported"),
+                    iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.imported_scroll_offset },
+                ),
+                iced::widget::scrollable::scroll_to(
+                    iced::widget::scrollable::Id::new("aligned"),
+                    iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.aligned_scroll_offset },
+                ),
+                iced::widget::scrollable::scroll_to(
+                    iced::widget::scrollable::Id::new("bunches"),
+                    iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.bunches_scroll_offset },
+                ),
+                iced::widget::scrollable::scroll_to(
+                    iced::widget::scrollable::Id::new("final"),
+                    iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.final_scroll_offset },
+                ),
+            ]);
+        }
+        
+        // If no preview is open but we're processing, ESC should cancel the operation
         if self.is_processing {
             self.is_processing = false;
             // Signal background task to cancel
@@ -100,31 +148,7 @@ impl ImageStacker {
             return Task::none();
         }
         
-        self.preview_image_path = None;
-        self.preview_handle = None;
-        self.preview_loading = false;
-        self.preview_is_thumbnail = false;
-        self.preview_current_pane.clear();
-        self.preview_navigation_throttle = false;
-        // Restore scroll positions after closing preview
-        Task::batch(vec![
-            iced::widget::scrollable::scroll_to(
-                iced::widget::scrollable::Id::new("imported"),
-                iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.imported_scroll_offset },
-            ),
-            iced::widget::scrollable::scroll_to(
-                iced::widget::scrollable::Id::new("aligned"),
-                iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.aligned_scroll_offset },
-            ),
-            iced::widget::scrollable::scroll_to(
-                iced::widget::scrollable::Id::new("bunches"),
-                iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.bunches_scroll_offset },
-            ),
-            iced::widget::scrollable::scroll_to(
-                iced::widget::scrollable::Id::new("final"),
-                iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.final_scroll_offset },
-            ),
-        ])
+        Task::none()
     }
 
     /// Handle NextImageInPreview - navigate to next image
@@ -210,6 +234,12 @@ impl ImageStacker {
     /// Handle ImportedScrollChanged
     pub fn handle_imported_scroll_changed(&mut self, offset: f32) -> Task<Message> {
         self.imported_scroll_offset = offset;
+        Task::none()
+    }
+
+    /// Handle SharpnessScrollChanged
+    pub fn handle_sharpness_scroll_changed(&mut self, offset: f32) -> Task<Message> {
+        self.sharpness_scroll_offset = offset;
         Task::none()
     }
 

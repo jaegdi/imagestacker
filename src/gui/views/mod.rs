@@ -7,4 +7,6 @@ pub mod settings;
 pub mod pane_aligned;
 pub mod pane_bunches;
 pub mod pane_generic;
+pub mod pane_imported;
+pub mod pane_sharpness;
 pub mod windows;

@@ -3,13 +3,42 @@
 //! This module contains the settings panel UI with all configuration options.
 
 use iced::widget::{
-    button, checkbox, column, container, row, slider, text, text_input,
+    button, checkbox, column, container, horizontal_rule, mouse_area, row, scrollable, slider, text, text_input,
 };
 use iced::{Element, Length};
+use iced::mouse::ScrollDelta;
 
 use crate::config::{EccMotionType, FeatureDetector};
 use crate::messages::Message;
 use super::super::state::ImageStacker;
+
+/// Helper function to create a slider with mouse wheel support for fine-grained adjustments
+fn scrollable_slider<'a>(
+    range: std::ops::RangeInclusive<f32>,
+    value: f32,
+    on_change: impl Fn(f32) -> Message + 'a + Clone,
+    step: f32,
+    width: impl Into<Length>,
+) -> Element<'a, Message> {
+    let min = *range.start();
+    let max = *range.end();
+    let on_change_clone = on_change.clone();
+    
+    mouse_area(
+        slider(range, value, on_change)
+            .step(step)
+            .width(width)
+    )
+    .on_scroll(move |delta| {
+        let delta_y = match delta {
+            ScrollDelta::Lines { y, .. } => y * step,
+            ScrollDelta::Pixels { y, .. } => y * step * 0.1,
+        };
+        let new_value = (value + delta_y).clamp(min, max);
+        on_change_clone(new_value)
+    })
+    .into()
+}
 
 impl ImageStacker {
     pub(crate) fn render_settings_panel(&self) -> Element<'_, Message> {
@@ -27,9 +56,7 @@ impl ImageStacker {
         
         let sharpness_slider = row![
             text("Blur Threshold:").width(label_width),
-            slider(10.0..=10000.0, self.config.sharpness_threshold, Message::SharpnessThresholdChanged)
-                .step(10.0)
-                .width(slider_width),
+            scrollable_slider(10.0..=10000.0, self.config.sharpness_threshold, Message::SharpnessThresholdChanged, 10.0, slider_width),
             text(format!("{:.0}", self.config.sharpness_threshold)).width(value_width),
         ]
         .spacing(10)
@@ -37,9 +64,7 @@ impl ImageStacker {
 
         let grid_size_slider = row![
             text("Sharpness Grid:").width(label_width),
-            slider(4.0..=16.0, self.config.sharpness_grid_size as f32, Message::SharpnessGridSizeChanged)
-                .step(1.0)
-                .width(slider_width),
+            scrollable_slider(4.0..=16.0, self.config.sharpness_grid_size as f32, Message::SharpnessGridSizeChanged, 1.0, slider_width),
             text(format!("{}x{}", self.config.sharpness_grid_size, self.config.sharpness_grid_size)).width(value_width),
         ]
         .spacing(10)
@@ -47,9 +72,7 @@ impl ImageStacker {
 
         let iqr_multiplier_slider = row![
             text("Blur Filter (IQR):").width(label_width),
-            slider(0.5..=5.0, self.config.sharpness_iqr_multiplier, Message::SharpnessIqrMultiplierChanged)
-                .step(0.1)
-                .width(slider_width),
+            scrollable_slider(0.5..=5.0, self.config.sharpness_iqr_multiplier, Message::SharpnessIqrMultiplierChanged, 0.1, slider_width),
             text(format!("{:.1} {}", 
                 self.config.sharpness_iqr_multiplier,
                 if self.config.sharpness_iqr_multiplier <= 1.0 { "(strict)" }
@@ -208,28 +231,42 @@ impl ImageStacker {
             // Parameters sliders
             let iterations_slider = column![
                 text(format!("Max Iterations: {}", self.config.ecc_max_iterations)).size(12),
-                slider(3000.0..=30000.0, self.config.ecc_max_iterations as f32, Message::EccMaxIterationsChanged)
-                    .step(1000.0)
+                scrollable_slider(3000.0..=30000.0, self.config.ecc_max_iterations as f32, Message::EccMaxIterationsChanged, 1000.0, Length::Fill)
             ].spacing(3);
 
             // Epsilon uses logarithmic scale: slider shows exponent, actual value is 10^x
             let epsilon_exponent = self.config.ecc_epsilon.log10();
             let epsilon_slider = column![
                 text(format!("Epsilon: {:.1e} (convergence threshold)", self.config.ecc_epsilon)).size(12),
-                slider(-8.0..=-4.0, epsilon_exponent as f32, Message::EccEpsilonChanged)
-                    .step(0.5)
+                scrollable_slider(-8.0..=-4.0, epsilon_exponent as f32, Message::EccEpsilonChanged, 0.5, Length::Fill)
             ].spacing(3);
 
             let filter_slider = column![
                 text(format!("Gaussian Filter Size: {}x{}", self.config.ecc_gauss_filter_size, self.config.ecc_gauss_filter_size)).size(12),
-                slider(3.0..=15.0, self.config.ecc_gauss_filter_size as f32, Message::EccGaussFilterSizeChanged)
-                    .step(2.0)  // Ensures odd values
+                scrollable_slider(3.0..=15.0, self.config.ecc_gauss_filter_size as f32, Message::EccGaussFilterSizeChanged, 2.0, Length::Fill)  // Ensures odd values
             ].spacing(3);
 
             let chunk_slider = column![
                 text(format!("Parallel Chunk Size: {} images", self.config.ecc_chunk_size)).size(12),
-                slider(4.0..=24.0, self.config.ecc_chunk_size as f32, Message::EccChunkSizeChanged)
-                    .step(2.0)
+                scrollable_slider(4.0..=24.0, self.config.ecc_chunk_size as f32, Message::EccChunkSizeChanged, 2.0, Length::Fill)
+            ].spacing(3);
+
+            let batch_slider = column![
+                text(format!("Batch Size: {} images (controls memory usage)", self.config.ecc_batch_size)).size(12),
+                scrollable_slider(2.0..=16.0, self.config.ecc_batch_size as f32, Message::EccBatchSizeChanged, 1.0, Length::Fill),
+                text("Lower = less memory, slower | Higher = more memory, faster").size(10)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                    })
+            ].spacing(3);
+
+            let hybrid_checkbox = column![
+                checkbox("Use Hybrid Mode (40-50% faster)", self.config.ecc_use_hybrid)
+                    .on_toggle(Message::EccUseHybridChanged),
+                text("SIFT initialization + ECC refinement for speed with quality").size(10)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                    })
             ].spacing(3);
 
             column![
@@ -317,6 +354,8 @@ impl ImageStacker {
                 epsilon_slider,
                 filter_slider,
                 chunk_slider,
+                batch_slider,
+                hybrid_checkbox,
             ]
             .spacing(8)
             .padding(10)
@@ -325,6 +364,44 @@ impl ImageStacker {
             // Empty column when ECC not selected
             column![].into()
         };
+
+        // Transform validation sliders - shown for ALL alignment methods
+        let transform_validation_ui = column![
+            horizontal_rule(1),
+            text("Transform Validation (All Alignment Methods):").size(13).style(|_| text::Style {
+                color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
+            }),
+            text("Reject distorted transformations - applies to ORB, SIFT, AKAZE, and ECC").size(10)
+                .style(|_| text::Style {
+                    color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                }),
+            column![
+                text(format!("Max Transform Scale: {:.2}x", self.config.max_transform_scale)).size(12),
+                scrollable_slider(1.1..=3.0, self.config.max_transform_scale, Message::MaxTransformScaleChanged, 0.1, Length::Fill),
+                text("Maximum allowed scale deviation (reject if exceeded)").size(10)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                    })
+            ].spacing(3),
+            column![
+                text(format!("Max Translation: {:.0} pixels", self.config.max_transform_translation)).size(12),
+                scrollable_slider(100.0..=1000.0, self.config.max_transform_translation, Message::MaxTransformTranslationChanged, 50.0, Length::Fill),
+                text("Maximum allowed translation distance (reject if exceeded)").size(10)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                    })
+            ].spacing(3),
+            column![
+                text(format!("Max Determinant: {:.1}x", self.config.max_transform_determinant)).size(12),
+                scrollable_slider(1.5..=5.0, self.config.max_transform_determinant, Message::MaxTransformDeterminantChanged, 0.5, Length::Fill),
+                text("Maximum determinant deviation (skew/distortion threshold)").size(10)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                    })
+            ].spacing(3),
+        ]
+        .spacing(8)
+        .padding(10);
 
         let batch_info = if self.config.use_adaptive_batches {
             text(format!(
@@ -351,6 +428,7 @@ impl ImageStacker {
                 clahe_checkbox,
                 feature_layout,
                 ecc_params_ui,
+                transform_validation_ui,
             ]
             .spacing(10)
         )
@@ -375,8 +453,7 @@ impl ImageStacker {
             
             row![
                 text("Noise Strength:").width(label_width),
-                slider(1.0..=10.0, self.config.noise_reduction_strength, Message::NoiseReductionStrengthChanged)
-                    .width(slider_width),
+                scrollable_slider(1.0..=10.0, self.config.noise_reduction_strength, Message::NoiseReductionStrengthChanged, 0.1, slider_width),
                 text(format!("{:.1}", self.config.noise_reduction_strength)).width(value_width),
             ]
             .spacing(10)
@@ -390,8 +467,7 @@ impl ImageStacker {
             
             row![
                 text("Sharpen Strength:").width(label_width),
-                slider(0.0..=5.0, self.config.sharpening_strength, Message::SharpeningStrengthChanged)
-                    .width(slider_width),
+                scrollable_slider(0.0..=5.0, self.config.sharpening_strength, Message::SharpeningStrengthChanged, 0.1, slider_width),
                 text(format!("{:.1}", self.config.sharpening_strength)).width(value_width),
             ]
             .spacing(10)
@@ -405,8 +481,7 @@ impl ImageStacker {
             
             row![
                 text("Contrast:").width(label_width),
-                slider(0.5..=3.0, self.config.contrast_boost, Message::ContrastBoostChanged)
-                    .width(slider_width),
+                scrollable_slider(0.5..=3.0, self.config.contrast_boost, Message::ContrastBoostChanged, 0.1, slider_width),
                 text(format!("{:.1}", self.config.contrast_boost)).width(value_width),
             ]
             .spacing(10)
@@ -414,8 +489,7 @@ impl ImageStacker {
             
             row![
                 text("Brightness:").width(label_width),
-                slider(-100.0..=100.0, self.config.brightness_boost, Message::BrightnessBoostChanged)
-                    .width(slider_width),
+                scrollable_slider(-100.0..=100.0, self.config.brightness_boost, Message::BrightnessBoostChanged, 1.0, slider_width),
                 text(format!("{:.0}", self.config.brightness_boost)).width(value_width),
             ]
             .spacing(10)
@@ -423,8 +497,7 @@ impl ImageStacker {
             
             row![
                 text("Saturation:").width(label_width),
-                slider(0.0..=3.0, self.config.saturation_boost, Message::SaturationBoostChanged)
-                    .width(slider_width),
+                scrollable_slider(0.0..=3.0, self.config.saturation_boost, Message::SaturationBoostChanged, 0.1, slider_width),
                 text(format!("{:.1}", self.config.saturation_boost)).width(value_width),
             ]
             .spacing(10)
@@ -472,8 +545,7 @@ impl ImageStacker {
                 
                 row![
                     text("Preview Max Width:").width(label_width),
-                    slider(400.0..=2000.0, self.config.preview_max_width, Message::PreviewMaxWidthChanged)
-                        .width(slider_width),
+                    scrollable_slider(400.0..=2000.0, self.config.preview_max_width, Message::PreviewMaxWidthChanged, 10.0, slider_width),
                     text(format!("{:.0}px", self.config.preview_max_width)).width(value_width),
                 ]
                 .spacing(10)
@@ -481,8 +553,7 @@ impl ImageStacker {
                 
                 row![
                     text("Preview Max Height:").width(label_width),
-                    slider(300.0..=1500.0, self.config.preview_max_height, Message::PreviewMaxHeightChanged)
-                        .width(slider_width),
+                    scrollable_slider(300.0..=1500.0, self.config.preview_max_height, Message::PreviewMaxHeightChanged, 10.0, slider_width),
                     text(format!("{:.0}px", self.config.preview_max_height)).width(value_width),
                 ]
                 .spacing(10)
@@ -585,17 +656,21 @@ impl ImageStacker {
         };
 
         container(
-            column![
-                text("Processing Settings").size(20).style(|_| text::Style { 
-                    color: Some(iced::Color::from_rgb(0.9, 0.9, 1.0)) 
-                }),
-                panes_layout,
-                reset_button,
-            ]
-            .spacing(15)
+            scrollable(
+                column![
+                    text("Processing Settings").size(20).style(|_| text::Style { 
+                        color: Some(iced::Color::from_rgb(0.9, 0.9, 1.0)) 
+                    }),
+                    panes_layout,
+                    reset_button,
+                ]
+                .spacing(15)
+            )
+            .height(Length::Fill)
         )
         .padding(15)
         .width(Length::Fill)
+        .height(Length::Fill)
         .style(|_| container::Style::default()
             .background(iced::Color::from_rgb(0.2, 0.2, 0.25)))
         .into()

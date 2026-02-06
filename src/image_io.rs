@@ -13,6 +13,16 @@ pub fn load_image(path: &PathBuf) -> Result<Mat> {
     // Use IMREAD_UNCHANGED to preserve alpha channel (transparency)
     let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_UNCHANGED)?;
 
+    // Convert 16-bit to 8-bit if necessary (some PNG files are 16-bit)
+    let img = if img.depth() == opencv::core::CV_16U || img.depth() == opencv::core::CV_16S {
+        let mut img_8 = Mat::default();
+        img.convert_to(&mut img_8, opencv::core::CV_8U, 1.0/256.0, 0.0)?;
+        log::debug!("Converted 16-bit to 8-bit for {}", filename);
+        img_8
+    } else {
+        img
+    };
+
     let elapsed = start.elapsed();
     log::info!(
         "Loaded {} in {:?} - Size: {}x{}, Channels: {}",

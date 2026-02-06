@@ -245,6 +245,7 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
     
     let mut fused_pyramid: Vec<core::UMat> = Vec::new();
     let mut max_energies: Vec<core::UMat> = Vec::new();
+    let mut fused_alpha = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT); // Track alpha separately
 
     for (idx, img) in images.iter().enumerate() {
         log::info!("Processing image {}/{} for stacking", idx + 1, images.len());
@@ -273,11 +274,51 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             core::UMatUsageFlags::USAGE_DEFAULT,
         )?.convert_to(&mut float_img, core::CV_32F, 1.0, 0.0)?;
 
-        let current_pyramid = generate_laplacian_pyramid(&float_img, levels)?;
+        // Extract and store original alpha channel BEFORE pyramid processing
+        // CRITICAL: Convert to PREMULTIPLIED ALPHA to avoid artifacts at edges!
+        // 
+        // Problem: PNG uses "straight alpha" (RGB independent of alpha)
+        // Extract BGR channels (without alpha) for pyramid processing
+        // Keep original alpha separate to avoid corruption by Laplacian operations
+        let (pyramid_input, original_alpha) = if float_img.channels() == 4 {
+            let mut channels = opencv::core::Vector::<core::UMat>::new();
+            core::split(&float_img, &mut channels)?;
+            
+            let alpha = channels.get(3)?;  // Save original alpha
+            
+            // Create BGR image (without alpha) for pyramid
+            let mut bgr_channels = opencv::core::Vector::<core::UMat>::new();
+            bgr_channels.push(channels.get(0)?);  // B
+            bgr_channels.push(channels.get(1)?);  // G
+            bgr_channels.push(channels.get(2)?);  // R
+            
+            let mut bgr_img = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            core::merge(&bgr_channels, &mut bgr_img)?;
+            
+            (bgr_img, Some(alpha))
+        } else {
+            (float_img.clone(), None)
+        };
+
+        let current_pyramid = generate_laplacian_pyramid(&pyramid_input, levels)?;
 
         if idx == 0 {
             // Initialize fused pyramid with the first image's pyramid
             fused_pyramid = current_pyramid.clone();
+
+            // Initialize fused_alpha with the first image's alpha
+            if let Some(ref alpha) = original_alpha {
+                fused_alpha = alpha.clone();
+            } else {
+                // If no alpha channel, create opaque alpha
+                fused_alpha = core::UMat::new_rows_cols_with_default(
+                    pyramid_input.rows(),
+                    pyramid_input.cols(),
+                    core::CV_32F,
+                    core::Scalar::all(255.0),
+                    core::UMatUsageFlags::USAGE_DEFAULT,
+                )?;
+            }
 
             // Initialize max energies for Laplacian levels
             for l in 0..levels as usize {
@@ -449,8 +490,40 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
                 let mut mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
                 core::compare(&blurred_energy, &max_energies[l], &mut mask, core::CMP_GT)?;
 
-                layer.copy_to_masked(&mut fused_pyramid[l], &mask)?;
-                blurred_energy.copy_to_masked(&mut max_energies[l], &mask)?;
+                // Check if we have original alpha to apply as mask
+                if let Some(ref orig_alpha) = original_alpha {
+                    // Resize original alpha to match current pyramid level size
+                    let mut alpha_resized = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                    let layer_size = layer.size()?;
+                    imgproc::resize(
+                        orig_alpha,
+                        &mut alpha_resized,
+                        layer_size,
+                        0.0,
+                        0.0,
+                        imgproc::INTER_LINEAR,
+                    )?;
+                    
+                    // CRITICAL FIX: Use alpha-weighted energy for smooth selection
+                    // Convert alpha to float [0, 1] for smooth blending
+                    let mut alpha_weight = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                    alpha_resized.convert_to(&mut alpha_weight, core::CV_32F, 1.0/255.0, 0.0)?;
+                    
+                    // Combine sharpness and alpha: weighted_energy = energy * alpha
+                    let mut weighted_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                    core::multiply(&blurred_energy, &alpha_weight, &mut weighted_energy, 1.0, -1)?;
+                    
+                    // Create energy mask where this image is sharper
+                    let mut energy_mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                    core::compare(&weighted_energy, &max_energies[l], &mut energy_mask, core::CMP_GT)?;
+                    
+                    // Use mask directly (NO feathering - causes dark lines due to premultiplied alpha)
+                    layer.copy_to_masked(&mut fused_pyramid[l], &energy_mask)?;
+                    weighted_energy.copy_to_masked(&mut max_energies[l], &energy_mask)?;
+                } else {
+                    layer.copy_to_masked(&mut fused_pyramid[l], &mask)?;
+                    blurred_energy.copy_to_masked(&mut max_energies[l], &mask)?;
+                }
             }
 
             // Also use winner-take-all for base level instead of averaging
@@ -512,23 +585,149 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             let mut float_base_layer = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
             base_layer.convert_to(&mut float_base_layer, core::CV_32F, 1.0, 0.0)?;
             
-            float_base_layer.copy_to_masked(&mut fused_pyramid[base_idx], &base_mask)?;
-            blurred_base_energy.copy_to_masked(&mut max_energies[base_idx], &base_mask)?;
+            // Check if we have original alpha to apply as mask
+            if let Some(ref orig_alpha) = original_alpha {
+                // Resize original alpha to match base layer size
+                let mut alpha_resized = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                let base_size = base_layer.size()?;
+                imgproc::resize(
+                    orig_alpha,
+                    &mut alpha_resized,
+                    base_size,
+                    0.0,
+                    0.0,
+                    imgproc::INTER_LINEAR,
+                )?;
+                
+                // CRITICAL FIX: Use alpha-weighted energy (no mask feathering)
+                // Convert alpha to normalized float weight [0, 1]
+                let mut alpha_weight = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                alpha_resized.convert_to(&mut alpha_weight, core::CV_32F, 1.0/255.0, 0.0)?;
+                
+                // Combine sharpness and alpha
+                let mut weighted_base_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                core::multiply(&blurred_base_energy, &alpha_weight, &mut weighted_base_energy, 1.0, -1)?;
+                
+                // Create energy mask (NO feathering - causes dark lines)
+                let mut combined_base_mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                core::compare(&weighted_base_energy, &max_energies[base_idx], &mut combined_base_mask, core::CMP_GT)?;
+                
+                // Use mask directly
+                float_base_layer.copy_to_masked(&mut fused_pyramid[base_idx], &combined_base_mask)?;
+                weighted_base_energy.copy_to_masked(&mut max_energies[base_idx], &combined_base_mask)?;
+            } else {
+                float_base_layer.copy_to_masked(&mut fused_pyramid[base_idx], &base_mask)?;
+                blurred_base_energy.copy_to_masked(&mut max_energies[base_idx], &base_mask)?;
+            }
+
+            // Update fused_alpha ONCE per image (not per pyramid level!)
+            // AND-combine alpha channels: only where ALL images have alpha > 0, the bunch is opaque
+            // This ensures the transparent border is large enough to hide pyramid artifacts
+            if let Some(ref orig_alpha) = original_alpha {
+                // Convert both to binary masks (alpha > 0 = 255, alpha == 0 = 0)
+                let mut orig_mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                core::compare(orig_alpha, &core::Scalar::all(0.0), &mut orig_mask, core::CMP_GT)?;
+                
+                let mut fused_mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                core::compare(&fused_alpha, &core::Scalar::all(0.0), &mut fused_mask, core::CMP_GT)?;
+                
+                // AND: only opaque where BOTH are opaque (= smallest common opaque area)
+                let mut combined_mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                core::bitwise_and(&orig_mask, &fused_mask, &mut combined_mask, &core::no_array())?;
+                
+                // Convert binary mask back to alpha values (0 or 255)
+                combined_mask.convert_to(&mut fused_alpha, core::CV_32F, 1.0, 0.0)?;
+            }
         }
     }
 
     log::info!("Collapsing pyramid...");
-    // Base level now uses winner-take-all, no averaging needed
 
-    // 3. Collapse Pyramid
-    let result_umat = collapse_pyramid(&fused_pyramid)?;
+    // 3. Collapse Pyramid (BGR only, 3 channels)
+    let result_bgr_umat = collapse_pyramid(&fused_pyramid)?;
+    
+    // 4. Add back alpha channel from the fused_alpha we tracked
+    let mut final_img_umat = result_bgr_umat.clone();
 
-    // Convert back to Mat and download from GPU
-    let mut final_img_umat = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-    result_umat.convert_to(&mut final_img_umat, core::CV_8U, 1.0, 0.0)?;
+    // Debug-Logging: Shapes und Typen vor dem Merge
+    log::info!("result_bgr_umat: rows={}, cols={}, channels={}, type={}",
+        result_bgr_umat.rows(), result_bgr_umat.cols(), result_bgr_umat.channels(), result_bgr_umat.typ());
+    log::info!("fused_alpha: rows={}, cols={}, channels={}, type={}, empty={}",
+        fused_alpha.rows(), fused_alpha.cols(), fused_alpha.channels(), fused_alpha.typ(), fused_alpha.empty());
 
+    // If we tracked alpha (fused_alpha is not empty), add it back
+    if final_img_umat.channels() == 3 && !fused_alpha.empty() {
+        let mut channels = opencv::core::Vector::<core::UMat>::new();
+        core::split(&final_img_umat, &mut channels)?;
+
+        // Resize fused_alpha to match the full image size if needed
+        let target_size = core::Size::new(final_img_umat.cols(), final_img_umat.rows());
+        let mut alpha_resized = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+        if fused_alpha.rows() != final_img_umat.rows() || fused_alpha.cols() != final_img_umat.cols() {
+            imgproc::resize(
+                &fused_alpha,
+                &mut alpha_resized,
+                target_size,
+                0.0,
+                0.0,
+                imgproc::INTER_LINEAR,
+            )?;
+            log::info!("Resized fused_alpha from {}x{} to {}x{}", fused_alpha.cols(), fused_alpha.rows(), alpha_resized.cols(), alpha_resized.rows());
+        } else {
+            alpha_resized = fused_alpha.clone();
+        }
+
+        // Erode the alpha to make transparent border larger, hiding pyramid artifacts at edges
+        // The Laplacian pyramid with 7 levels creates artifacts up to ~2^7 = 128 pixels from edges
+        // Erode by a few pixels to push the opaque boundary inward
+        let erode_size = 5; // pixels to erode inward
+        let kernel = imgproc::get_structuring_element(
+            imgproc::MORPH_ELLIPSE,
+            core::Size::new(erode_size * 2 + 1, erode_size * 2 + 1),
+            core::Point::new(-1, -1),
+        )?;
+        let mut alpha_eroded = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+        // Convert to 8U for morphology operation
+        let mut alpha_8u = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+        alpha_resized.convert_to(&mut alpha_8u, core::CV_8U, 1.0, 0.0)?;
+        imgproc::erode(
+            &alpha_8u,
+            &mut alpha_eroded,
+            &kernel,
+            core::Point::new(-1, -1),
+            1,
+            core::BORDER_CONSTANT,
+            imgproc::morphology_default_border_value()?,
+        )?;
+        // Convert back to CV_32F
+        let mut alpha_final = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+        alpha_eroded.convert_to(&mut alpha_final, core::CV_32F, 1.0, 0.0)?;
+
+        channels.push(alpha_final);
+        core::merge(&channels, &mut final_img_umat)?;
+    } else if final_img_umat.channels() == 3 {
+        let mut channels = opencv::core::Vector::<core::UMat>::new();
+        core::split(&final_img_umat, &mut channels)?;
+
+        let alpha = core::UMat::new_rows_cols_with_default(
+            final_img_umat.rows(),
+            final_img_umat.cols(),
+            core::CV_32F,
+            core::Scalar::all(255.0),
+            core::UMatUsageFlags::USAGE_DEFAULT,
+        )?;
+
+        channels.push(alpha);
+        core::merge(&channels, &mut final_img_umat)?;
+    }
+    
+    // Convert to CV_8U
+    let mut final_img_umat_8u = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+    final_img_umat.convert_to(&mut final_img_umat_8u, core::CV_8U, 1.0, 0.0)?;
+    
+    // Download from GPU to CPU
     let mut final_img = Mat::default();
-    final_img_umat.get_mat(core::AccessFlag::ACCESS_READ)?.copy_to(&mut final_img)?;
+    final_img_umat_8u.get_mat(core::AccessFlag::ACCESS_READ)?.copy_to(&mut final_img)?;
     
     log::info!("Stacking batch complete");
     Ok(final_img)
@@ -608,7 +807,15 @@ fn collapse_pyramid(pyramid: &[core::UMat]) -> Result<core::UMat> {
             &core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT),
             -1,
         )?;
-        current = next;
+        
+        // CRITICAL: Clip values to [0, 255] to prevent bright artifacts
+        // When Laplacian details from different images are added, values can exceed valid range
+        let mut clipped = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+        core::min(&next, &core::Scalar::all(255.0), &mut clipped)?;
+        let mut clipped2 = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+        core::max(&clipped, &core::Scalar::all(0.0), &mut clipped2)?;
+        
+        current = clipped2;
     }
     Ok(current)
 }
