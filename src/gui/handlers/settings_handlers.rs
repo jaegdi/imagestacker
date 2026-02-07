@@ -106,6 +106,41 @@ impl ImageStacker {
         Task::none()
     }
 
+    /// Handle EccBatchSizeChanged
+    pub fn handle_ecc_batch_size_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_batch_size = value as usize;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccUseHybridChanged
+    pub fn handle_ecc_use_hybrid_changed(&mut self, enabled: bool) -> Task<Message> {
+        self.config.ecc_use_hybrid = enabled;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle MaxTransformScaleChanged
+    pub fn handle_max_transform_scale_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.max_transform_scale = value;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle MaxTransformTranslationChanged
+    pub fn handle_max_transform_translation_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.max_transform_translation = value;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle MaxTransformDeterminantChanged
+    pub fn handle_max_transform_determinant_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.max_transform_determinant = value;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
     /// Handle ProgressUpdate
     pub fn handle_progress_update(&mut self, msg: String, value: f32) -> Task<Message> {
         self.progress_message = msg;
@@ -205,8 +240,9 @@ impl ImageStacker {
     }
 
     /// Handle WindowResized
-    pub fn handle_window_resized(&mut self, width: f32, _height: f32) -> Task<Message> {
+    pub fn handle_window_resized(&mut self, width: f32, height: f32) -> Task<Message> {
         self.window_width = width;
+        self.window_height = height;
         Task::none()
     }
 }

@@ -47,6 +47,29 @@ impl ImageStacker {
                         paths
                     };
 
+                    let scan_yaml_dir = |dir_name: &str| -> Vec<PathBuf> {
+                        let dir_path = base_dir.join(dir_name);
+                        let mut paths = Vec::new();
+                        if let Ok(entries) = std::fs::read_dir(dir_path) {
+                            for entry in entries.flatten() {
+                                let p = entry.path();
+                                if p.is_file() {
+                                    if let Some(ext) =
+                                        p.extension().and_then(|e| e.to_str())
+                                    {
+                                        let ext = ext.to_lowercase();
+                                        if ["yml", "yaml"].contains(&ext.as_str()) {
+                                            paths.push(p);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        paths.sort();
+                        paths
+                    };
+
+                    let sharpness = scan_yaml_dir("sharpness");
                     let aligned = scan_dir("aligned");
                     let bunches = scan_dir("bunches");
                     let final_imgs = scan_dir("final");
@@ -54,16 +77,17 @@ impl ImageStacker {
                     // Return scanned paths - don't pass paths_to_process as it would
                     // trigger import behavior. Let InternalPathsScanned determine which
                     // thumbnails need to be generated.
-                    (aligned, bunches, final_imgs, Vec::<PathBuf>::new())
+                    (sharpness, aligned, bunches, final_imgs, Vec::<PathBuf>::new())
                 },
-                |(aligned, bunches, final_imgs, _paths_to_process)| {
+                |(sharpness_paths, aligned_paths, bunches_paths, final_paths, _paths_to_process)| {
                     // Pass empty vec for paths_to_process to indicate this is a
                     // subdirectory refresh, not an import operation
                     Message::InternalPathsScanned(
-                        aligned,
-                        bunches,
-                        final_imgs,
-                        vec![],
+                        vec![],  // imported (empty for refresh)
+                        sharpness_paths,
+                        aligned_paths,
+                        bunches_paths,
+                        final_paths,
                     )
                 },
             );
@@ -111,7 +135,54 @@ impl ImageStacker {
                         }
                     }
                     paths.sort();
-                    Message::InternalPathsScanned(vec![], vec![], vec![], paths)
+                    Message::InternalPathsScanned(vec![], vec![], vec![], vec![], paths)
+                },
+                |msg| msg,
+            );
+        }
+        Task::none()
+    }
+
+    /// Handle RefreshSharpnessPane - refresh sharpness pane by rescanning sharpness directory
+    pub fn handle_refresh_sharpness_pane(&mut self) -> Task<Message> {
+        if let Some(first_path) = self.images.first() {
+            let base_dir = first_path.parent().unwrap_or(std::path::Path::new(".")).to_path_buf();
+            
+            // Clear thumbnails for images that have sharpness data
+            {
+                let mut cache = self.thumbnail_cache.write().unwrap();
+                for path in &self.images {
+                    // Check if this image has a corresponding YAML file
+                    let yaml_name = path.file_stem()
+                        .unwrap_or_default()
+                        .to_string_lossy()
+                        .to_string() + ".yml";
+                    let yaml_path = base_dir.join("sharpness").join(yaml_name);
+                    if yaml_path.exists() {
+                        cache.remove(path);
+                    }
+                }
+            }
+            
+            return Task::perform(
+                async move {
+                    let sharpness_dir = base_dir.join("sharpness");
+                    let mut paths = Vec::new();
+                    if let Ok(entries) = std::fs::read_dir(&sharpness_dir) {
+                        for entry in entries.flatten() {
+                            let p = entry.path();
+                            if p.is_file() {
+                                if let Some(ext) = p.extension().and_then(|e| e.to_str()) {
+                                    let ext = ext.to_lowercase();
+                                    if ["yml", "yaml"].contains(&ext.as_str()) {
+                                        paths.push(p);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    paths.sort();
+                    Message::InternalPathsScanned(vec![], paths, vec![], vec![], vec![])
                 },
                 |msg| msg,
             );
@@ -150,7 +221,7 @@ impl ImageStacker {
                         }
                     }
                     paths.sort();
-                    Message::InternalPathsScanned(paths, vec![], vec![], vec![])
+                    Message::InternalPathsScanned(vec![], vec![], paths, vec![], vec![])
                 },
                 |msg| msg,
             );
@@ -189,7 +260,7 @@ impl ImageStacker {
                         }
                     }
                     paths.sort();
-                    Message::InternalPathsScanned(vec![], paths, vec![], vec![])
+                    Message::InternalPathsScanned(vec![], vec![], vec![], paths, vec![])
                 },
                 |msg| msg,
             );
@@ -228,7 +299,7 @@ impl ImageStacker {
                         }
                     }
                     paths.sort();
-                    Message::InternalPathsScanned(vec![], vec![], paths, vec![])
+                    Message::InternalPathsScanned(vec![], vec![], vec![], vec![], paths)
                 },
                 |msg| msg,
             );

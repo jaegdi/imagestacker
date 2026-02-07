@@ -20,7 +20,7 @@ impl ImageStacker {
         Task::perform(
             async {
                 let files = rfd::AsyncFileDialog::new()
-                    .add_filter("Images", &["jpg", "jpeg", "png", "tif", "tiff"])
+                    .add_filter("Images", &["jpg", "jpeg", "png", "tif", "tiff", "JPG", "JPEG", "PNG", "TIF", "TIFF"])
                     .pick_files()
                     .await;
 
@@ -139,10 +139,29 @@ impl ImageStacker {
                 }
                 final_paths.sort();
                 
+                // Check for sharpness YAML files
+                let mut sharpness_paths = Vec::new();
+                let sharpness_dir = path.join("sharpness");
+                if sharpness_dir.exists() {
+                    if let Ok(entries) = std::fs::read_dir(&sharpness_dir) {
+                        for entry in entries.flatten() {
+                            let path = entry.path();
+                            if path.is_file() {
+                                if let Some(ext) = path.extension() {
+                                    if ext == "yml" || ext == "yaml" {
+                                        sharpness_paths.push(path);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                sharpness_paths.sort();
+                
                 // Create a combined message with all paths
-                if !aligned_paths.is_empty() || !bunch_paths.is_empty() || !final_paths.is_empty() {
+                if !sharpness_paths.is_empty() || !aligned_paths.is_empty() || !bunch_paths.is_empty() || !final_paths.is_empty() {
                     // We have existing processed images
-                    Message::InternalPathsScanned(aligned_paths, bunch_paths, final_paths, paths)
+                    Message::InternalPathsScanned(paths, sharpness_paths, aligned_paths, bunch_paths, final_paths)
                 } else {
                     // No existing processed images, just load the main images
                     Message::ImagesSelected(paths)
@@ -206,10 +225,11 @@ impl ImageStacker {
     /// Handle InternalPathsScanned - process scanned paths from folder loading
     pub fn handle_internal_paths_scanned(
         &mut self,
+        paths_to_process: Vec<PathBuf>,  // imported
+        sharpness: Vec<PathBuf>,
         aligned: Vec<PathBuf>,
         bunches: Vec<PathBuf>,
         final_imgs: Vec<PathBuf>,
-        paths_to_process: Vec<PathBuf>,
     ) -> Task<Message> {
         // Determine if this is an initial load or a refresh
         let is_initial_load = !paths_to_process.is_empty() && self.images.is_empty();
@@ -220,6 +240,7 @@ impl ImageStacker {
             if is_imported_refresh {
                 // Clear all panes when doing an import refresh (like starting new project)
                 self.images.clear();
+                self.sharpness_images.clear();
                 self.aligned_images.clear();
                 self.bunch_images.clear();
                 self.final_images.clear();
@@ -232,6 +253,7 @@ impl ImageStacker {
             self.images.extend(paths_to_process.clone());
             
             if is_initial_load {
+                self.sharpness_images = sharpness.clone();
                 self.aligned_images = aligned.clone();
                 self.bunch_images = bunches.clone();
                 self.final_images = final_imgs.clone();
@@ -264,20 +286,62 @@ impl ImageStacker {
             }
         }
         
-        // Handle refresh of aligned, bunches, or final (when paths_to_process is empty)
+        // Handle refresh of individual panes (when paths_to_process is empty)
+        // Update the pane based on which vector has content
         if paths_to_process.is_empty() {
-            // Clear and replace the specific pane being refreshed
-            if !aligned.is_empty() {
-                self.aligned_images.clear();
-                self.aligned_images.extend(aligned.clone());
-            }
-            if !bunches.is_empty() {
-                self.bunch_images.clear();
-                self.bunch_images.extend(bunches.clone());
-            }
-            if !final_imgs.is_empty() {
-                self.final_images.clear();
-                self.final_images.extend(final_imgs.clone());
+            let has_sharpness = !sharpness.is_empty();
+            let has_aligned = !aligned.is_empty();
+            let has_bunches = !bunches.is_empty();
+            let has_final = !final_imgs.is_empty();
+            
+            // Count how many panes have data
+            let active_count = [has_sharpness, has_aligned, has_bunches, has_final]
+                .iter()
+                .filter(|&&x| x)
+                .count();
+            
+            // Only update if exactly one pane has data (single pane refresh)
+            if active_count == 1 {
+                if has_sharpness {
+                    log::debug!("Refreshing sharpness pane with {} YAML files", sharpness.len());
+                    self.sharpness_images.clear();
+                    self.sharpness_images.extend(sharpness.clone());
+                } else if has_aligned {
+                    log::debug!("Refreshing aligned pane with {} images", aligned.len());
+                    self.aligned_images.clear();
+                    self.aligned_images.extend(aligned.clone());
+                } else if has_bunches {
+                    log::debug!("Refreshing bunches pane with {} images", bunches.len());
+                    self.bunch_images.clear();
+                    self.bunch_images.extend(bunches.clone());
+                } else if has_final {
+                    log::debug!("Refreshing final pane with {} images", final_imgs.len());
+                    self.final_images.clear();
+                    self.final_images.extend(final_imgs.clone());
+                }
+            } else if active_count > 1 {
+                // Multiple panes have data - this can happen when file watcher triggers
+                // multiple events simultaneously (e.g., during batch alignment)
+                // Update all panes that have data
+                log::debug!("Multi-pane refresh: {} panes active (sharpness:{}, aligned:{}, bunches:{}, final:{})",
+                           active_count, sharpness.len(), aligned.len(), bunches.len(), final_imgs.len());
+                
+                if has_sharpness {
+                    self.sharpness_images.clear();
+                    self.sharpness_images.extend(sharpness.clone());
+                }
+                if has_aligned {
+                    self.aligned_images.clear();
+                    self.aligned_images.extend(aligned.clone());
+                }
+                if has_bunches {
+                    self.bunch_images.clear();
+                    self.bunch_images.extend(bunches.clone());
+                }
+                if has_final {
+                    self.final_images.clear();
+                    self.final_images.extend(final_imgs.clone());
+                }
             }
         }
 
@@ -288,6 +352,28 @@ impl ImageStacker {
             // Initial load or refresh: process paths_to_process
             all_paths.extend(paths_to_process.clone());
         }
+        
+        // For sharpness refresh, we need to find the corresponding image files
+        // and regenerate their thumbnails (already removed from cache above)
+        if !sharpness.is_empty() && aligned.is_empty() && bunches.is_empty() && final_imgs.is_empty() {
+            // This is a sharpness-only refresh
+            // Find the corresponding image files for each YAML file
+            for yaml_path in &sharpness {
+                if let Some(yaml_stem) = yaml_path.file_stem() {
+                    let yaml_stem_str = yaml_stem.to_string_lossy();
+                    // Find matching image in self.images
+                    for img_path in &self.images {
+                        if let Some(img_stem) = img_path.file_stem() {
+                            if img_stem.to_string_lossy() == yaml_stem_str {
+                                all_paths.push(img_path.clone());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         all_paths.extend(aligned.clone());
         all_paths.extend(bunches.clone());
         all_paths.extend(final_imgs.clone());

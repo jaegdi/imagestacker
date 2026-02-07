@@ -14,6 +14,7 @@ use opencv::{core, imgproc};
 /// 
 /// # Returns
 /// * Sharpness score (0.0 = very blurry, higher = sharper)
+#[allow(dead_code)]
 pub fn compute_sharpness_auto(img: &Mat) -> Result<f64> {
     // Try GPU first
     match img.get_umat(core::AccessFlag::ACCESS_READ, core::UMatUsageFlags::USAGE_DEFAULT) {
@@ -71,6 +72,14 @@ pub fn compute_sharpness(img: &Mat) -> Result<f64> {
             img,
             &mut gray,
             imgproc::COLOR_BGR2GRAY,
+            0,
+            core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        )?;
+    } else if img.channels() == 4 {
+        imgproc::cvt_color(
+            img,
+            &mut gray,
+            imgproc::COLOR_BGRA2GRAY,
             0,
             core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
@@ -267,6 +276,16 @@ pub fn compute_sharpness_umat(img_umat: &core::UMat) -> Result<f64> {
             img_umat,
             &mut gray,
             imgproc::COLOR_BGR2GRAY,
+            0,
+            core::AlgorithmHint::ALGO_HINT_DEFAULT,
+        )?;
+        gray
+    } else if img_umat.channels() == 4 {
+        let mut gray = core::UMat::new_def();
+        imgproc::cvt_color(
+            img_umat,
+            &mut gray,
+            imgproc::COLOR_BGRA2GRAY,
             0,
             core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;

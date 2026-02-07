@@ -51,6 +51,30 @@ impl ImageStacker {
                 })
         };
 
+        // Stack Imported button: enabled when images are imported and not processing
+        let stack_imported_button = if !self.images.is_empty() && !self.is_processing {
+            button("Stack Imported").on_press(Message::StackImported)
+        } else {
+            button("Stack Imported")
+                .style(|theme, _status| button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
+                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
+                    ..button::secondary(theme, button::Status::Disabled)
+                })
+        };
+
+        // Stack Sharpness button: enabled when sharpness images exist and not processing
+        let stack_sharpness_button = if !self.sharpness_images.is_empty() && !self.is_processing {
+            button("Stack Sharpness").on_press(Message::StackSharpness)
+        } else {
+            button("Stack Sharpness")
+                .style(|theme, _status| button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
+                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
+                    ..button::secondary(theme, button::Status::Disabled)
+                })
+        };
+
         // Stack Bunches button: enabled when bunch images exist and not processing
         let stack_bunches_button = if !self.bunch_images.is_empty() && !self.is_processing {
             button("Stack Bunches").on_press(Message::StackBunches)
@@ -79,6 +103,29 @@ impl ImageStacker {
                 .width(1.0)
                 .color(iced::Color::from_rgb(0.4, 0.4, 0.4))));
 
+        // Sharpness button: enabled when images are imported and not processing
+        let sharpness_button = if !self.images.is_empty() && !self.is_processing {
+            button("Detect Sharpness").on_press(Message::DetectSharpness)
+        } else {
+            button("Detect Sharpness")
+                .style(|theme, _status| button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
+                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
+                    ..button::secondary(theme, button::Status::Disabled)
+                })
+        };
+
+        let sharpness_group = container(
+            column![
+                sharpness_button
+            ]
+        )
+        .padding(8)
+        .style(|_| container::Style::default()
+            .border(iced::Border::default()
+                .width(1.0)
+                .color(iced::Color::from_rgb(0.4, 0.4, 0.4))));
+
         let align_group = container(
             column![
                 align_button
@@ -93,6 +140,8 @@ impl ImageStacker {
         let stack_group = container(
             column![
                 row![
+                    stack_imported_button,
+                    stack_sharpness_button,
                     stack_aligned_button,
                     stack_bunches_button,
                 ]
@@ -126,6 +175,7 @@ impl ImageStacker {
 
         let buttons = row![
             import_group,
+            sharpness_group,
             align_group,
             stack_group,
             tools_group,
@@ -172,7 +222,8 @@ impl ImageStacker {
         }
 
         let panes = row![
-            self.render_pane("Imported", &self.images),
+            self.render_imported_pane(),
+            self.render_sharpness_pane(),
             self.render_aligned_pane(),
             self.render_bunches_pane(),
             self.render_pane("Final", &self.final_images),
@@ -239,18 +290,79 @@ impl ImageStacker {
                     .center_y(Length::Fill)
                     .into()
             } else if let Some(handle) = &self.preview_handle {
-                // Show the loaded image
-                container(
-                    iced_image(handle.clone())
-                        .width(Length::Fixed(self.config.preview_max_width - 40.0)) // Account for padding
-                        .height(Length::Fixed(self.config.preview_max_height - 140.0)) // Account for header/footer/padding
-                        .content_fit(iced::ContentFit::Contain)
-                )
-                .width(Length::Fixed(self.config.preview_max_width - 40.0))
-                .height(Length::Fixed(self.config.preview_max_height - 140.0))
-                .center_x(Length::Fill)
-                .center_y(Length::Fill)
-                .into()
+                // Use full window size for full resolution, configured size for thumbnails
+                let (preview_width, preview_height) = if self.preview_is_thumbnail {
+                    (self.config.preview_max_width, self.config.preview_max_height)
+                } else {
+                    // Full resolution: use 95% of window size to leave some margin
+                    (self.window_width * 0.95, self.window_height * 0.95)
+                };
+                
+                // Create base image widget
+                let base_image = iced_image(handle.clone())
+                    .width(Length::Fixed(preview_width - 40.0))
+                    .height(Length::Fixed(preview_height - 140.0))
+                    .content_fit(iced::ContentFit::Contain);
+                
+                // Add sharpness overlay if data is available
+                let image_with_overlay = if let Some(info) = &self.preview_sharpness_info {
+                    let overlay_text = column![
+                        text("Sharpness Analysis").size(16).style(|_| text::Style {
+                            color: Some(iced::Color::WHITE)
+                        }),
+                        text("").size(4),
+                        text(format!("Max Regional: {:.2}", info.max_regional_sharpness)).size(13).style(|_| text::Style {
+                            color: Some(iced::Color::WHITE)
+                        }),
+                        text(format!("Global: {:.2}", info.global_sharpness)).size(13).style(|_| text::Style {
+                            color: Some(iced::Color::WHITE)
+                        }),
+                        text(format!("Sharp Regions: {:.1}", info.sharp_region_count)).size(13).style(|_| text::Style {
+                            color: Some(iced::Color::WHITE)
+                        }),
+                        text(format!("Grid: {}x{}", info.grid_size, info.grid_size)).size(13).style(|_| text::Style {
+                            color: Some(iced::Color::WHITE)
+                        }),
+                        text(format!("Size: {}x{}", info.image_size.0, info.image_size.1)).size(13).style(|_| text::Style {
+                            color: Some(iced::Color::WHITE)
+                        }),
+                    ]
+                    .spacing(3)
+                    .padding(8);
+                    
+                    let overlay_container = container(overlay_text)
+                        .style(|_theme: &iced::Theme| {
+                            container::Style {
+                                background: Some(iced::Background::Color(iced::Color::from_rgba(0.0, 0.0, 0.0, 0.75))),
+                                border: iced::Border {
+                                    width: 1.0,
+                                    color: iced::Color::from_rgba(1.0, 1.0, 1.0, 0.3),
+                                    radius: 6.0.into(),
+                                },
+                                ..Default::default()
+                            }
+                        });
+                    
+                    iced::widget::stack![
+                        base_image,
+                        container(overlay_container)
+                            .width(Length::Fill)
+                            .height(Length::Fill)
+                            .align_x(iced::alignment::Horizontal::Left)
+                            .align_y(iced::alignment::Vertical::Top)
+                            .padding(12)
+                    ]
+                } else {
+                    iced::widget::stack![base_image]
+                };
+                
+                // Show the loaded image with overlay
+                container(image_with_overlay)
+                    .width(Length::Fixed(preview_width - 40.0))
+                    .height(Length::Fixed(preview_height - 140.0))
+                    .center_x(Length::Fill)
+                    .center_y(Length::Fill)
+                    .into()
             } else {
                 // Fallback if no handle
                 container(text("Failed to load image").size(16))
@@ -330,19 +442,29 @@ impl ImageStacker {
                 ]
                 .spacing(10)
                 .padding(20)
-            )
-            .width(Length::Fixed(self.config.preview_max_width))
-            .height(Length::Fixed(self.config.preview_max_height))
-            .style(|_| container::Style::default()
-                .background(iced::Background::Color(iced::Color::from_rgb(0.15, 0.15, 0.15)))
-                .border(iced::Border::default()
-                    .width(2.0)
-                    .color(iced::Color::from_rgb(0.3, 0.3, 0.3))));
+            );
+            
+            // Use full window size for full resolution, configured size for thumbnails
+            let (preview_width, preview_height) = if self.preview_is_thumbnail {
+                (self.config.preview_max_width, self.config.preview_max_height)
+            } else {
+                // Full resolution: use 95% of window size
+                (self.window_width * 0.95, self.window_height * 0.95)
+            };
+            
+            let preview_container = container(preview_content)
+                .width(Length::Fixed(preview_width))
+                .height(Length::Fixed(preview_height))
+                .style(|_| container::Style::default()
+                    .background(iced::Background::Color(iced::Color::from_rgb(0.15, 0.15, 0.15)))
+                    .border(iced::Border::default()
+                        .width(2.0)
+                        .color(iced::Color::from_rgb(0.3, 0.3, 0.3))));
 
             // Stack the preview on top of the background
             iced::widget::stack![
                 background,
-                container(preview_content)
+                container(preview_container)
                     .width(Length::Fill)
                     .height(Length::Fill)
                     .center_x(Length::Fill)

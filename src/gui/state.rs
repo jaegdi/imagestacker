@@ -17,6 +17,7 @@ use crate::settings::load_settings;
 pub struct ImageStacker {
     // Image collections
     pub(crate) images: Vec<PathBuf>,
+    pub(crate) sharpness_images: Vec<PathBuf>,  // YAML files with sharpness data
     pub(crate) aligned_images: Vec<PathBuf>,
     pub(crate) bunch_images: Vec<PathBuf>,
     pub(crate) final_images: Vec<PathBuf>,
@@ -47,19 +48,26 @@ pub struct ImageStacker {
     pub(crate) preview_image_path: Option<PathBuf>,
     pub(crate) preview_loading: bool,
     pub(crate) preview_is_thumbnail: bool,
+    pub(crate) preview_sharpness_info: Option<crate::sharpness_cache::SharpnessInfo>,
     pub(crate) preview_current_pane: Vec<PathBuf>,
     pub(crate) preview_navigation_throttle: bool,
     
     // Scroll position tracking
     pub(crate) imported_scroll_offset: f32,
+    pub(crate) sharpness_scroll_offset: f32,
     pub(crate) aligned_scroll_offset: f32,
     pub(crate) bunches_scroll_offset: f32,
     pub(crate) final_scroll_offset: f32,
     
     // Window sizing
     pub(crate) window_width: f32,
+    pub(crate) window_height: f32,
     
     // Selection modes
+    pub(crate) imported_selection_mode: bool,
+    pub(crate) selected_imported: Vec<PathBuf>,
+    pub(crate) sharpness_selection_mode: bool,
+    pub(crate) selected_sharpness: Vec<PathBuf>,
     pub(crate) aligned_selection_mode: bool,
     pub(crate) selected_aligned: Vec<PathBuf>,
     pub(crate) bunch_selection_mode: bool,
@@ -73,6 +81,7 @@ impl Default for ImageStacker {
     fn default() -> Self {
         Self {
             images: Vec::new(),
+            sharpness_images: Vec::new(),
             aligned_images: Vec::new(),
             bunch_images: Vec::new(),
             final_images: Vec::new(),
@@ -91,13 +100,20 @@ impl Default for ImageStacker {
             preview_image_path: None,
             preview_loading: false,
             preview_is_thumbnail: false,
+            preview_sharpness_info: None,
             preview_current_pane: Vec::new(),
             preview_navigation_throttle: false,
             imported_scroll_offset: 0.0,
+            sharpness_scroll_offset: 0.0,
             aligned_scroll_offset: 0.0,
             bunches_scroll_offset: 0.0,
             final_scroll_offset: 0.0,
             window_width: 1400.0,
+            window_height: 900.0,
+            imported_selection_mode: false,
+            selected_imported: Vec::new(),
+            sharpness_selection_mode: false,
+            selected_sharpness: Vec::new(),
             aligned_selection_mode: false,
             selected_aligned: Vec::new(),
             bunch_selection_mode: false,
