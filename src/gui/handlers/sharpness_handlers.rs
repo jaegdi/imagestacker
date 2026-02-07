@@ -102,14 +102,12 @@ async fn detect_sharpness_task(
                 opencv::imgcodecs::IMREAD_COLOR,
             ).map_err(|e| format!("Failed to load {}: {}", image_path.display(), e))?;
 
-            // Compute sharpness with OpenCL mutex for thread safety
-            use std::sync::Mutex;
-            static OPENCL_MUTEX: Mutex<()> = Mutex::new(());
-            let _lock = OPENCL_MUTEX.lock().unwrap();
+            // Compute sharpness - GPU concurrency bounded by gpu_semaphore()
+            let _gpu_permit = crate::alignment::gpu_semaphore().acquire();
             let (max_regional, global_sharpness, sharp_region_count) = 
                 crate::sharpness::compute_regional_sharpness_auto(&img, config.sharpness_grid_size as i32)
                     .map_err(|e| format!("Failed to compute sharpness for {}: {}", image_path.display(), e))?;
-            drop(_lock);
+            drop(_gpu_permit); // Release GPU permit before saving to disk
 
             // Create sharpness info
             let image_filename = image_path.file_name()

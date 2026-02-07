@@ -96,7 +96,11 @@ fn stack_recursive(
         return load_image(&image_paths[0]);
     }
 
-    let batch_size = config.batch_config.stacking_batch_size;
+    let batch_size = if config.auto_bunch_size {
+        config.batch_config.stacking_batch_size
+    } else {
+        config.stacking_bunch_size
+    };
     const OVERLAP: usize = 2;
 
     if image_paths.len() <= batch_size {
@@ -109,25 +113,10 @@ fn stack_recursive(
             }
         }
 
-        // Load images in parallel for better performance
-        let images: Vec<Result<Mat>> = image_paths
-            .par_iter()
-            .map(|path| load_image(path))
-            .collect();
-
-        let mut valid_images = Vec::new();
-        for (idx, img_result) in images.into_iter().enumerate() {
-            match img_result {
-                Ok(img) => valid_images.push(img),
-                Err(e) => log::warn!("Failed to load image {}: {}", idx, e),
-            }
-        }
-
-        if valid_images.is_empty() {
-            return Err(anyhow::anyhow!("No valid images to stack"));
-        }
-
-        return stack_images_direct(&valid_images);
+        // Process images one at a time to minimize GPU memory usage.
+        // Each 43MP BGRA float32 image uses ~672MB of VRAM, so loading all
+        // images simultaneously would easily exceed GPU memory.
+        return stack_images_direct_from_paths(image_paths);
     }
 
     let bunches_dir = output_dir.join("bunches");
@@ -244,6 +233,84 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
     for (idx, img) in images.iter().enumerate() {
         log::debug!("Processing image {}/{}", idx + 1, images.len());
         
+        process_image_into_pyramid(
+            img, idx, levels,
+            &mut fused_pyramid, &mut max_energies, &mut fused_alpha,
+        )?;
+    }
+
+    log::debug!("Collapsing pyramid...");
+    let result_bgr = collapse_pyramid(&fused_pyramid)?;
+    let final_img = assemble_final_image(&result_bgr, &fused_alpha)?;
+    
+    log::debug!("Stacking batch complete");
+    Ok(final_img)
+}
+
+/// Memory-efficient variant: loads images one at a time from paths.
+/// Each image is loaded, processed into the pyramid, then dropped before the next is loaded.
+/// This prevents GPU VRAM exhaustion with large images (43MP BGRA float32 = ~672MB each).
+fn stack_images_direct_from_paths(image_paths: &[PathBuf]) -> Result<Mat> {
+    if image_paths.is_empty() {
+        return Err(anyhow::anyhow!("No images to stack"));
+    }
+    if image_paths.len() == 1 {
+        return Ok(load_image(&image_paths[0])?);
+    }
+
+    let levels = 7;
+    
+    let use_gpu = opencv::core::use_opencl().unwrap_or(false);
+    log::info!("stack_images_direct_from_paths: {} images, OpenCL={}", image_paths.len(), use_gpu);
+    
+    let mut fused_pyramid: Vec<core::UMat> = Vec::new();
+    let mut max_energies: Vec<core::UMat> = Vec::new();
+    let mut fused_alpha = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+
+    for (idx, path) in image_paths.iter().enumerate() {
+        let filename = path.file_name().unwrap_or_default().to_string_lossy();
+        log::debug!("Processing image {}/{}: {}", idx + 1, image_paths.len(), filename);
+        
+        // Load image — it will be dropped at the end of this iteration
+        let img = match load_image(path) {
+            Ok(img) => img,
+            Err(e) => {
+                log::warn!("Failed to load image {}: {}", filename, e);
+                continue;
+            }
+        };
+        
+        process_image_into_pyramid(
+            &img, idx, levels,
+            &mut fused_pyramid, &mut max_energies, &mut fused_alpha,
+        )?;
+        // `img` is dropped here, freeing CPU memory before loading the next image
+    }
+
+    if fused_pyramid.is_empty() {
+        return Err(anyhow::anyhow!("No valid images to stack"));
+    }
+
+    log::debug!("Collapsing pyramid...");
+    let result_bgr = collapse_pyramid(&fused_pyramid)?;
+    let final_img = assemble_final_image(&result_bgr, &fused_alpha)?;
+    
+    log::debug!("Stacking batch complete");
+    Ok(final_img)
+}
+
+/// Process a single image into the fused Laplacian pyramid.
+/// After this function returns, the caller can drop the source image to free memory.
+/// Only the pyramid contributions (much smaller than the full image) are retained.
+fn process_image_into_pyramid(
+    img: &Mat,
+    idx: usize,
+    levels: i32,
+    fused_pyramid: &mut Vec<core::UMat>,
+    max_energies: &mut Vec<core::UMat>,
+    fused_alpha: &mut core::UMat,
+) -> Result<()> {
+        
         // Ensure all images have 4 channels (BGRA)
         let img_normalized = if img.channels() == 3 {
             log::debug!("Converting 3-channel BGR to 4-channel BGRA");
@@ -269,8 +336,8 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
         let current_pyramid = generate_laplacian_pyramid(&pyramid_input, levels)?;
 
         if idx == 0 {
-            fused_pyramid = current_pyramid.clone();
-            fused_alpha = init_alpha(&original_alpha, pyramid_input.rows(), pyramid_input.cols())?;
+            *fused_pyramid = current_pyramid.clone();
+            *fused_alpha = init_alpha(&original_alpha, pyramid_input.rows(), pyramid_input.cols())?;
 
             // Initialize max energies for all levels (Laplacian + base)
             for l in 0..=levels as usize {
@@ -312,16 +379,10 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             max_energies[base_idx] = fused_base_energy;
 
             // Update fused_alpha: AND-combine so only pixels opaque in ALL images remain opaque
-            update_fused_alpha(&mut fused_alpha, &original_alpha)?;
+            update_fused_alpha(fused_alpha, &original_alpha)?;
         }
-    }
-
-    log::debug!("Collapsing pyramid...");
-    let result_bgr = collapse_pyramid(&fused_pyramid)?;
-    let final_img = assemble_final_image(&result_bgr, &fused_alpha)?;
     
-    log::debug!("Stacking batch complete");
-    Ok(final_img)
+    Ok(())
 }
 
 /// Extract BGR channels and alpha from a BGRA float UMat.

@@ -50,6 +50,10 @@ impl ImageStacker {
                                 // The update() function will handle the logic
                                 Some(Message::CloseImagePreview)  // Will be handled by update() to check state
                             }
+                            iced::keyboard::Key::Named(iced::keyboard::key::Named::Delete) => {
+                                // Delete current preview image and all its cache derivatives
+                                Some(Message::DeletePreviewImage)
+                            }
                             _ => None,
                         }
                     }

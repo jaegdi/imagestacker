@@ -31,9 +31,15 @@ impl ImageStacker {
             return Task::none();
         }
 
-        // Clean up existing bunches images before starting new stacking
+        // Clean up existing bunches images before starting new stacking,
+        // but ONLY if we're not stacking from the bunches directory itself
         let bunches_dir = output_dir.join("bunches");
-        if bunches_dir.exists() {
+        let stacking_from_bunches = images_to_stack.first()
+            .and_then(|p| p.parent())
+            .map(|p| p == bunches_dir)
+            .unwrap_or(false);
+        
+        if bunches_dir.exists() && !stacking_from_bunches {
             log::info!("Cleaning up existing bunches images in {}", bunches_dir.display());
             if let Err(e) = std::fs::remove_dir_all(&bunches_dir) {
                 log::warn!("Failed to remove bunches directory: {}", e);

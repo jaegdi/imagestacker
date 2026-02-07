@@ -3,8 +3,9 @@ use opencv::prelude::*;
 use opencv::{calib3d, core, features2d, imgproc, video};
 use rayon::prelude::*;
 use std::path::PathBuf;
-use std::sync::{Arc, Mutex, OnceLock};
+use std::sync::{Arc, Condvar, Mutex, OnceLock};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
 
 use crate::config::{EccMotionType, FeatureDetector, ProcessingConfig};
 use crate::image_io::load_image;
@@ -14,12 +15,91 @@ use crate::sharpness_cache::SharpnessInfo;
 /// Progress callback: (message, percentage)
 pub type ProgressCallback = Arc<Mutex<dyn FnMut(String, f32) + Send>>;
 
-/// Global mutex to serialize OpenCL operations across threads
-/// This ensures thread-safe GPU access when using parallel processing
-static OPENCL_MUTEX: OnceLock<Mutex<()>> = OnceLock::new();
+// ---------------------------------------------------------------------------
+// GPU concurrency limiter (counting semaphore)
+// ---------------------------------------------------------------------------
+// Instead of a binary mutex (1 thread at a time) or unlimited parallelism
+// (GPU OOM on large images), we allow N concurrent GPU operations.
+//
+// Controlled by IMAGESTACKER_GPU_CONCURRENCY env var:
+//   0  = unlimited (no guard, fastest but may OOM on large images)
+//   1  = fully serialized (safest, equivalent to old OPENCL_MUTEX)
+//   2+ = bounded parallelism (default: 2, good balance)
+//
+// The old IMAGESTACKER_OPENCL_MUTEX=1 env var is still honored as a
+// shortcut for GPU_CONCURRENCY=1.
 
-fn opencl_mutex() -> &'static Mutex<()> {
-    OPENCL_MUTEX.get_or_init(|| Mutex::new(()))
+/// A counting semaphore for bounding concurrent GPU operations.
+pub struct GpuSemaphore {
+    state: Mutex<usize>,   // current number of available permits
+    condvar: Condvar,
+    max_permits: usize,    // 0 means unlimited (no-op)
+}
+
+/// RAII guard that releases a GPU permit when dropped.
+pub struct GpuPermit<'a> {
+    sem: &'a GpuSemaphore,
+}
+
+impl GpuSemaphore {
+    fn new(max_permits: usize) -> Self {
+        Self {
+            state: Mutex::new(max_permits),
+            condvar: Condvar::new(),
+            max_permits,
+        }
+    }
+
+    /// Acquire a permit. Blocks until one is available.
+    /// Returns `None` if concurrency is unlimited (max_permits == 0).
+    pub fn acquire(&self) -> Option<GpuPermit<'_>> {
+        if self.max_permits == 0 {
+            return None; // unlimited — no guard needed
+        }
+        let mut permits = self.state.lock().unwrap();
+        while *permits == 0 {
+            permits = self.condvar.wait(permits).unwrap();
+        }
+        *permits -= 1;
+        Some(GpuPermit { sem: self })
+    }
+}
+
+impl Drop for GpuPermit<'_> {
+    fn drop(&mut self) {
+        let mut permits = self.sem.state.lock().unwrap();
+        *permits += 1;
+        self.sem.condvar.notify_one();
+    }
+}
+
+/// Global GPU semaphore, initialized once from environment variables.
+static GPU_SEMAPHORE: OnceLock<GpuSemaphore> = OnceLock::new();
+
+/// Get the global GPU concurrency semaphore.
+///
+/// Priority (first match wins):
+///   1. `IMAGESTACKER_OPENCL_MUTEX=1`  → concurrency = 1 (full serialization)
+///   2. `IMAGESTACKER_GPU_CONCURRENCY` → concurrency = env value
+///   3. Settings file (`gpu_concurrency`) → concurrency = saved value
+///   4. default                        → concurrency = 2
+pub fn gpu_semaphore() -> &'static GpuSemaphore {
+    GPU_SEMAPHORE.get_or_init(|| {
+        let concurrency = if std::env::var("IMAGESTACKER_OPENCL_MUTEX").unwrap_or_default() == "1" {
+            log::info!("GPU concurrency: 1 (forced by IMAGESTACKER_OPENCL_MUTEX=1)");
+            1
+        } else if let Ok(val) = std::env::var("IMAGESTACKER_GPU_CONCURRENCY") {
+            let c = val.parse::<usize>().unwrap_or(2);
+            log::info!("GPU concurrency: {} (from IMAGESTACKER_GPU_CONCURRENCY env var)", c);
+            c
+        } else {
+            // Read from saved settings
+            let config = crate::settings::load_settings();
+            log::info!("GPU concurrency: {} (from settings)", config.gpu_concurrency);
+            config.gpu_concurrency
+        };
+        GpuSemaphore::new(concurrency)
+    })
 }
 
 /// Try to load cached sharpness value from YAML file
@@ -245,7 +325,7 @@ fn compute_hybrid_ecc_transform(
     let tgt_descriptors: core::Mat;
     
     {
-        let _lock = opencl_mutex().lock().unwrap();
+        // Feature extraction runs on CPU Mat — no GPU mutex needed
         (ref_keypoints, ref_descriptors) = extract_features(ref_img, FeatureDetector::SIFT)?;
         (tgt_keypoints, tgt_descriptors) = extract_features(tgt_img, FeatureDetector::SIFT)?;
     }
@@ -366,33 +446,19 @@ fn compute_hybrid_ecc_transform(
         epsilon: config.ecc_epsilon,
     };
     
-    // Run ECC refinement
-    let use_mutex = std::env::var("IMAGESTACKER_ECC_MUTEX").unwrap_or_else(|_| "0".to_string()) == "1";
+    // Run ECC refinement — GPU concurrency bounded by gpu_semaphore()
+    let _gpu_permit = gpu_semaphore().acquire();
     
-    let warp_result = if use_mutex {
-        let _lock = opencl_mutex().lock().unwrap();
-        video::find_transform_ecc(
-            tgt_blurred,
-            ref_blurred,
-            &mut warp_matrix,
-            motion_type,
-            criteria,
-            &Mat::default(),
-            5,
-        )
-    } else {
-        video::find_transform_ecc(
-            tgt_blurred,
-            ref_blurred,
-            &mut warp_matrix,
-            motion_type,
-            criteria,
-            &Mat::default(),
-            5,
-        )
-    };
+    find_transform_ecc_with_timeout(
+        tgt_blurred,
+        ref_blurred,
+        &mut warp_matrix,
+        motion_type,
+        criteria,
+        config.ecc_timeout_seconds,
+        "hybrid",
+    )?;
     
-    warp_result?;
     Ok(warp_matrix)
 }
 
@@ -414,38 +480,76 @@ fn compute_ecc_transform_internal(
     };
     
     // 5. Compute ECC transformation
-    // Experimental: Try without mutex to allow true parallelization
-    // OpenCV 4.x+ claims to handle OpenCL thread safety internally
-    // If crashes occur, we'll need to add the mutex back or use batch processing
-    let use_mutex = std::env::var("IMAGESTACKER_ECC_MUTEX").unwrap_or_else(|_| "0".to_string()) == "1";
+    // GPU concurrency bounded by gpu_semaphore()
+    let _gpu_permit = gpu_semaphore().acquire();
     
-    let warp_result = if use_mutex {
-        log::debug!("Using mutex for ECC (IMAGESTACKER_ECC_MUTEX=1)");
-        let _lock = opencl_mutex().lock().unwrap();
-        video::find_transform_ecc(
-            tgt_blurred,
-            ref_blurred,
-            &mut warp_matrix,
-            motion_type,
-            criteria,
-            &Mat::default(),  // inputMask
-            5,                // gaussFiltSize (internal, additional to our pre-blur)
-        )
-    } else {
-        // No mutex - allow true parallel ECC computation
-        video::find_transform_ecc(
-            tgt_blurred,
-            ref_blurred,
-            &mut warp_matrix,
-            motion_type,
-            criteria,
-            &Mat::default(),  // inputMask
-            5,                // gaussFiltSize (internal, additional to our pre-blur)
-        )
-    };
-    warp_result?;
+    find_transform_ecc_with_timeout(
+        tgt_blurred,
+        ref_blurred,
+        &mut warp_matrix,
+        motion_type,
+        criteria,
+        config.ecc_timeout_seconds,
+        "standard",
+    )?;
+    drop(_gpu_permit);
     
     Ok(warp_matrix)
+}
+
+/// Run find_transform_ecc with a timeout to prevent infinite hangs.
+/// OpenCV's find_transform_ecc is a blocking C++ call that cannot be interrupted.
+/// On certain images, it can run for many minutes without converging or failing.
+/// This wrapper spawns a dedicated thread and waits with a timeout.
+/// If the timeout is reached, the ECC computation is abandoned (the thread will
+/// eventually finish on its own, but we don't wait for it).
+fn find_transform_ecc_with_timeout(
+    tgt_blurred: &Mat,
+    ref_blurred: &Mat,
+    warp_matrix: &mut Mat,
+    motion_type: i32,
+    criteria: core::TermCriteria,
+    timeout_seconds: u64,
+    filename: &str,
+) -> Result<()> {
+    // Clone the data for the thread (Mat is refcounted, clone is cheap for headers but we need deep copies)
+    let tgt_clone = tgt_blurred.clone();
+    let ref_clone = ref_blurred.clone();
+    let mut warp_clone = warp_matrix.clone();
+    
+    let (tx, rx) = std::sync::mpsc::channel();
+    let fname = filename.to_string();
+    
+    std::thread::spawn(move || {
+        let result = video::find_transform_ecc(
+            &tgt_clone,
+            &ref_clone,
+            &mut warp_clone,
+            motion_type,
+            criteria,
+            &Mat::default(),
+            5,
+        );
+        // Send result back (may fail if receiver dropped due to timeout, that's ok)
+        let _ = tx.send((result, warp_clone));
+    });
+    
+    match rx.recv_timeout(Duration::from_secs(timeout_seconds)) {
+        Ok((warp_result, result_matrix)) => {
+            warp_result?;
+            // Copy the result back into the caller's warp_matrix
+            result_matrix.copy_to(warp_matrix)?;
+            Ok(())
+        }
+        Err(std::sync::mpsc::RecvTimeoutError::Timeout) => {
+            log::warn!("   ⏱️  ECC timed out after {}s for {} (thread abandoned)", timeout_seconds, fname);
+            Err(anyhow::anyhow!("ECC timeout after {}s - do not converge", timeout_seconds))
+        }
+        Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => {
+            log::error!("   ECC thread panicked for {}", fname);
+            Err(anyhow::anyhow!("ECC thread panicked"))
+        }
+    }
 }
 
 /// Check if a transformation matrix is reasonable (not too distorted)
@@ -709,9 +813,8 @@ fn align_images_ecc(
             let img = load_image(path)?;
             log::info!("   Computing sharpness for {}", 
                       path.file_name().unwrap_or_default().to_string_lossy());
-            let _lock = opencl_mutex().lock().unwrap();
+            let _gpu_permit = gpu_semaphore().acquire();
             let (max_regional, _, _) = sharpness::compute_regional_sharpness_auto(&img, config.sharpness_grid_size)?;
-            drop(_lock);
             // Image is dropped here, freeing memory
             max_regional
         };
@@ -821,16 +924,9 @@ fn align_images_ecc(
     
     log::info!("🚀 Starting batch ECC alignment of {} images (batch_size={})", total_to_align, batch_size);
     log::info!("   Using Rayon parallel processing with {} threads per batch", rayon::current_num_threads());
-    
-    // Check if ECC mutex is enabled (for debugging thread safety issues)
-    let ecc_mutex_enabled = std::env::var("IMAGESTACKER_ECC_MUTEX").unwrap_or_else(|_| "0".to_string()) == "1";
-    if ecc_mutex_enabled {
-        log::warn!("   ⚠️  ECC mutex ENABLED (serialized ECC computation)");
-        log::warn!("   Set IMAGESTACKER_ECC_MUTEX=0 to allow parallel ECC");
-    } else {
-        log::info!("   ✓ ECC mutex DISABLED (fully parallel processing)");
-        log::info!("   If crashes occur, set IMAGESTACKER_ECC_MUTEX=1");
-    }
+    log::info!("   GPU concurrency limit: {} (set IMAGESTACKER_GPU_CONCURRENCY to change)", 
+        std::env::var("IMAGESTACKER_GPU_CONCURRENCY").unwrap_or_else(|_| "2".to_string()));
+    log::info!("   Per-image ECC timeout: {}s (configurable in Settings)", config.ecc_timeout_seconds);
     
     // Calculate common bounding box for all aligned images
     let bbox = Arc::new(Mutex::new(core::Rect::new(0, 0, ref_size.width, ref_size.height)));
@@ -1197,12 +1293,9 @@ pub fn align_images(
                 match load_image(path) {
                     Ok(img) => {
                         // Use configured grid size for regional analysis
-                        // Serialize OpenCL operations for thread safety
-                        // Use smart wrapper that automatically tries GPU first, falls back to CPU
-                        let sharpness_result = {
-                            let _lock = opencl_mutex().lock().unwrap();
-                            sharpness::compute_regional_sharpness_auto(&img, config.sharpness_grid_size)
-                        };
+                        // GPU concurrency bounded by gpu_semaphore()
+                        let _gpu_permit = gpu_semaphore().acquire();
+                        let sharpness_result = sharpness::compute_regional_sharpness_auto(&img, config.sharpness_grid_size);
                         
                         match sharpness_result {
                             Ok((max_regional, global, sharp_count)) => {
@@ -1503,9 +1596,10 @@ pub fn align_images(
                 let img = load_image(path)?;
 
                 // GPU preprocessing: minimize CPU↔GPU transfers by doing all GPU work in one go
+                // GPU concurrency bounded by gpu_semaphore()
                 let gpu_start = std::time::Instant::now();
                 let (preprocessed, scale) = {
-                    let _lock = opencl_mutex().lock().unwrap();
+                    let _gpu_permit = gpu_semaphore().acquire();
                     let lock_acquired = std::time::Instant::now();
                     
                     // Upload to GPU once
@@ -1561,9 +1655,9 @@ pub fn align_images(
                     )?;
                     let gpu_ops_done = std::time::Instant::now();
                     
-                    // Download from GPU once (with clone to break reference)
-                    let small_img_ref = small_umat.get_mat(core::AccessFlag::ACCESS_READ)?;
-                    let small_img = small_img_ref.clone();
+                    // Deep-copy from GPU into a standalone Mat (avoids UMat lifetime issue)
+                    let mut small_img = core::Mat::default();
+                    small_umat.copy_to(&mut small_img)?;
                     let download_done = std::time::Instant::now();
                     
                     log::debug!(
@@ -1929,9 +2023,9 @@ pub fn align_images(
 
                 let img = load_image(img_path)?;
 
-                // Serialize GPU-intensive warp operations for thread safety
+                // Warp operations - GPU concurrency bounded by gpu_semaphore()
                 let (warped, output_path) = {
-                    let _lock = opencl_mutex().lock().unwrap();
+                    let _gpu_permit = gpu_semaphore().acquire();
                     
                     // Convert to BGRA if needed (to support transparent borders)
                     let img_with_alpha = if img.channels() == 3 {
