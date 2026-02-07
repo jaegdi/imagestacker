@@ -269,6 +269,15 @@ impl ImageStacker {
         Task::none()
     }
 
+    /// Handle DefaultFontChanged - set the default application font
+    pub fn handle_default_font_changed(&mut self, font: String) -> Task<Message> {
+        self.config.default_font = font;
+        let _ = save_settings(&self.config);
+        // Font is set once at startup via daemon().default_font()
+        // Changes take effect on next app restart.
+        Task::none()
+    }
+
     /// Handle WindowResized
     pub fn handle_window_resized(&mut self, width: f32, height: f32) -> Task<Message> {
         self.window_width = width;

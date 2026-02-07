@@ -3,12 +3,15 @@
 //! This module contains the main application view and image preview modal.
 
 use iced::widget::{
-    button, column, container, horizontal_space, image as iced_image, row, text, text_input,
+    button, column, container, horizontal_space, image as iced_image, row, text,
+    pane_grid,
 };
 use iced::{Element, Length};
 use iced::window;
 
 use crate::messages::Message;
+use crate::gui::state::PaneId;
+use crate::gui::theme;
 use super::super::state::ImageStacker;
 
 impl ImageStacker {
@@ -30,101 +33,47 @@ impl ImageStacker {
         // Align button: enabled when images are imported and not processing
         let align_button = if !self.images.is_empty() && !self.is_processing {
             button("Align").on_press(Message::AlignImages)
+                .width(Length::Fixed(120.0))
         } else {
             button("Align")
-                .style(|theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
-                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
-                    ..button::secondary(theme, button::Status::Disabled)
-                })
+                .style(theme::button_disabled)
+                .width(Length::Fixed(120.0))
         };
 
         // Stack button: enabled when aligned images exist and not processing
         let stack_aligned_button = if !self.aligned_images.is_empty() && !self.is_processing {
             button("Stack Aligned").on_press(Message::StackImages)
-                .style(|_theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.28, 0.22, 0.48))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        color: iced::Color::from_rgb(0.45, 0.40, 0.72),
-                        width: 1.0,
-                        radius: 4.0.into(),
-                    },
-                    ..Default::default()
-                })
+                .style(theme::stack_aligned_button)
         } else {
             button("Stack Aligned")
-                .style(|theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
-                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
-                    ..button::secondary(theme, button::Status::Disabled)
-                })
+                .style(theme::button_disabled)
         };
 
         // Stack Imported button: enabled when images are imported and not processing
         let stack_imported_button = if !self.images.is_empty() && !self.is_processing {
             button("Stack Imported").on_press(Message::StackImported)
-                .style(|_theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.20, 0.28, 0.40))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        color: iced::Color::from_rgb(0.35, 0.50, 0.70),
-                        width: 1.0,
-                        radius: 4.0.into(),
-                    },
-                    ..Default::default()
-                })
+                .style(theme::stack_imported_button)
         } else {
             button("Stack Imported")
-                .style(|theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
-                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
-                    ..button::secondary(theme, button::Status::Disabled)
-                })
+                .style(theme::button_disabled)
         };
 
         // Stack Sharpness button: enabled when sharpness images exist and not processing
         let stack_sharpness_button = if !self.sharpness_images.is_empty() && !self.is_processing {
             button("Stack Sharpness").on_press(Message::StackSharpness)
-                .style(|_theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.12, 0.30, 0.35))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        color: iced::Color::from_rgb(0.25, 0.55, 0.60),
-                        width: 1.0,
-                        radius: 4.0.into(),
-                    },
-                    ..Default::default()
-                })
+                .style(theme::stack_sharpness_button)
         } else {
             button("Stack Sharpness")
-                .style(|theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
-                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
-                    ..button::secondary(theme, button::Status::Disabled)
-                })
+                .style(theme::button_disabled)
         };
 
         // Stack Bunches button: enabled when bunch images exist and not processing
         let stack_bunches_button = if !self.bunch_images.is_empty() && !self.is_processing {
             button("Stack Bunches").on_press(Message::StackBunches)
-                .style(|_theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.35, 0.25, 0.14))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        color: iced::Color::from_rgb(0.60, 0.42, 0.25),
-                        width: 1.0,
-                        radius: 4.0.into(),
-                    },
-                    ..Default::default()
-                })
+                .style(theme::stack_bunches_button)
         } else {
             button("Stack Bunches")
-                .style(|theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
-                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
-                    ..button::secondary(theme, button::Status::Disabled)
-                })
+                .style(theme::button_disabled)
         };
 
         // Group buttons in frames
@@ -138,21 +87,14 @@ impl ImageStacker {
             ]
         )
         .padding(8)
-        .style(|_| container::Style::default()
-            .border(iced::Border::default()
-                .width(1.0)
-                .color(iced::Color::from_rgb(0.4, 0.4, 0.4))));
+        .style(|t| theme::button_group(t));
 
         // Sharpness button: enabled when images are imported and not processing
         let sharpness_button = if !self.images.is_empty() && !self.is_processing {
             button("Detect Sharpness").on_press(Message::DetectSharpness)
         } else {
             button("Detect Sharpness")
-                .style(|theme, _status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.3, 0.3))),
-                    text_color: iced::Color::from_rgb(0.5, 0.5, 0.5),
-                    ..button::secondary(theme, button::Status::Disabled)
-                })
+                .style(theme::button_disabled)
         };
 
         let sharpness_group = container(
@@ -161,10 +103,7 @@ impl ImageStacker {
             ]
         )
         .padding(8)
-        .style(|_| container::Style::default()
-            .border(iced::Border::default()
-                .width(1.0)
-                .color(iced::Color::from_rgb(0.4, 0.4, 0.4))));
+        .style(|t| theme::button_group(t));
 
         let align_group = container(
             column![
@@ -172,10 +111,7 @@ impl ImageStacker {
             ]
         )
         .padding(8)
-        .style(|_| container::Style::default()
-            .border(iced::Border::default()
-                .width(1.0)
-                .color(iced::Color::from_rgb(0.4, 0.4, 0.4))));
+        .style(|t| theme::button_group(t));
 
         let stack_group = container(
             column![
@@ -189,10 +125,7 @@ impl ImageStacker {
             ]
         )
         .padding(8)
-        .style(|_| container::Style::default()
-            .border(iced::Border::default()
-                .width(1.0)
-                .color(iced::Color::from_rgb(0.4, 0.4, 0.4))));
+        .style(|t| theme::button_group(t));
 
         let tools_group = container(
             column![
@@ -201,16 +134,7 @@ impl ImageStacker {
                         let settings_btn = button(if self.show_settings { "Hide Settings" } else { "Settings" })
                             .on_press(Message::ToggleSettings);
                         if self.show_settings {
-                            settings_btn.style(|_theme, _status| button::Style {
-                                background: Some(iced::Background::Color(iced::Color::from_rgb(0.85, 0.55, 0.1))),
-                                text_color: iced::Color::WHITE,
-                                border: iced::Border {
-                                    color: iced::Color::from_rgb(0.95, 0.65, 0.15),
-                                    width: 1.0,
-                                    radius: 4.0.into(),
-                                },
-                                ..Default::default()
-                            })
+                            settings_btn.style(theme::settings_active_button)
                         } else {
                             settings_btn
                         }
@@ -224,18 +148,15 @@ impl ImageStacker {
             ]
         )
         .padding(8)
-        .style(|_| container::Style::default()
-            .border(iced::Border::default()
-                .width(1.0)
-                .color(iced::Color::from_rgb(0.4, 0.4, 0.4))));
+        .style(|t| theme::button_group(t));
 
         let buttons = row![
             import_group,
             sharpness_group,
             align_group,
             stack_group,
-            tools_group,
             horizontal_space(),
+            tools_group,
             button("Exit").on_press(Message::Exit),
         ]
         .spacing(10)
@@ -263,54 +184,59 @@ impl ImageStacker {
                         .width(Length::Fill),
                     text("Press ESC to cancel")
                         .size(12)
-                        .style(|_| text::Style {
-                            color: Some(iced::Color::from_rgb(1.0, 0.8, 0.0))
-                        })
+                        .style(|t| theme::warning_text(t))
                 ]
                 .spacing(5)
             )
             .padding(10)
             .width(Length::Fill)
-            .style(|_| container::Style::default()
-                .background(iced::Color::from_rgb(0.15, 0.25, 0.35)));
+            .style(|t| theme::progress_container(t));
             
             main_column = main_column.push(progress_bar);
         }
 
-        let panes = row![
-            self.render_imported_pane(),
-            self.render_sharpness_pane(),
-            self.render_aligned_pane(),
-            self.render_bunches_pane(),
-            self.render_pane("Final", &self.final_images),
-        ]
-        .spacing(10)
-        .padding(10)
-        .height(Length::Fill);
+        let panes = pane_grid::PaneGrid::new(&self.pane_state, |_pane, pane_id, _is_maximized| {
+                let content: Element<'_, Message> = match pane_id {
+                    PaneId::Imported  => self.render_imported_pane(),
+                    PaneId::Sharpness => self.render_sharpness_pane(),
+                    PaneId::Aligned   => self.render_aligned_pane(),
+                    PaneId::Bunches   => self.render_bunches_pane(),
+                    PaneId::Final     => self.render_pane("Final", &self.final_images),
+                };
+                pane_grid::Content::new(content)
+            })
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .spacing(4)
+            .on_resize(6, |event| Message::PaneResized(event))
+            .on_drag(|event| Message::PaneDragged(event))
+            .style(|t| theme::pane_grid_style(t));
 
         main_column = main_column
             .push(panes)
             .push(
                 container(
-                    text_input("", &self.status)
-                        .size(16)
-                        .style(|_theme, _status| text_input::Style {
-                            background: iced::Background::Color(iced::Color::from_rgb(0.1, 0.1, 0.1)),
-                            border: iced::Border {
-                                color: iced::Color::from_rgb(0.6, 0.6, 0.6),
-                                width: 1.0,
-                                radius: 4.0.into(),
-                            },
-                            icon: iced::Color::from_rgb(0.8, 0.8, 0.8),
-                            placeholder: iced::Color::from_rgb(0.5, 0.5, 0.5),
-                            value: iced::Color::from_rgb(0.9, 0.9, 0.9),
-                            selection: iced::Color::from_rgb(0.5, 0.7, 1.0),
-                        })
+                    row![
+                        text(&self.status)
+                            .size(13)
+                            .width(Length::Fill),
+                        text(format!(
+                            "Imp: {}  Sharp: {}  Align: {}  Bunch: {}  Final: {}",
+                            self.images.len(),
+                            self.sharpness_images.len(),
+                            self.aligned_images.len(),
+                            self.bunch_images.len(),
+                            self.final_images.len()
+                        ))
+                        .size(12)
+                        .style(|t| theme::secondary_text(t)),
+                    ]
+                    .spacing(20)
+                    .align_y(iced::Alignment::Center)
+                    .padding(iced::Padding::from([4, 10]))
                 )
-                    .padding(5)
-                    .width(Length::Fill)
-                    .style(|_| container::Style::default()
-                        .background(iced::Color::from_rgb(0.1, 0.1, 0.1)))
+                .width(Length::Fill)
+                .style(|t| theme::status_bar(t))
             );
 
         main_column.into()
@@ -363,25 +289,13 @@ impl ImageStacker {
                 // Add sharpness overlay if data is available
                 let image_with_overlay = if let Some(info) = &self.preview_sharpness_info {
                     let overlay_text = column![
-                        text("Sharpness Analysis").size(16).style(|_| text::Style {
-                            color: Some(iced::Color::WHITE)
-                        }),
+                        text("Sharpness Analysis").size(16).style(|t| theme::white_text(t)),
                         text("").size(4),
-                        text(format!("Max Regional: {:.2}", info.max_regional_sharpness)).size(13).style(|_| text::Style {
-                            color: Some(iced::Color::WHITE)
-                        }),
-                        text(format!("Global: {:.2}", info.global_sharpness)).size(13).style(|_| text::Style {
-                            color: Some(iced::Color::WHITE)
-                        }),
-                        text(format!("Sharp Regions: {:.1}", info.sharp_region_count)).size(13).style(|_| text::Style {
-                            color: Some(iced::Color::WHITE)
-                        }),
-                        text(format!("Grid: {}x{}", info.grid_size, info.grid_size)).size(13).style(|_| text::Style {
-                            color: Some(iced::Color::WHITE)
-                        }),
-                        text(format!("Size: {}x{}", info.image_size.0, info.image_size.1)).size(13).style(|_| text::Style {
-                            color: Some(iced::Color::WHITE)
-                        }),
+                        text(format!("Max Regional: {:.2}", info.max_regional_sharpness)).size(13).style(|t| theme::white_text(t)),
+                        text(format!("Global: {:.2}", info.global_sharpness)).size(13).style(|t| theme::white_text(t)),
+                        text(format!("Sharp Regions: {:.1}", info.sharp_region_count)).size(13).style(|t| theme::white_text(t)),
+                        text(format!("Grid: {}x{}", info.grid_size, info.grid_size)).size(13).style(|t| theme::white_text(t)),
+                        text(format!("Size: {}x{}", info.image_size.0, info.image_size.1)).size(13).style(|t| theme::white_text(t)),
                     ]
                     .spacing(3)
                     .padding(8);
@@ -392,7 +306,7 @@ impl ImageStacker {
                                 background: Some(iced::Background::Color(iced::Color::from_rgba(0.0, 0.0, 0.0, 0.75))),
                                 border: iced::Border {
                                     width: 1.0,
-                                    color: iced::Color::from_rgba(1.0, 1.0, 1.0, 0.3),
+                                    color: iced::Color::from_rgba(1.0, 1.0, 1.0, 0.2),
                                     radius: 6.0.into(),
                                 },
                                 ..Default::default()
@@ -450,7 +364,7 @@ impl ImageStacker {
                             current_index + 1, 
                             self.preview_current_pane.len()))
                             .size(12)
-                            .style(|_theme| text::Style { color: Some(iced::Color::from_rgb(0.7, 0.7, 0.7)) })
+                            .style(|t| theme::secondary_text(t))
                     } else {
                         text("").size(12)
                     },
@@ -511,11 +425,7 @@ impl ImageStacker {
             let preview_container = container(preview_content)
                 .width(Length::Fixed(preview_width))
                 .height(Length::Fixed(preview_height))
-                .style(|_| container::Style::default()
-                    .background(iced::Background::Color(iced::Color::from_rgb(0.15, 0.15, 0.15)))
-                    .border(iced::Border::default()
-                        .width(2.0)
-                        .color(iced::Color::from_rgb(0.3, 0.3, 0.3))));
+                .style(|t| theme::preview_overlay(t));
 
             // Stack the preview on top of the background
             iced::widget::stack![

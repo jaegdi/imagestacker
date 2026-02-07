@@ -13,7 +13,7 @@ mod system_info;
 mod thumbnail;
 
 use gui::ImageStacker;
-use iced::{daemon, window};
+use iced::{daemon, window, Font};
 use clap::Parser;
 use std::path::PathBuf;
 
@@ -54,6 +54,10 @@ pub fn main() -> iced::Result {
     // Parse command line arguments
     let args = Args::parse();
     
+    // Load config to get font setting (must happen before daemon starts)
+    let saved_config = settings::load_settings();
+    let font_name: &'static str = Box::leak(saved_config.default_font.clone().into_boxed_str());
+    
     // Calculate initial window size to comfortably fit all 5 panes
     // Each pane needs ~280-300px width + spacing
     // 5 panes * 300px + spacing = ~1600px minimum
@@ -64,6 +68,10 @@ pub fn main() -> iced::Result {
     daemon(ImageStacker::title, ImageStacker::update, ImageStacker::view)
         .subscription(ImageStacker::subscription)
         .theme(ImageStacker::theme)
+        .default_font(Font {
+            family: iced::font::Family::Name(font_name),
+            ..Font::DEFAULT
+        })
         .run_with(move || {
             let (_id, open) = window::open(window::Settings {
                 size: iced::Size::new(window_width, window_height),

@@ -120,6 +120,7 @@ impl ImageStacker {
             Message::GpuConcurrencyChanged(value) => self.handle_gpu_concurrency_changed(value),
             Message::AutoBunchSizeChanged(enabled) => self.handle_auto_bunch_size_changed(enabled),
             Message::BunchSizeChanged(value) => self.handle_bunch_size_changed(value),
+            Message::DefaultFontChanged(font) => self.handle_default_font_changed(font),
             Message::MaxTransformDeterminantChanged(value) => self.handle_max_transform_determinant_changed(value),
             Message::MaxTransformScaleChanged(value) => self.handle_max_transform_scale_changed(value),
             Message::MaxTransformTranslationChanged(value) => self.handle_max_transform_translation_changed(value),
@@ -137,6 +138,18 @@ impl ImageStacker {
             Message::UseCLAHE(enabled) => self.handle_use_clahe(enabled),
             Message::UseInternalPreview(enabled) => self.handle_use_internal_preview(enabled),
             Message::WindowResized(width, height) => self.handle_window_resized(width, height),
+
+            // PaneGrid events
+            Message::PaneResized(event) => {
+                self.pane_state.resize(event.split, event.ratio);
+                Task::none()
+            }
+            Message::PaneDragged(event) => {
+                if let iced::widget::pane_grid::DragEvent::Dropped { pane, target } = event {
+                    self.pane_state.drop(pane, target);
+                }
+                Task::none()
+            }
 
             // No-op message
             Message::None => Task::none(),

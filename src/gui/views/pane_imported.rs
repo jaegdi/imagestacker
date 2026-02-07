@@ -12,6 +12,7 @@ use iced::{Element, Length};
 
 use crate::messages::Message;
 use crate::gui::state::ImageStacker;
+use crate::gui::theme;
 
 impl ImageStacker {
     pub(crate) fn render_imported_pane(&self) -> Element<'_, Message> {
@@ -45,7 +46,7 @@ impl ImageStacker {
                         .center_x(Length::Fill)
                         .center_y(Length::Fill)
                         .style(|_| {
-                            container::Style::default().background(iced::Color::from_rgb(0.2, 0.2, 0.2))
+                            container::Style::default().background(theme::bg::PLACEHOLDER)
                         })
                         .into()
                 };
@@ -67,33 +68,14 @@ impl ImageStacker {
                     // Apply different style if selected - green background and border
                     if is_selected {
                         container(
-                            btn.style(|_theme, _status| button::Style {
-                                background: Some(iced::Background::Color(iced::Color::from_rgb(0.2, 0.5, 0.2))),
-                                text_color: iced::Color::WHITE,
-                                border: iced::Border {
-                                    color: iced::Color::from_rgb(0.3, 0.9, 0.3),
-                                    width: 4.0,
-                                    radius: 4.0.into(),
-                                },
-                                ..button::Style::default()
-                            })
+                            btn.style(theme::thumb_selected)
                         )
-                        .style(|_| container::Style::default()
-                            .background(iced::Color::from_rgb(0.1, 0.3, 0.1)))
+                        .style(|t| theme::thumb_selected_container(t))
                         .padding(2)
                         .into()
                     } else {
                         // Unselected - darker background
-                        btn.style(|_theme, _status| button::Style {
-                            background: Some(iced::Background::Color(iced::Color::from_rgb(0.15, 0.15, 0.2))),
-                            text_color: iced::Color::WHITE,
-                            border: iced::Border {
-                                color: iced::Color::from_rgb(0.4, 0.4, 0.5),
-                                width: 2.0,
-                                radius: 4.0.into(),
-                            },
-                            ..button::Style::default()
-                        })
+                        btn.style(theme::thumb_unselected)
                         .into()
                     }
                 } else {
@@ -150,9 +132,7 @@ impl ImageStacker {
                     .align_x(iced::Alignment::Center),
                 text(format!("{} images", self.images.len()))
                     .size(12)
-                    .style(|_theme| text::Style {
-                        color: Some(iced::Color::from_rgb(0.7, 0.7, 0.7))
-                    })
+                    .style(|t| theme::secondary_text(t))
                     .align_x(iced::Alignment::Center)
             ]
             .width(Length::Fill)
@@ -160,15 +140,7 @@ impl ImageStacker {
             button("Refresh")
                 .on_press(Message::RefreshImportedPane)
                 .padding(4)
-                .style(|theme, status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.2, 0.7, 0.2))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        radius: 4.0.into(),
-                        ..Default::default()
-                    },
-                    ..button::secondary(theme, status)
-                })
+                .style(theme::refresh_button)
         ]
         .spacing(5)
         .align_y(iced::Alignment::Center);
@@ -179,12 +151,7 @@ impl ImageStacker {
             container(scrollable_widget)
                 .width(Length::Fill)
                 .height(Length::Fill)
-                .style(|_| container::Style {
-                    background: Some(iced::Background::Color(iced::Color::TRANSPARENT)),
-                    border: iced::Border::default(),
-                    text_color: Some(iced::Color::TRANSPARENT),
-                    shadow: iced::Shadow::default(),
-                })
+                .style(|t| theme::scrollable_inner(t))
         ]
         .spacing(10);
 
@@ -207,18 +174,10 @@ impl ImageStacker {
                     row![
                         button("Cancel")
                             .on_press(Message::CancelImportedSelection)
-                            .style(|theme, status| button::Style {
-                                background: Some(iced::Background::Color(iced::Color::from_rgb(0.8, 0.3, 0.3))),
-                                text_color: iced::Color::WHITE,
-                                ..button::secondary(theme, status)
-                            }),
+                            .style(theme::danger_button),
                         button(text(format!("Stack ({} selected)", self.selected_imported.len())))
                             .on_press(Message::StackSelectedImported)
-                            .style(|theme, status| button::Style {
-                                background: Some(iced::Background::Color(iced::Color::from_rgb(0.2, 0.7, 0.2))),
-                                text_color: iced::Color::WHITE,
-                                ..button::secondary(theme, status)
-                            }),
+                            .style(theme::success_button),
                     ]
                     .spacing(10)
                     .padding(5)
@@ -230,13 +189,7 @@ impl ImageStacker {
             .width(Length::Fill)
             .height(Length::Fill)
             .padding(10)
-            .style(|_| container::Style::default()
-                .background(iced::Color::from_rgb(0.14, 0.18, 0.28))
-                .border(iced::Border {
-                    color: iced::Color::from_rgb(0.35, 0.50, 0.70),
-                    width: 2.0,
-                    radius: 4.0.into(),
-                }))
+            .style(|_| theme::pane_container(theme::pane::IMPORTED_BG, theme::pane::IMPORTED_BORDER))
             .into()
     }
 }

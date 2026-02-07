@@ -10,100 +10,100 @@ permissions:
   contents: write
 
 jobs:
-  # windows:
-  #   name: Windows (x86_64)
-  #   runs-on: windows-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
+  windows:
+    name: Windows (x86_64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Ensure tag is on master
-  #       run: |
-  #         git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
-  #         $sha = (git rev-list -n 1 $env:GITHUB_REF)
-  #         git merge-base --is-ancestor $sha origin/master
+      - name: Ensure tag is on master
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
+          $sha = (git rev-list -n 1 $env:GITHUB_REF)
+          git merge-base --is-ancestor $sha origin/master
 
-  #     - name: Install Rust
-  #       uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
-  #     - name: Install OpenCV (vcpkg)
-  #       shell: pwsh
-  #       run: |
-  #         vcpkg install opencv4[core,calib3d,dnn]:x64-windows
-  #         # Expose vcpkg integration for CMake/pkg-config discovery where applicable
-  #         "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
-  #         "VCPKGRS_DYNAMIC=1" | Out-File -FilePath $env:GITHUB_ENV -Append
-  #         "VCPKGRS_TRIPLET=x64-windows" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - name: Install OpenCV (vcpkg)
+        shell: pwsh
+        run: |
+          vcpkg install opencv4[core,calib3d,dnn]:x64-windows
+          # Expose vcpkg integration for CMake/pkg-config discovery where applicable
+          "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "VCPKGRS_DYNAMIC=1" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "VCPKGRS_TRIPLET=x64-windows" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-  #     - name: Install LLVM
-  #       shell: pwsh
-  #       run: |
-  #         choco install llvm -y
-  #         echo "LIBCLANG_PATH=C:\\Program Files\\LLVM\\bin" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - name: Install LLVM
+        shell: pwsh
+        run: |
+          choco install llvm -y
+          echo "LIBCLANG_PATH=C:\\Program Files\\LLVM\\bin" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-  #     - name: Build (release)
-  #       run: cargo build --release
+      - name: Build (release)
+        run: cargo build --release
 
-  #     - name: Assemble dist
-  #       shell: pwsh
-  #       run: |
-  #         New-Item -ItemType Directory -Force -Path dist/windows/bin | Out-Null
-  #         New-Item -ItemType Directory -Force -Path dist/windows/doc | Out-Null
-  #         Copy-Item -Force target/release/imagestacker.exe dist/windows/bin/
-  #         if (Test-Path USER_MANUAL.md) { Copy-Item -Force USER_MANUAL.md dist/windows/doc/ }
-  #         if (Test-Path README.md) { Copy-Item -Force README.md dist/windows/doc/ }
+      - name: Assemble dist
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/windows/bin | Out-Null
+          New-Item -ItemType Directory -Force -Path dist/windows/doc | Out-Null
+          Copy-Item -Force target/release/imagestacker.exe dist/windows/bin/
+          if (Test-Path USER_MANUAL.md) { Copy-Item -Force USER_MANUAL.md dist/windows/doc/ }
+          if (Test-Path README.md) { Copy-Item -Force README.md dist/windows/doc/ }
 
-  #     - name: Zip
-  #       shell: pwsh
-  #       run: |
-  #         if (Test-Path dist/imagestacker-windows-x86_64.zip) { Remove-Item -Force dist/imagestacker-windows-x86_64.zip }
-  #         Compress-Archive -Path dist/windows/* -DestinationPath dist/imagestacker-windows-x86_64.zip
+      - name: Zip
+        shell: pwsh
+        run: |
+          if (Test-Path dist/imagestacker-windows-x86_64.zip) { Remove-Item -Force dist/imagestacker-windows-x86_64.zip }
+          Compress-Archive -Path dist/windows/* -DestinationPath dist/imagestacker-windows-x86_64.zip
 
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: imagestacker-windows-x86_64
-  #         path: dist/imagestacker-windows-x86_64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: imagestacker-windows-x86_64
+          path: dist/imagestacker-windows-x86_64.zip
 
-  # macos_arm64:
-  #   name: macOS (arm64)
-  #   runs-on: macos-14
-  #   steps:
-  #     - uses: actions/checkout@v4
+  macos_arm64:
+    name: macOS (arm64)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Ensure tag is on master
-  #       run: |
-  #         git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
-  #         TAG_REF="${GITHUB_REF##*/}"            # Extract just the tag name from GITHUB_REF
-  #         TAG_SHA=$(git rev-list -n 1 "$TAG_REF" 2>/dev/null || echo "")
-  #         if [ -z "$TAG_SHA" ]; then
-  #           echo "ERROR: Unable to resolve tag SHA for $TAG_REF" >&2
-  #           exit 1
-  #         fi
-  #         git merge-base --is-ancestor "$TAG_SHA" origin/master || { echo "ERROR: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"; exit 1; }
+      - name: Ensure tag is on master
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/master:refs/remotes/origin/master
+          TAG_REF="${GITHUB_REF##*/}"            # Extract just the tag name from GITHUB_REF
+          TAG_SHA=$(git rev-list -n 1 "$TAG_REF" 2>/dev/null || echo "")
+          if [ -z "$TAG_SHA" ]; then
+            echo "ERROR: Unable to resolve tag SHA for $TAG_REF" >&2
+            exit 1
+          fi
+          git merge-base --is-ancestor "$TAG_SHA" origin/master || { echo "ERROR: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"; exit 1; }
 
-  #     - name: Install dependencies (Homebrew)
-  #       run: |
-  #         brew update
-  #         brew install opencv pkg-config llvm
-  #         # Help pkg-config find Homebrew OpenCV
-  #         echo "PKG_CONFIG_PATH=$(brew --prefix)/lib/pkgconfig:$(brew --prefix opencv)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+      - name: Install dependencies (Homebrew)
+        run: |
+          brew update
+          brew install opencv pkg-config llvm
+          # Help pkg-config find Homebrew OpenCV
+          echo "PKG_CONFIG_PATH=$(brew --prefix)/lib/pkgconfig:$(brew --prefix opencv)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
 
-  #     - name: Set LLVM environment variables
-  #       run: |
-  #         echo "LIBCLANG_PATH=$(brew --prefix llvm)/lib" >> $GITHUB_ENV
-  #         echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
+      - name: Set LLVM environment variables
+        run: |
+          echo "LIBCLANG_PATH=$(brew --prefix llvm)/lib" >> $GITHUB_ENV
+          echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
 
-  #     - name: Install Rust
-  #       uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
 
-  #     - name: Build .app + zip
-  #       run: |
-  #         chmod +x packaging/macos/build.sh
-  #         ./packaging/macos/build.sh
+      - name: Build .app + zip
+        run: |
+          chmod +x packaging/macos/build.sh
+          ./packaging/macos/build.sh
 
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: imagestacker-macos-arm64
-  #         path: dist/imagestacker-macos-arm64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: imagestacker-macos-arm64
+          path: dist/imagestacker-macos-arm64.zip
 
   linux_rpm:
     name: Linux RPM (openSUSE Tumbleweed)

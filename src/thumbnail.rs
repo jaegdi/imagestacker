@@ -395,6 +395,7 @@ pub fn load_preview_for_screen(path: &Path, screen_width: f32, screen_height: f3
 /// Clear the thumbnail cache directory for a given image directory.
 ///
 /// Call this when the user does a full re-import or wants to force regeneration.
+#[allow(dead_code)]
 pub fn clear_thumbnail_cache(image_dir: &Path) {
     let cache_dir = image_dir.join(THUMB_CACHE_DIR);
     if cache_dir.exists() {
