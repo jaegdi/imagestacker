@@ -1,7 +1,6 @@
 use anyhow::Result;
 use opencv::prelude::*;
 use opencv::{core, imgproc};
-use rayon::prelude::*;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -35,7 +34,26 @@ pub fn stack_images(
     let mut reversed_paths: Vec<PathBuf> = image_paths.iter().cloned().collect();
     reversed_paths.reverse();
 
-    let result = stack_recursive(&reversed_paths, output_dir, 0, config, progress_cb.clone(), cancel_flag.clone())?;
+    // Disable OpenCL for the stacking pipeline to prevent CL_INVALID_COMMAND_QUEUE crashes.
+    // The Laplacian pyramid stacking creates many temporary UMat buffers across multiple batches,
+    // which can exhaust GPU memory and corrupt the OpenCL command queue (especially on GPUs with
+    // limited VRAM). With OpenCL disabled, UMat operations transparently fall back to CPU.
+    // CPU stacking is still fast and avoids the fatal OpenCL driver crashes.
+    let opencl_was_enabled = opencv::core::use_opencl().unwrap_or(false);
+    if opencl_was_enabled {
+        log::info!("Temporarily disabling OpenCL for stacking to prevent GPU memory exhaustion");
+        let _ = opencv::core::set_use_opencl(false);
+    }
+
+    let result = stack_recursive(&reversed_paths, output_dir, 0, config, progress_cb.clone(), cancel_flag.clone());
+
+    // Restore OpenCL state
+    if opencl_was_enabled {
+        log::info!("Re-enabling OpenCL after stacking");
+        let _ = opencv::core::set_use_opencl(true);
+    }
+    
+    let result = result?;
 
     report_progress("Saving final result...", 95.0);
 
@@ -165,17 +183,51 @@ fn stack_recursive(
         // Only load images that are not already in memory from the previous batch
         let start_load = if batch_idx == 0 { 0 } else { OVERLAP };
 
-        // Parallel load of new images
-        let new_images: Vec<Result<Mat>> = batch_paths[start_load..]
-            .par_iter()
-            .map(|path| load_image(path))
-            .collect();
-
-        for img_result in new_images {
-            batch_images.push(img_result?);
+        // Sequential stacking: process overlap images through the pyramid first,
+        // then load and process remaining images one at a time to minimize GPU memory.
+        // This avoids loading all batch images into memory simultaneously, which can
+        // exhaust GPU VRAM and cause CL_INVALID_COMMAND_QUEUE errors.
+        let levels = 7;
+        let use_gpu_here = opencv::core::use_opencl().unwrap_or(false);
+        log::info!("stack_images_hybrid: {} overlap + {} new images, OpenCL={}",
+            batch_images.len(), batch_paths[start_load..].len(), use_gpu_here);
+        
+        let mut fused_pyramid: Vec<core::UMat> = Vec::new();
+        let mut max_energies_batch: Vec<core::UMat> = Vec::new();
+        let mut fused_alpha = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+        let mut global_idx = 0;
+        
+        // First: process the overlap images already in memory
+        for img in &batch_images {
+            process_image_into_pyramid(
+                img, global_idx, levels,
+                &mut fused_pyramid, &mut max_energies_batch, &mut fused_alpha,
+            )?;
+            if use_gpu_here { let _ = core::finish(); }
+            global_idx += 1;
         }
-
-        let result = stack_images_direct(&batch_images)?;
+        
+        // Second: load and process remaining images one at a time
+        for path in &batch_paths[start_load..] {
+            let img = load_image(path)?;
+            process_image_into_pyramid(
+                &img, global_idx, levels,
+                &mut fused_pyramid, &mut max_energies_batch, &mut fused_alpha,
+            )?;
+            if use_gpu_here { let _ = core::finish(); }
+            global_idx += 1;
+            batch_images.push(img);
+        }
+        
+        let result_bgr = collapse_pyramid(&fused_pyramid)?;
+        let result = assemble_final_image(&result_bgr, &fused_alpha)?;
+        
+        // Explicitly drop GPU buffers and flush before saving to prevent
+        // OpenCL queue corruption from accumulated GPU memory pressure
+        drop(fused_pyramid);
+        drop(max_energies_batch);
+        drop(fused_alpha);
+        if use_gpu_here { let _ = core::finish(); }
 
         let filename = format!("L{}_B{:04}.png", level, batch_idx);
         let path = bunches_dir.join(&filename);
@@ -213,6 +265,7 @@ fn stack_recursive(
     stack_recursive(&intermediate_files, output_dir, level + 1, config, progress_cb, cancel_flag)
 }
 
+#[allow(dead_code)]
 fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
     if images.is_empty() {
         return Err(anyhow::anyhow!("No images to stack"));
@@ -237,6 +290,13 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
             img, idx, levels,
             &mut fused_pyramid, &mut max_energies, &mut fused_alpha,
         )?;
+        
+        // Flush OpenCL queue between images to prevent CL_INVALID_COMMAND_QUEUE errors.
+        // Without this, async GPU operations can accumulate and exhaust the command queue,
+        // especially with large batches or limited GPU memory.
+        if use_gpu {
+            let _ = core::finish();
+        }
     }
 
     log::debug!("Collapsing pyramid...");
@@ -285,6 +345,11 @@ fn stack_images_direct_from_paths(image_paths: &[PathBuf]) -> Result<Mat> {
             &mut fused_pyramid, &mut max_energies, &mut fused_alpha,
         )?;
         // `img` is dropped here, freeing CPU memory before loading the next image
+        
+        // Flush OpenCL queue between images to prevent CL_INVALID_COMMAND_QUEUE errors
+        if use_gpu {
+            let _ = core::finish();
+        }
     }
 
     if fused_pyramid.is_empty() {
@@ -564,8 +629,11 @@ fn assemble_final_image(result_bgr: &core::UMat, fused_alpha: &core::UMat) -> Re
     }
     
     // Convert to 8-bit and download from GPU
+    // Flush OpenCL queue before GPU→CPU transfer to ensure all operations are complete
+    let _ = core::finish();
     let mut final_8u = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
     final_img_umat.convert_to(&mut final_8u, core::CV_8U, 1.0, 0.0)?;
+    let _ = core::finish();
     let mut final_img = Mat::default();
     final_8u.get_mat(core::AccessFlag::ACCESS_READ)?.copy_to(&mut final_img)?;
     
