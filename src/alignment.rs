@@ -164,15 +164,9 @@ pub fn extract_features(
         }
         FeatureDetector::SIFT => {
             // SIFT: Scale-Invariant Feature Transform - best quality, slower
-            // Optimized to 2000 features for better speed/quality balance
-            let mut sift = features2d::SIFT::create(
-                2000,  // nfeatures - reduced from 3000 for ~30% speed improvement
-                3,     // nOctaveLayers
-                0.04,  // contrastThreshold
-                10.0,  // edgeThreshold
-                1.6,   // sigma
-                false, // enable_precise_upscale
-            )?;
+            // Using create_def() for cross-version OpenCV compatibility
+            // (OpenCV 4.8+ added enable_precise_upscale parameter)
+            let mut sift = crate::opencv_compat::sift_create()?;
             sift.detect_and_compute(
                 img,
                 &core::Mat::default(),
@@ -183,17 +177,9 @@ pub fn extract_features(
         }
         FeatureDetector::AKAZE => {
             // AKAZE: Accelerated-KAZE - good balance of speed and quality
-            // Very conservative settings for large images to prevent OOM
-            let mut akaze = features2d::AKAZE::create(
-                features2d::AKAZE_DescriptorType::DESCRIPTOR_MLDB,
-                0,      // descriptor_size
-                3,      // descriptor_channels
-                0.003,  // threshold - increased to reduce number of keypoints
-                3,      // nOctaves - reduced from 4 to save memory
-                4,      // nOctaveLayers
-                features2d::KAZE_DiffusivityType::DIFF_PM_G2,
-                64,     // max_points - reduced from 128 to prevent OOM on very large images
-            )?;
+            // Using create_def() for cross-version OpenCV compatibility
+            // (OpenCV 4.7+ added max_points parameter)
+            let mut akaze = crate::opencv_compat::akaze_create()?;
             akaze.detect_and_compute(
                 img,
                 &core::Mat::default(),
