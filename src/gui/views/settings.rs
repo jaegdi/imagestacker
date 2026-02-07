@@ -260,6 +260,15 @@ impl ImageStacker {
                     })
             ].spacing(3);
 
+            let timeout_slider = column![
+                text(format!("ECC Timeout: {}s per image", self.config.ecc_timeout_seconds)).size(12),
+                scrollable_slider(10.0..=300.0, self.config.ecc_timeout_seconds as f32, Message::EccTimeoutChanged, 5.0, Length::Fill),
+                text("Prevents hangs on difficult images. Falls back to feature-based alignment on timeout.").size(10)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                    })
+            ].spacing(3);
+
             let hybrid_checkbox = column![
                 checkbox("Use Hybrid Mode (40-50% faster)", self.config.ecc_use_hybrid)
                     .on_toggle(Message::EccUseHybridChanged),
@@ -355,6 +364,7 @@ impl ImageStacker {
                 filter_slider,
                 chunk_slider,
                 batch_slider,
+                timeout_slider,
                 hybrid_checkbox,
             ]
             .spacing(8)
@@ -607,6 +617,143 @@ impl ImageStacker {
         })
         .width(Length::Fill);
 
+        // ============== PANE 4: GPU / PERFORMANCE ==============
+        let gpu_concurrency_desc = match self.config.gpu_concurrency {
+            0 => "unlimited (fastest, may OOM on large images)",
+            1 => "serialized (safest, slowest)",
+            2 => "2 concurrent (default, good balance)",
+            n => if n <= 4 { "moderate parallelism" } else { "high parallelism (needs lots of VRAM)" },
+        };
+
+        let gpu_pane = container(
+            column![
+                text("GPU / Performance").size(16).style(|_| text::Style { 
+                    color: Some(iced::Color::from_rgb(0.8, 0.8, 1.0)) 
+                }),
+
+                text("GPU Concurrency").size(13).style(|_| text::Style {
+                    color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
+                }),
+                text("Max simultaneous GPU operations. Lower = less VRAM usage, higher = faster.").size(10)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                    }),
+                row![
+                    text("GPU Concurrency:").width(label_width),
+                    scrollable_slider(0.0..=8.0, self.config.gpu_concurrency as f32, Message::GpuConcurrencyChanged, 1.0, slider_width),
+                    text(format!("{}", self.config.gpu_concurrency)).width(value_width),
+                ]
+                .spacing(10)
+                .align_y(iced::Alignment::Center),
+                text(gpu_concurrency_desc).size(11)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.5, 0.7, 0.5))
+                    }),
+
+                container(column![]).height(10),  // Spacer
+                
+                text("⚠ Changes take effect on next app restart").size(11)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.8, 0.6, 0.3))
+                    }),
+                
+                horizontal_rule(1),
+
+                // Stacking Bunch Size
+                text("Stacking Bunch Size").size(13).style(|_| text::Style {
+                    color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
+                }),
+                text("Number of images per bunch during recursive stacking. More images per bunch = fewer levels, but higher memory usage.").size(10)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                    }),
+                checkbox(
+                    format!("Auto (RAM-based: {})", self.config.batch_config.stacking_batch_size),
+                    self.config.auto_bunch_size,
+                )
+                .on_toggle(Message::AutoBunchSizeChanged),
+                if !self.config.auto_bunch_size {
+                    column![
+                        row![
+                            text("Bunch Size:").width(label_width),
+                            scrollable_slider(4.0..=64.0, self.config.stacking_bunch_size as f32, Message::BunchSizeChanged, 1.0, slider_width),
+                            text(format!("{}", self.config.stacking_bunch_size)).width(value_width),
+                        ]
+                        .spacing(10)
+                        .align_y(iced::Alignment::Center),
+                        text(format!("Active: {} images per bunch", self.config.stacking_bunch_size)).size(11)
+                            .style(|_| text::Style {
+                                color: Some(iced::Color::from_rgb(0.5, 0.7, 0.5))
+                            }),
+                    ].spacing(4)
+                } else {
+                    column![
+                        text(format!("Active: {} images per bunch (auto)", self.config.batch_config.stacking_batch_size)).size(11)
+                            .style(|_| text::Style {
+                                color: Some(iced::Color::from_rgb(0.5, 0.7, 0.5))
+                            }),
+                    ]
+                },
+
+                horizontal_rule(1),
+                
+                text("Environment Variable Overrides").size(13).style(|_| text::Style {
+                    color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
+                }),
+                text("Env vars override settings (for testing/debugging):").size(10)
+                    .style(|_| text::Style {
+                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
+                    }),
+                
+                column![
+                    text("IMAGESTACKER_GPU_CONCURRENCY=N").size(11)
+                        .style(|_| text::Style {
+                            color: Some(iced::Color::from_rgb(0.6, 0.8, 0.6))
+                        }),
+                    text("  Override GPU concurrency (0=unlimited, 1=serialized)").size(10)
+                        .style(|_| text::Style {
+                            color: Some(iced::Color::from_rgb(0.5, 0.5, 0.5))
+                        }),
+                ].spacing(2),
+                
+                column![
+                    text("IMAGESTACKER_OPENCL_MUTEX=1").size(11)
+                        .style(|_| text::Style {
+                            color: Some(iced::Color::from_rgb(0.6, 0.8, 0.6))
+                        }),
+                    text("  Force GPU concurrency to 1 (fully serialized)").size(10)
+                        .style(|_| text::Style {
+                            color: Some(iced::Color::from_rgb(0.5, 0.5, 0.5))
+                        }),
+                ].spacing(2),
+                
+                column![
+                    text("IMAGESTACKER_ECC_BATCH_SIZE=N").size(11)
+                        .style(|_| text::Style {
+                            color: Some(iced::Color::from_rgb(0.6, 0.8, 0.6))
+                        }),
+                    text("  Override ECC batch size (overrides 'Batch Size' setting)").size(10)
+                        .style(|_| text::Style {
+                            color: Some(iced::Color::from_rgb(0.5, 0.5, 0.5))
+                        }),
+                ].spacing(2),
+            ]
+            .spacing(8)
+        )
+        .padding(10)
+        .style(|_theme| {
+            container::Style {
+                background: Some(iced::Background::Color(iced::Color::from_rgba(0.1, 0.1, 0.15, 0.3))),
+                border: iced::Border {
+                    color: iced::Color::from_rgb(0.3, 0.3, 0.4),
+                    width: 1.0,
+                    radius: 8.0.into(),
+                },
+                ..Default::default()
+            }
+        })
+        .width(Length::Fill);
+
         // ============== RESET BUTTON ==============
         let reset_button = button(
             row![
@@ -631,16 +778,24 @@ impl ImageStacker {
         .on_press(Message::ResetToDefaults);
 
         // ============== RESPONSIVE LAYOUT ==============
-        // Use horizontal layout when window is wide enough (>= 1200px for 3 panes at 380px each)
-        // Otherwise, stack vertically for better readability
+        // Use horizontal layout when window is wide enough
+        // Wide: 2x2 grid (2 panes per row at 380px each + spacing)
+        // Narrow: vertical stack
         const MIN_PANE_WIDTH: f32 = 380.0;
         
         let panes_layout: Element<'_, Message> = if use_horizontal_layout {
-            // Horizontal layout for wide screens - panes side by side
-            row![
-                container(alignment_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
-                container(postprocessing_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
-                container(preview_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
+            // 2x2 grid for wide screens
+            column![
+                row![
+                    container(alignment_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
+                    container(postprocessing_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
+                    container(preview_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
+                ]
+                .spacing(15),
+                row![
+                    container(gpu_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
+                ]
+                .spacing(15),
             ]
             .spacing(15)
             .into()
@@ -650,6 +805,7 @@ impl ImageStacker {
                 alignment_pane,
                 postprocessing_pane,
                 preview_pane,
+                gpu_pane,
             ]
             .spacing(15)
             .into()

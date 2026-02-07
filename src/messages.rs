@@ -19,6 +19,7 @@ pub enum Message {
     CancelImportedSelection,
     CancelSharpnessSelection,
     CloseImagePreview,
+    DeletePreviewImage,
     DeselectAllAligned,
     DeselectAllBunches,
     DeselectAllImported,
@@ -81,6 +82,7 @@ pub enum Message {
     EccMaxIterationsChanged(f32),
     EccMotionTypeChanged(crate::config::EccMotionType),
     EccUseHybridChanged(bool),
+    EccTimeoutChanged(f32),
     // Transform validation parameters
     MaxTransformScaleChanged(f32),
     MaxTransformTranslationChanged(f32),
@@ -101,6 +103,11 @@ pub enum Message {
     PreviewMaxHeightChanged(f32),
     PreviewMaxWidthChanged(f32),
     UseInternalPreview(bool),
+    // GPU / Performance settings
+    GpuConcurrencyChanged(f32),
+    // Stacking bunch size settings
+    AutoBunchSizeChanged(bool),
+    BunchSizeChanged(f32),
     // Scroll position tracking
     AlignedScrollChanged(f32),
     BunchesScrollChanged(f32),

@@ -56,6 +56,7 @@ pub struct ProcessingConfig {
     pub ecc_chunk_size: usize,         // Images per parallel chunk (8-16, default 12)
     pub ecc_batch_size: usize,         // Images processed in parallel per batch (2-16, default 4) - controls memory usage
     pub ecc_use_hybrid: bool,          // Use SIFT initialization + ECC refinement for 40-50% speedup (default true)
+    pub ecc_timeout_seconds: u64,      // Per-image ECC timeout in seconds (10-300, default 60) - prevents infinite hangs
     // Transform validation settings (for all alignment algorithms)
     pub max_transform_scale: f32,      // Maximum scale factor (0.5-2.0, default 1.5)
     pub max_transform_translation: f32, // Maximum translation in pixels (0-1000, default 600)
@@ -76,6 +77,11 @@ pub struct ProcessingConfig {
     // External applications
     pub external_viewer_path: String,  // For left-click when use_internal_preview is false
     pub external_editor_path: String,  // For right-click
+    // GPU / Performance settings
+    pub gpu_concurrency: usize,        // Max concurrent GPU operations (0=unlimited, 1=serialized, 2+=bounded)
+    // Stacking bunch size
+    pub auto_bunch_size: bool,         // true = auto-calculate bunch size based on RAM, false = use manual value
+    pub stacking_bunch_size: usize,    // Manual bunch size (4-64, default 12) — how many images per bunch/batch
 }
 
 impl Default for ProcessingConfig {
@@ -96,6 +102,7 @@ impl Default for ProcessingConfig {
             ecc_chunk_size: 12,                          // Optimal for 4-8 core systems
             ecc_batch_size: 4,                           // Conservative memory usage (4 images in parallel)
             ecc_use_hybrid: true,                        // Hybrid mode: 60-70% faster with same quality
+            ecc_timeout_seconds: 60,                     // 60 seconds per image before timeout
             // Transform validation defaults
             max_transform_scale: 1.5,                    // Allow up to 1.5x scale
             max_transform_translation: 600.0,            // Allow up to 600 pixels translation
@@ -116,6 +123,11 @@ impl Default for ProcessingConfig {
             // External applications (empty = use system default)
             external_viewer_path: String::new(),
             external_editor_path: String::new(),
+            // GPU / Performance defaults
+            gpu_concurrency: 2,                          // Allow 2 concurrent GPU operations
+            // Stacking bunch size defaults
+            auto_bunch_size: true,                       // Auto-calculate based on RAM
+            stacking_bunch_size: 12,                     // Manual default: 12 images per bunch
         }
     }
 }

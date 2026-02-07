@@ -120,6 +120,13 @@ impl ImageStacker {
         Task::none()
     }
 
+    /// Handle EccTimeoutChanged
+    pub fn handle_ecc_timeout_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_timeout_seconds = value as u64;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
     /// Handle MaxTransformScaleChanged
     pub fn handle_max_transform_scale_changed(&mut self, value: f32) -> Task<Message> {
         self.config.max_transform_scale = value;
@@ -235,6 +242,29 @@ impl ImageStacker {
     /// Handle ExternalEditorPathChanged
     pub fn handle_external_editor_path_changed(&mut self, path: String) -> Task<Message> {
         self.config.external_editor_path = path;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle GpuConcurrencyChanged
+    pub fn handle_gpu_concurrency_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.gpu_concurrency = value as usize;
+        let _ = save_settings(&self.config);
+        // Note: GPU semaphore is initialized once at startup from config/env.
+        // Changes take effect on next app restart.
+        Task::none()
+    }
+
+    /// Handle AutoBunchSizeChanged - toggle auto/manual bunch size
+    pub fn handle_auto_bunch_size_changed(&mut self, enabled: bool) -> Task<Message> {
+        self.config.auto_bunch_size = enabled;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle BunchSizeChanged - set manual bunch/batch size for stacking
+    pub fn handle_bunch_size_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.stacking_bunch_size = value as usize;
         let _ = save_settings(&self.config);
         Task::none()
     }
