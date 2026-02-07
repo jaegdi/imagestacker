@@ -42,6 +42,16 @@ impl ImageStacker {
         // Stack button: enabled when aligned images exist and not processing
         let stack_aligned_button = if !self.aligned_images.is_empty() && !self.is_processing {
             button("Stack Aligned").on_press(Message::StackImages)
+                .style(|_theme, _status| button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.28, 0.22, 0.48))),
+                    text_color: iced::Color::WHITE,
+                    border: iced::Border {
+                        color: iced::Color::from_rgb(0.45, 0.40, 0.72),
+                        width: 1.0,
+                        radius: 4.0.into(),
+                    },
+                    ..Default::default()
+                })
         } else {
             button("Stack Aligned")
                 .style(|theme, _status| button::Style {
@@ -54,6 +64,16 @@ impl ImageStacker {
         // Stack Imported button: enabled when images are imported and not processing
         let stack_imported_button = if !self.images.is_empty() && !self.is_processing {
             button("Stack Imported").on_press(Message::StackImported)
+                .style(|_theme, _status| button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.20, 0.28, 0.40))),
+                    text_color: iced::Color::WHITE,
+                    border: iced::Border {
+                        color: iced::Color::from_rgb(0.35, 0.50, 0.70),
+                        width: 1.0,
+                        radius: 4.0.into(),
+                    },
+                    ..Default::default()
+                })
         } else {
             button("Stack Imported")
                 .style(|theme, _status| button::Style {
@@ -66,6 +86,16 @@ impl ImageStacker {
         // Stack Sharpness button: enabled when sharpness images exist and not processing
         let stack_sharpness_button = if !self.sharpness_images.is_empty() && !self.is_processing {
             button("Stack Sharpness").on_press(Message::StackSharpness)
+                .style(|_theme, _status| button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.12, 0.30, 0.35))),
+                    text_color: iced::Color::WHITE,
+                    border: iced::Border {
+                        color: iced::Color::from_rgb(0.25, 0.55, 0.60),
+                        width: 1.0,
+                        radius: 4.0.into(),
+                    },
+                    ..Default::default()
+                })
         } else {
             button("Stack Sharpness")
                 .style(|theme, _status| button::Style {
@@ -78,6 +108,16 @@ impl ImageStacker {
         // Stack Bunches button: enabled when bunch images exist and not processing
         let stack_bunches_button = if !self.bunch_images.is_empty() && !self.is_processing {
             button("Stack Bunches").on_press(Message::StackBunches)
+                .style(|_theme, _status| button::Style {
+                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.35, 0.25, 0.14))),
+                    text_color: iced::Color::WHITE,
+                    border: iced::Border {
+                        color: iced::Color::from_rgb(0.60, 0.42, 0.25),
+                        width: 1.0,
+                        radius: 4.0.into(),
+                    },
+                    ..Default::default()
+                })
         } else {
             button("Stack Bunches")
                 .style(|theme, _status| button::Style {
@@ -157,8 +197,24 @@ impl ImageStacker {
         let tools_group = container(
             column![
                 row![
-                    button(if self.show_settings { "Hide Settings" } else { "Settings" })
-                        .on_press(Message::ToggleSettings),
+                    {
+                        let settings_btn = button(if self.show_settings { "Hide Settings" } else { "Settings" })
+                            .on_press(Message::ToggleSettings);
+                        if self.show_settings {
+                            settings_btn.style(|_theme, _status| button::Style {
+                                background: Some(iced::Background::Color(iced::Color::from_rgb(0.85, 0.55, 0.1))),
+                                text_color: iced::Color::WHITE,
+                                border: iced::Border {
+                                    color: iced::Color::from_rgb(0.95, 0.65, 0.15),
+                                    width: 1.0,
+                                    radius: 4.0.into(),
+                                },
+                                ..Default::default()
+                            })
+                        } else {
+                            settings_btn
+                        }
+                    },
                     button("Help")
                         .on_press(Message::ToggleHelp),
                     button("Show Log")

@@ -36,10 +36,10 @@ After successful build, install the package:
 
 ```bash
 # Install with zypper (recommended - handles dependencies)
-sudo zypper install ~/rpmbuild/RPMS/x86_64/imagestacker-0.1.0-1.*.rpm
+sudo zypper install ~/rpmbuild/RPMS/x86_64/imagestacker-1.0.0-1.*.rpm
 
 # Or install with rpm directly
-sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/imagestacker-0.1.0-1.*.rpm
+sudo rpm -ivh ~/rpmbuild/RPMS/x86_64/imagestacker-1.0.0-1.*.rpm
 ```
 
 ### What Gets Installed
@@ -101,18 +101,18 @@ sudo rpm -e imagestacker
 ### Changing Version
 
 Edit the version in two places:
-1. `imagestacker.spec`: Change `Version: 0.1.0`
-2. `build-rpm.sh`: Change `VERSION="0.1.0"`
+1. `imagestacker.spec`: Change `Version: 1.0.0`
+2. `build-rpm.sh`: Change `VERSION="1.0.0"`
 
 ### Adding Icon
 
-The package uses `testimages_small/final/result_0005.png` as the application icon.
+The package uses `icons/imagestacker_icon.png` as the application icon.
 During the build process, this image is automatically resized to multiple icon sizes:
 - 64x64 for standard displays (`/usr/share/pixmaps/imagestacker.png`)
 - 128x128 for HiDPI displays
 - 256x256 for high-resolution displays
 
-To use a different icon, replace `testimages_small/final/result_0005.png` in your 
+To use a different icon, replace `icons/imagestacker_icon.png` in your
 source tree before building, or modify the spec file icon paths.
 
 ### Package Metadata
@@ -180,7 +180,7 @@ rpmbuild --rebuild ~/rpmbuild/SRPMS/imagestacker-0.1.0-1.src.rpm
 
 Modify the `%{_prefix}` macro in the spec file or use:
 ```bash
-rpm --prefix=/opt/imagestacker -ivh imagestacker-0.1.0-1.rpm
+rpm --prefix=/opt/imagestacker -ivh imagestacker-1.0.0-1.rpm
 ```
 
 ## Support
