@@ -270,8 +270,7 @@ jobs:
   release:
     name: Create/Update GitHub Release
     runs-on: ubuntu-latest
-    # needs: [windows, macos_arm64, linux_rpm]
-    needs: [linux_rpm, linux_deb]
+    needs: [windows, macos_arm64, linux_rpm, linux_deb]
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
