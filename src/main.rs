@@ -39,17 +39,11 @@ pub fn main() -> iced::Result {
     
     // Try to enable OpenCL for GPU acceleration in OpenCV
     // If it fails or causes issues, OpenCV will fall back to CPU
-    match opencv::core::set_use_opencl(true) {
-        Ok(_) => {
-            match opencv::core::use_opencl() {
-                Ok(true) => log::info!("OpenCV GPU acceleration (OpenCL) enabled"),
-                Ok(false) => log::info!("OpenCV using CPU (OpenCL not available)"),
-                Err(e) => log::warn!("Could not check OpenCL status: {}", e),
-            }
-        }
-        Err(e) => {
-            log::warn!("Could not enable OpenCL: {}, using CPU", e);
-        }
+    crate::opencv_compat::set_use_opencl(true);
+    if crate::opencv_compat::use_opencl() {
+        log::info!("OpenCV GPU acceleration (OpenCL) enabled");
+    } else {
+        log::info!("OpenCV using CPU (OpenCL not available)");
     }
     
     // Parse command line arguments

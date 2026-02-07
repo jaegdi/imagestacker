@@ -69,3 +69,58 @@ pub fn sift_create() -> Result<core::Ptr<features2d::SIFT>> {
 pub fn akaze_create() -> Result<core::Ptr<features2d::AKAZE>> {
     features2d::AKAZE::create_def()
 }
+
+// --- OpenCL compatibility wrappers ---
+// OpenCL functions (use_opencl, set_use_opencl, finish, Device) are only available
+// when OpenCV is built with OpenCL support. The vcpkg Windows build typically lacks
+// OpenCL, so the opencv crate doesn't generate these bindings.
+// The cfg flag `ocvrs_has_inherent_feature_opencl` is set by the opencv crate's
+// build script when OpenCL support is detected.
+
+/// Check if OpenCL is currently enabled. Returns false if OpenCL is not available.
+pub fn use_opencl() -> bool {
+    #[cfg(ocvrs_has_inherent_feature_opencl)]
+    {
+        opencv::core::use_opencl().unwrap_or(false)
+    }
+    #[cfg(not(ocvrs_has_inherent_feature_opencl))]
+    {
+        false
+    }
+}
+
+/// Enable or disable OpenCL. No-op if OpenCL is not available.
+pub fn set_use_opencl(flag: bool) {
+    #[cfg(ocvrs_has_inherent_feature_opencl)]
+    {
+        let _ = opencv::core::set_use_opencl(flag);
+    }
+    #[cfg(not(ocvrs_has_inherent_feature_opencl))]
+    {
+        let _ = flag;
+    }
+}
+
+/// Flush the OpenCL command queue. No-op if OpenCL is not available.
+pub fn finish() {
+    #[cfg(ocvrs_has_inherent_feature_opencl)]
+    {
+        let _ = opencv::core::finish();
+    }
+}
+
+/// Get the default OpenCL device name. Returns None if OpenCL is not available.
+pub fn get_opencl_device_name() -> Option<String> {
+    #[cfg(ocvrs_has_inherent_feature_opencl)]
+    {
+        if let Ok(device) = opencv::core::Device::get_default() {
+            device.name().ok()
+        } else {
+            None
+        }
+    }
+    #[cfg(not(ocvrs_has_inherent_feature_opencl))]
+    {
+        None
+    }
+}

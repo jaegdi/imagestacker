@@ -755,11 +755,11 @@ fn align_images_ecc(
                if config.ecc_use_hybrid { "ENABLED (60-70% faster)" } else { "DISABLED" });
     
     // Check OpenCL/GPU availability
-    let opencl_available = opencv::core::use_opencl().unwrap_or(false);
+    let opencl_available = crate::opencv_compat::use_opencl();
     log::info!("   OpenCL available: {}", opencl_available);
     if opencl_available {
-        if let Ok(device_name) = opencv::core::Device::get_default() {
-            log::info!("   OpenCL device: {}", device_name.name().unwrap_or_else(|_| "Unknown".to_string()));
+        if let Some(device_name) = crate::opencv_compat::get_opencl_device_name() {
+            log::info!("   OpenCL device: {}", device_name);
         }
     } else {
         log::warn!("   ⚠️  OpenCL not available - using CPU only");
@@ -1175,7 +1175,7 @@ pub fn align_images(
     }
     
     // Log OpenCL state at function entry
-    let opencl_at_start = opencv::core::use_opencl().unwrap_or(false);
+    let opencl_at_start = crate::opencv_compat::use_opencl();
     log::info!("🔍 align_images() called - OpenCL enabled at entry: {}", opencl_at_start);
     if opencl_at_start {
         log::info!("🚀 Using hybrid parallel processing: Rayon threads + GPU (mutex-serialized OpenCL)");
@@ -2169,7 +2169,7 @@ pub fn align_images(
     report_progress("Alignment completed!", 100.0);
 
     // Log OpenCL state at function exit
-    let opencl_at_end = opencv::core::use_opencl().unwrap_or(false);
+    let opencl_at_end = crate::opencv_compat::use_opencl();
     log::info!("🔍 align_images() exiting - OpenCL enabled at exit: {}", opencl_at_end);
     if !opencl_at_end && opencl_at_start {
         log::warn!("⚠️  OpenCL was disabled during alignment and not restored!");

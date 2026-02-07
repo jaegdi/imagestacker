@@ -1,11 +1,10 @@
 use serde::{Deserialize, Serialize};
-use std::fs;
 
 /// Get available system memory in GB
 pub fn get_available_memory_gb() -> f64 {
     #[cfg(target_os = "linux")]
     {
-        if let Ok(content) = fs::read_to_string("/proc/meminfo") {
+        if let Ok(content) = std::fs::read_to_string("/proc/meminfo") {
             for line in content.lines() {
                 if line.starts_with("MemAvailable:") {
                     if let Some(kb_str) = line.split_whitespace().nth(1) {
@@ -37,7 +36,7 @@ pub fn get_available_memory_gb() -> f64 {
     #[cfg(target_os = "windows")]
     {
         // Simplified - would need winapi for accurate measurement
-        8.0 // Default fallback
+        return 8.0; // Default fallback
     }
     
     // Fallback: assume 8GB available

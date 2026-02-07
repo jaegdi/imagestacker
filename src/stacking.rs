@@ -39,10 +39,10 @@ pub fn stack_images(
     // which can exhaust GPU memory and corrupt the OpenCL command queue (especially on GPUs with
     // limited VRAM). With OpenCL disabled, UMat operations transparently fall back to CPU.
     // CPU stacking is still fast and avoids the fatal OpenCL driver crashes.
-    let opencl_was_enabled = opencv::core::use_opencl().unwrap_or(false);
+    let opencl_was_enabled = crate::opencv_compat::use_opencl();
     if opencl_was_enabled {
         log::info!("Temporarily disabling OpenCL for stacking to prevent GPU memory exhaustion");
-        let _ = opencv::core::set_use_opencl(false);
+        crate::opencv_compat::set_use_opencl(false);
     }
 
     let result = stack_recursive(&reversed_paths, output_dir, 0, config, progress_cb.clone(), cancel_flag.clone());
@@ -50,7 +50,7 @@ pub fn stack_images(
     // Restore OpenCL state
     if opencl_was_enabled {
         log::info!("Re-enabling OpenCL after stacking");
-        let _ = opencv::core::set_use_opencl(true);
+        crate::opencv_compat::set_use_opencl(true);
     }
     
     let result = result?;
@@ -188,7 +188,7 @@ fn stack_recursive(
         // This avoids loading all batch images into memory simultaneously, which can
         // exhaust GPU VRAM and cause CL_INVALID_COMMAND_QUEUE errors.
         let levels = 7;
-        let use_gpu_here = opencv::core::use_opencl().unwrap_or(false);
+        let use_gpu_here = crate::opencv_compat::use_opencl();
         log::info!("stack_images_hybrid: {} overlap + {} new images, OpenCL={}",
             batch_images.len(), batch_paths[start_load..].len(), use_gpu_here);
         
@@ -203,7 +203,7 @@ fn stack_recursive(
                 img, global_idx, levels,
                 &mut fused_pyramid, &mut max_energies_batch, &mut fused_alpha,
             )?;
-            if use_gpu_here { let _ = core::finish(); }
+            if use_gpu_here { crate::opencv_compat::finish(); }
             global_idx += 1;
         }
         
@@ -214,7 +214,7 @@ fn stack_recursive(
                 &img, global_idx, levels,
                 &mut fused_pyramid, &mut max_energies_batch, &mut fused_alpha,
             )?;
-            if use_gpu_here { let _ = core::finish(); }
+            if use_gpu_here { crate::opencv_compat::finish(); }
             global_idx += 1;
             batch_images.push(img);
         }
@@ -227,7 +227,7 @@ fn stack_recursive(
         drop(fused_pyramid);
         drop(max_energies_batch);
         drop(fused_alpha);
-        if use_gpu_here { let _ = core::finish(); }
+        if use_gpu_here { crate::opencv_compat::finish(); }
 
         let filename = format!("L{}_B{:04}.png", level, batch_idx);
         let path = bunches_dir.join(&filename);
@@ -276,7 +276,7 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
 
     let levels = 7;
     
-    let use_gpu = opencv::core::use_opencl().unwrap_or(false);
+    let use_gpu = crate::opencv_compat::use_opencl();
     log::info!("stack_images_direct: {} images, OpenCL={}", images.len(), use_gpu);
     
     let mut fused_pyramid: Vec<core::UMat> = Vec::new();
@@ -295,7 +295,7 @@ fn stack_images_direct(images: &[Mat]) -> Result<Mat> {
         // Without this, async GPU operations can accumulate and exhaust the command queue,
         // especially with large batches or limited GPU memory.
         if use_gpu {
-            let _ = core::finish();
+            crate::opencv_compat::finish();
         }
     }
 
@@ -320,7 +320,7 @@ fn stack_images_direct_from_paths(image_paths: &[PathBuf]) -> Result<Mat> {
 
     let levels = 7;
     
-    let use_gpu = opencv::core::use_opencl().unwrap_or(false);
+    let use_gpu = crate::opencv_compat::use_opencl();
     log::info!("stack_images_direct_from_paths: {} images, OpenCL={}", image_paths.len(), use_gpu);
     
     let mut fused_pyramid: Vec<core::UMat> = Vec::new();
@@ -348,7 +348,7 @@ fn stack_images_direct_from_paths(image_paths: &[PathBuf]) -> Result<Mat> {
         
         // Flush OpenCL queue between images to prevent CL_INVALID_COMMAND_QUEUE errors
         if use_gpu {
-            let _ = core::finish();
+            crate::opencv_compat::finish();
         }
     }
 
@@ -630,10 +630,10 @@ fn assemble_final_image(result_bgr: &core::UMat, fused_alpha: &core::UMat) -> Re
     
     // Convert to 8-bit and download from GPU
     // Flush OpenCL queue before GPU→CPU transfer to ensure all operations are complete
-    let _ = core::finish();
+    crate::opencv_compat::finish();
     let mut final_8u = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
     final_img_umat.convert_to(&mut final_8u, core::CV_8U, 1.0, 0.0)?;
-    let _ = core::finish();
+    crate::opencv_compat::finish();
     let mut final_img = Mat::default();
     final_8u.get_mat(core::AccessFlag::ACCESS_READ)?.copy_to(&mut final_img)?;
     
