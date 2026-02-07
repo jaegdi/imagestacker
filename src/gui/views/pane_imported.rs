@@ -1,7 +1,7 @@
-//! Bunches pane rendering with selection mode support
+//! Imported pane rendering with selection mode support
 //!
-//! This module handles rendering the bunches images pane with:
-//! - Selection mode for choosing bunches to stack
+//! This module handles rendering the imported images pane with:
+//! - Selection mode for choosing images to stack
 //! - Thumbnail grid with click and right-click support
 //! - Select All/Deselect All/Cancel/Stack buttons when in selection mode
 
@@ -14,7 +14,7 @@ use crate::messages::Message;
 use crate::gui::state::ImageStacker;
 
 impl ImageStacker {
-    pub(crate) fn render_bunches_pane(&self) -> Element<'_, Message> {
+    pub(crate) fn render_imported_pane(&self) -> Element<'_, Message> {
         const THUMB_WIDTH: f32 = 120.0;
         const THUMB_HEIGHT: f32 = 90.0;
         const THUMB_SPACING: f32 = 8.0;
@@ -22,13 +22,13 @@ impl ImageStacker {
 
         let mut rows_vec: Vec<Element<Message>> = Vec::new();
         
-        for chunk in self.bunch_images.chunks(thumbs_per_row) {
+        for chunk in self.images.chunks(thumbs_per_row) {
             let mut row_elements: Vec<Element<Message>> = Vec::new();
             
             for path in chunk {
                 let path_clone = path.clone();
                 let path_for_right_click = path.clone();
-                let is_selected = self.selected_bunches.contains(path);
+                let is_selected = self.selected_imported.contains(path);
                 let cache = self.thumbnail_cache.read().unwrap();
                 let handle = cache.get(path).cloned();
 
@@ -58,10 +58,10 @@ impl ImageStacker {
                 ]
                 .align_x(iced::Alignment::Center);
 
-                let thumbnail_element = if self.bunch_selection_mode {
+                let thumbnail_element = if self.imported_selection_mode {
                     // In selection mode: make clickable for selection
                     let btn = button(thumbnail_content)
-                        .on_press(Message::ToggleBunchImage(path_clone))
+                        .on_press(Message::ToggleImportedImage(path_clone))
                         .width(Length::Fixed(THUMB_WIDTH));
                     
                     // Apply different style if selected - green background and border
@@ -100,7 +100,7 @@ impl ImageStacker {
                     // Normal mode: preview on click
                     button(thumbnail_content)
                         .on_press(if self.config.use_internal_preview {
-                            Message::ShowImagePreview(path_clone, self.bunch_images.clone())
+                            Message::ShowImagePreview(path_clone, self.images.clone())
                         } else {
                             Message::OpenImage(path_clone)
                         })
@@ -110,7 +110,7 @@ impl ImageStacker {
                 };
                 
                 // Wrap in mouse_area to detect right-clicks (only in normal mode)
-                let final_element = if !self.bunch_selection_mode {
+                let final_element = if !self.imported_selection_mode {
                     mouse_area(thumbnail_element)
                         .on_right_press(Message::OpenImageWithExternalEditor(path_for_right_click))
                         .into()
@@ -138,17 +138,17 @@ impl ImageStacker {
             .width(Length::Fill)
             .on_scroll(move |viewport| {
                 let offset = viewport.absolute_offset().y;
-                Message::BunchesScrollChanged(offset)
+                Message::ImportedScrollChanged(offset)
             })
-            .id(iced::widget::scrollable::Id::new("bunches"));
+            .id(iced::widget::scrollable::Id::new("imported"));
 
         // Create pane header with title, count, and refresh button
         let pane_header = row![
             column![
-                text("Bunches")
+                text("Imported")
                     .size(18)
                     .align_x(iced::Alignment::Center),
-                text(format!("{} images", self.bunch_images.len()))
+                text(format!("{} images", self.images.len()))
                     .size(12)
                     .style(|_theme| text::Style {
                         color: Some(iced::Color::from_rgb(0.7, 0.7, 0.7))
@@ -158,7 +158,7 @@ impl ImageStacker {
             .width(Length::Fill)
             .align_x(iced::Alignment::Center),
             button("Refresh")
-                .on_press(Message::RefreshBunchesPane)
+                .on_press(Message::RefreshImportedPane)
                 .padding(4)
                 .style(|theme, status| button::Style {
                     background: Some(iced::Background::Color(iced::Color::from_rgb(0.2, 0.7, 0.2))),
@@ -188,15 +188,15 @@ impl ImageStacker {
         ]
         .spacing(10);
 
-        if self.bunch_selection_mode {
+        if self.imported_selection_mode {
             pane_content = pane_content
                 .push(
                     row![
                         button("Select All")
-                            .on_press(Message::SelectAllBunches)
+                            .on_press(Message::SelectAllImported)
                             .style(button::secondary),
                         button("Deselect All")
-                            .on_press(Message::DeselectAllBunches)
+                            .on_press(Message::DeselectAllImported)
                             .style(button::secondary),
                     ]
                     .spacing(10)
@@ -206,14 +206,14 @@ impl ImageStacker {
                 .push(
                     row![
                         button("Cancel")
-                            .on_press(Message::CancelBunchSelection)
+                            .on_press(Message::CancelImportedSelection)
                             .style(|theme, status| button::Style {
                                 background: Some(iced::Background::Color(iced::Color::from_rgb(0.8, 0.3, 0.3))),
                                 text_color: iced::Color::WHITE,
                                 ..button::secondary(theme, status)
                             }),
-                        button(text(format!("Stack ({} selected)", self.selected_bunches.len())))
-                            .on_press(Message::StackSelectedBunches)
+                        button(text(format!("Stack ({} selected)", self.selected_imported.len())))
+                            .on_press(Message::StackSelectedImported)
                             .style(|theme, status| button::Style {
                                 background: Some(iced::Background::Color(iced::Color::from_rgb(0.2, 0.7, 0.2))),
                                 text_color: iced::Color::WHITE,
@@ -231,9 +231,9 @@ impl ImageStacker {
             .height(Length::Fill)
             .padding(10)
             .style(|_| container::Style::default()
-                .background(iced::Color::from_rgb(0.22, 0.16, 0.10))
+                .background(iced::Color::from_rgb(0.14, 0.18, 0.28))
                 .border(iced::Border {
-                    color: iced::Color::from_rgb(0.60, 0.42, 0.25),
+                    color: iced::Color::from_rgb(0.35, 0.50, 0.70),
                     width: 2.0,
                     radius: 4.0.into(),
                 }))

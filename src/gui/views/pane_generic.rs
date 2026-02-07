@@ -27,6 +27,7 @@ impl ImageStacker {
         // Create scroll message closure
         let scroll_message = match title {
             "Imported" => |offset: f32| Message::ImportedScrollChanged(offset),
+            "Sharpness" => |offset: f32| Message::SharpnessScrollChanged(offset),
             "Aligned" => |offset: f32| Message::AlignedScrollChanged(offset),
             "Bunches" => |offset: f32| Message::BunchesScrollChanged(offset),
             "Final" => |offset: f32| Message::FinalScrollChanged(offset),
@@ -115,6 +116,7 @@ impl ImageStacker {
         // Create scrollable ID based on pane title
         let scrollable_id = match title {
             "Imported" => Some(iced::widget::scrollable::Id::new("imported")),
+            "Sharpness" => Some(iced::widget::scrollable::Id::new("sharpness")),
             "Aligned" => Some(iced::widget::scrollable::Id::new("aligned")),
             "Bunches" => Some(iced::widget::scrollable::Id::new("bunches")),
             "Final" => Some(iced::widget::scrollable::Id::new("final")),
@@ -137,6 +139,7 @@ impl ImageStacker {
         // Determine refresh message based on pane title
         let refresh_message = match title {
             "Imported" => Message::RefreshImportedPane,
+            "Sharpness" => Message::RefreshSharpnessPane,
             "Aligned" => Message::RefreshAlignedPane,
             "Bunches" => Message::RefreshBunchesPane,
             "Final" => Message::RefreshFinalPane,

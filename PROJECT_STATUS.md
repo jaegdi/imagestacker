@@ -1,430 +1,286 @@
 # ImageStacker - Project Status & Continuation Prompt
 
 ## Projektübersicht
+
 Rust-basierte Focus-Stacking-Anwendung mit OpenCV für die Verarbeitung von Fotoserien. Verwendet iced GUI-Framework (v0.13) für die Benutzeroberfläche mit **vollständiger GPU-Beschleunigung via OpenCL**.
 
-## Aktueller Stand (1. Februar 2026)
+## Aktueller Stand (6. Februar 2026)
 
-### GPU-Beschleunigung (NEU!)
+### Kern-Algorithmus: Laplacian Pyramid Focus Stacking
+
+#### Winner-Take-All mit Alpha-Kanal-Behandlung
+
+- **7-Level Laplacian Pyramid**: Dekomposition jedes Bildes in Frequenzbänder
+- **Energy-basierte Pixelselektion**: Laplacian → AbsDiff → GaussianBlur(3×3)
+- **Alpha-gewichtete Energy**: `weighted_energy = sharpness_energy × (alpha / 255.0)`
+- **Winner-Take-All**: Pixel mit höchster Energy gewinnt auf jeder Pyramiden-Ebene (kein Averaging → kein Ghosting)
+- **BGR-only Pyramid**: Alpha-Kanal wird separat verarbeitet, nicht durch die Pyramide geschickt
+- **AND-kombiniertes Alpha**: Kleinstes gemeinsames opakes Gebiet aller Eingangsbilder
+- **5px Morphologische Erosion**: Entfernt potentielle Artefakte an Transparenz-Kanten
+- **Ergebnis**: Artefaktfreie transparente Ränder in PNG-Ausgabe
+
+#### Modulare Helper-Funktionen (Refactored)
+
+```text
+extract_bgr_and_alpha()    - Trennt BGR von Alpha für unabhängige Verarbeitung
+init_alpha()               - Initialisiert fused Alpha vom ersten Bild oder erstellt opakes Alpha
+to_grayscale()             - Konvertiert BGRA/BGR/Einkanal → Graustufen
+compute_sharpness_energy() - Laplacian → AbsDiff → GaussianBlur Pipeline
+fuse_layer_with_alpha()    - Winner-Take-All mit Alpha-gewichtetem Energy-Vergleich
+update_fused_alpha()       - AND-Kombination der Alpha-Kanäle über alle Bilder
+assemble_final_image()     - Merge BGR+Alpha, Erosion(5px), Konvertierung zu 8-Bit
+```
+
+### GPU-Beschleunigung (OpenCL)
 
 #### OpenCL GPU-Integration
+
 - **Vollständig GPU-beschleunigt**: Blur Detection, Feature Extraction, Warping, Stacking
 - **Thread-sicheres Design**: Global OpenCL Mutex für sichere parallele Verarbeitung
 - **UMat-basiert**: Minimiert CPU↔GPU Transfers durch GPU-native Operationen
-- **Performance**: 2-6x Speedup je nach Operation
+- **Performance**: 2-6× Speedup je nach Operation
   - Blur Detection: 1-2s pro 42MP Bild (GPU)
-  - Feature Extraction: 6.3x schneller mit ORB vs SIFT
+  - Feature Extraction: 6.3× schneller mit ORB vs SIFT
   - Warping: ~1.5s pro 42MP Bild (GPU)
-  - Gesamte SIFT Alignment: ~130-140s für 46 Bilder (optimiert von 191s)
+  - Gesamte SIFT Alignment: ~130-140s für 46 Bilder
   - Gesamte ORB Alignment: ~89s für 46 Bilder
 
 #### GPU-Operationen
-- **Blur Detection (`sharpness.rs`)**:
-  - `compute_sharpness_umat()`: GPU Gaussian blur, Laplacian, Sobel
-  - `compute_regional_sharpness_umat()`: GPU-beschleunigte Grid-Analyse
-  - Parallel processing mit mutex-serialisierten GPU-Ops
-  
-- **Feature Extraction (`alignment.rs`)**:
-  - GPU Preprocessing: Color conversion, CLAHE, Image resizing
-  - CPU Feature Detection: ORB/SIFT/AKAZE (keine GPU-Implementierung)
-  - Optimierter Pipeline: Upload → GPU-Ops → Download → Feature Detection
-  
-- **Image Warping (`alignment.rs`)**:
-  - GPU Affine transformations mit UMat
-  - Batch processing mit OpenCL serialization
-  
-- **Focus Stacking (`stacking.rs`)**:
-  - GPU Laplacian pyramid generation
-  - GPU pyramid collapse operations
+
+- **Blur Detection (`sharpness.rs`)**: GPU Gaussian blur, Laplacian, Sobel, Grid-Analyse
+- **Feature Extraction (`alignment.rs`)**: GPU Preprocessing (Color conversion, CLAHE, Resizing)
+- **Image Warping (`alignment.rs`)**: GPU Affine transformations mit UMat
+- **Focus Stacking (`stacking.rs`)**: GPU Laplacian pyramid generation und collapse
 
 #### Memory-Management für GPU
+
 - **Adaptive Batch-Größen für große Bilder (>30MP)**:
   - ORB: 3 Bilder gleichzeitig
-  - SIFT: 3 Bilder gleichzeitig (erhöht von 2 mit reduzierter Feature-Anzahl)
+  - SIFT: 3 Bilder gleichzeitig (mit reduzierter Feature-Anzahl)
   - AKAZE: 2 Bilder gleichzeitig
 - **UMat Reference Handling**: Automatisches Cloning beim Transfer zu Mat
 - **Typischer RAM-Verbrauch**: 8-10GB für 46×42MP Bilder
 - **Keine OOM-Fehler**: Stabil mit großen Image-Sets
 
-#### SIFT-Optimierungen
-- **Feature-Reduktion**: 3000 → 2000 Features (~30% schneller)
-- **Erhöhte Batch-Größe**: 2 → 3 Bilder für große Images
-- **Erwarteter Speedup**: 191s → 130-140s (30-35% Verbesserung)
-- **Qualitäts-Impact**: Minimal - 2000 Features reichen für excellentes Alignment
+### Alignment-Methoden
 
-### Erfolgreich implementierte Optimierungen
+#### Feature-basiert (ORB/SIFT/AKAZE)
 
-#### 1. Regionale Schärfe-Erkennung (Regional Sharpness Detection)
-- **Grid-basierte Analyse**: Teilt Bild in NxN Grid (4x4 bis 16x16 konfigurierbar)
+- **ORB**: Schnell, niedriger Speicherbedarf, 5000 Features
+- **SIFT**: Beste Qualität, 2000 Features (optimiert von 3000), 512 bytes/descriptor
+- **AKAZE**: Ausgewogen, 3000 Features nach Sortierung
+- **Adaptive Batch-Größen**: Basierend auf verfügbarem RAM und Bildgröße
+
+#### ECC Precision Alignment
+
+- **Sub-Pixel Genauigkeit**: Enhanced Correlation Coefficient für höchste Präzision
+- **4 Motion-Modelle**: Translation (2-DOF), Euclidean (3-DOF), Affine (6-DOF), Homography (8-DOF)
+- **Iterative Optimierung**: Bis zu 30.000 Iterationen für 0.01-0.001px Genauigkeit
+- **Perfekt für Makro-Focus-Stacking**: Übertrifft Feature-Detektoren bei statischen Motiven
+- **Konfigurierbare Parameter**:
+  - `ecc_motion_type`: Transformation model (Standard: Homography)
+  - `ecc_max_iterations`: 3000-30000 (Standard: 10000)
+  - `ecc_epsilon`: 1e-8 bis 1e-4 Konvergenz-Schwellwert (Standard: 1e-6)
+  - `ecc_gauss_filter_size`: 3×3 bis 15×15 Pre-Blur Kernel (Standard: 7×7)
+  - `ecc_chunk_size`: 4-24 Bilder für parallele Verarbeitung (Standard: 12)
+- **GPU-beschleunigt**: Nutzt OpenCV's optimierte `find_transform_ecc()` via OpenCL
+- **Automatisches Sharpness-Ranking**: Wählt mittelscharfes Bild als Referenz (stabil)
+- **Datei**: `src/alignment.rs` `align_images_ecc()`
+
+### Schärfe-Analyse
+
+#### Regionale Schärfe-Erkennung
+
+- **Grid-basierte Analyse**: Teilt Bild in NxN Grid (4×4 bis 16×16 konfigurierbar)
 - **Max-Regional Scoring**: Bewertet Bilder basierend auf schärfstem Bereich
-- **Perfekt für Focus-Stacking**: Akzeptiert Bilder auch wenn nur ein Bereich scharf ist
 - **Permissive Threshold**: Q1 - 3.0*IQR statt Q1 - 1.0*IQR
-- **Konfigurierbar**: Sharpness Grid Size Slider in Settings (4x4 bis 16x16)
-- **Funktion**: `compute_regional_sharpness()` in `src/sharpness.rs`
+- **GPU-beschleunigt**: UMat-basierte Grid-Analyse
 
-#### 2. Winner-Take-All Stacking Algorithmus
-- **Ghosting-frei**: Verwendet Winner-Take-All statt Averaging auf allen Pyramid-Ebenen
+#### Sharpness Caching
+
+- **YAML-basiert**: Schärfe-Werte werden pro Bild in `.yml`-Dateien gecacht
+- **Verzeichnis**: `<source_folder>/sharpness/` Unterordner
+- **Inhalt**: Globale Schärfe, regionale Schärfe-Werte, Metadaten
+- **Vorteil**: Wiederholte Analysen nutzen Cache, erhebliche Zeitersparnis
+
+### Erfolgreich implementierte Features
+
+#### 1. Winner-Take-All Stacking mit Alpha-Behandlung
+
+- **Ghosting-frei**: Keine Mittelung auf irgendeiner Pyramid-Ebene
 - **Laplacian Pyramid**: 7 Level Dekomposition mit Energy-basierter Selektion
-- **Basis-Level**: Wählt schärfstes Pixel aus jedem Bild ohne Mittelung
-- **Höhere Ebenen**: Konsistente Winner-Take-All Strategie durchgehend
-- **Ergebnis**: Kristallklare gestackte Bilder ohne Geisterbilder
+- **Alpha-Kanal**: AND-Kombination + 5px Erosion für artefaktfreie transparente Ränder
+- **BGR-only Pyramid**: Alpha wird separat verarbeitet für saubere Ergebnisse
 - **Datei**: `src/stacking.rs`
 
-#### 3. Memory-Optimierungen für SIFT & AKAZE
+#### 2. Memory-Optimierungen für SIFT & AKAZE
+
 - **Feature-Limitierung**:
-  - SIFT: 3000 Features max (128-dim float Descriptors = 512 bytes/Feature)
+  - SIFT: 2000 Features max (128-dim float Descriptors = 512 bytes/Feature)
   - AKAZE: 3000 Features max (nach Sortierung nach Stärke)
   - ORB: 5000 Features (32-byte binary Descriptors)
-  
-- **Adaptive Batch-Größen**:
-  - ORB: 16 Bilder/Batch (base size)
-  - SIFT: 4 Bilder/Batch (base / 4) - sehr hoher Memory-Bedarf
-  - AKAZE: 4 Bilder/Batch (base / 4) - nach Sortierung + Limitierung
-  
-- **Threshold-Anpassungen**:
-  - SIFT: nfeatures=3000 (limitiert Extraktion)
-  - AKAZE: threshold=0.003, nOctaves=3, explizite Top-3000 Auswahl
-  
-- **Ergebnis**: Läuft stabil mit 42MP Bildern (7952x5304) ohne OOM-Fehler
-- **Datei**: `src/alignment.rs` Lines 16-125, 325-336
+- **Adaptive Batch-Größen**: ORB 16, SIFT 4, AKAZE 4 Bilder/Batch
+- **Ergebnis**: Läuft stabil mit 42MP Bildern (7952×5304) ohne OOM-Fehler
 
-#### 4. Umfangreiches GUI-Hilfesystem
-- **Separates Help-Fenster**: Öffnet User Manual in eigenem Fenster (900x800px)
-- **Externe Markdown-Datei**: Lädt Hilfetext aus `USER_MANUAL.md`
-- **8 Kategorien**: Getting Started, Understanding Panes, Settings, Advanced Processing, Tips, Workflow, Technical Details, Troubleshooting
-- **Close Button**: Rotes Button zum Schließen des Fensters
-- **Multi-Window Support**: Verwendet iced daemon API für separate Fenster
-- **Scrollbar**: Vollständige Dokumentation mit scrollbarem Content
-- **Datei**: `USER_MANUAL.md` (Content), `src/gui.rs` render_help_window()
+#### 3. GUI-Hilfesystem
 
-#### 5. Responsive Settings-Panel
-- **3 organisierte Panes**:
-  1. **Alignment & Detection**: Blur threshold, Sharpness grid, Feature detector, Adaptive batches, CLAHE
-  2. **Post-Processing**: Noise reduction, Sharpening, Color correction (Contrast, Brightness, Saturation)
-  3. **Preview & UI**: Internal preview toggle, Preview dimensions
-  
-- **Responsives Layout**:
-  - **Horizontal** (Fenster ≥ 1200px): 3 Panes nebeneinander, Detector-Buttons vertikal
-  - **Vertikal** (Fenster < 1200px): 3 Panes gestapelt, Detector-Buttons horizontal
-  - Window Resize Subscription für automatische Anpassung
-  - **Adaptive Slider-Breiten**: Passen sich an Layout an (label/slider/value widths)
-  
-- **Reset to Defaults Button**: Rotes Button zum Zurücksetzen aller Einstellungen
-- **Responsive Slider Values**: In horizontalem Layout optimierte Breiten (120/150/60) verhindern vertikales Text-Stacking
-- **Datei**: `src/gui.rs` render_settings_panel(), Lines 1028-1420
+- **Browser-basierte Hilfe**: Konvertiert USER_MANUAL.md zu HTML, öffnet im Browser
+- **8 Kategorien**: Getting Started, Panes, Settings, Advanced Processing, Tips, Workflow, GPU, Troubleshooting
 
-#### 6. Automatische Verzeichnis-Bereinigung
-- **Aligned Cleanup**: Löscht `aligned/` Ordner vor jedem Alignment-Lauf
-- **Bunches Cleanup**: Löscht `bunches/` Ordner vor jedem Stacking-Lauf
-- **Verhindert**: Alte/inkonsistente Dateien in Output-Verzeichnissen
-- **User-freundlich**: Keine manuellen Cleanup-Schritte erforderlich
-- **Datei**: `src/gui.rs` Lines 256-283, 403-417
+#### 4. Responsive Settings-Panel
 
-#### 7. Smart Button States
-- **Align Button**: Nur aktiv wenn Bilder importiert
-- **Stack Button**: Nur aktiv wenn aligned Bilder vorhanden
-- **Visual Feedback**: Deaktivierte Buttons klar erkennbar
-- **Verhindert**: Fehlerhafte Operationen durch User
-- **Datei**: `src/gui.rs` Lines 793-815
+- **3 organisierte Panes**: Alignment & Detection, Post-Processing, Preview & UI
+- **Responsives Layout**: Horizontal (≥1200px) oder vertikal (<1200px)
+- **Adaptive Slider-Breiten**: Passen sich an Layout an
+- **Reset to Defaults Button**
 
-#### 8. Thumbnail-Visualisierung mit Farbcodierung
-- **Farbige Borders**:
-  - **Blau**: Importierte Original-Bilder (Input)
-  - **Grün**: Verarbeitete/Generierte Bilder (Aligned, Bunches, Final)
-- **2-Column Grid Layout**: Responsive Thumbnail-Darstellung
-- **Click to Preview**: Öffnet Bilder in Modal oder System Viewer
-- **Right-Click**: Öffnet Bild in externem Editor (konfigurierbar in Settings)
-- **Größenkonsistenz**: 120x90px Thumbnails bleiben konstant bei Resize
-- **Datei**: `src/gui.rs` render_pane_with_columns()
+#### 5. Automatische Verzeichnis-Bereinigung
 
-#### 9. Externe Anwendungsintegration
-- **External Viewer**: Konfigurierbar für Linksklick auf Thumbnails
-  - Standard: Internes Preview-Modal
-  - Optional: System-Viewer (z.B. eog, geeqie, gwenview)
-  - Einstellung: Settings → "External Image Viewer Path"
-- **External Editor**: Konfigurierbar für Rechtsklick auf Thumbnails
-  - Standard: Kein Editor konfiguriert
-  - Optional: Bildbearbeitung (z.B. GIMP, Darktable, Krita)
-  - Einstellung: Settings → "External Image Editor Path"
-- **Mouse Area Wrapper**: Erkennt Links- und Rechtsklick auf Thumbnails
-- **Datei**: `src/gui.rs`, `src/config.rs`, `USER_MANUAL.md`
+- Löscht `aligned/` und `bunches/` vor jedem neuen Lauf
 
-#### 10. Linux RPM Packaging für SUSE Tumbleweed
-- **Vollständiges RPM-Paket**: Installierbare Distribution mit allen Dependencies
-- **Desktop Integration**: 
-  - Application Menu Entry mit Icon
-  - MIME-Type Associations (PNG, JPEG, TIFF)
-  - FreeDesktop.org kompatibel mit KDE-spezifischen Erweiterungen
-- **Icon Integration**: 
-  - Multi-Size Icons: 64x64, 128x128, 256x256 (automatische Generierung)
-  - HiDPI Support durch hicolor icon theme
-  - Source: `icons/imagestacker_icon.png`
-- **Build-System**:
-  - Rustup-Detection: Vermeidet Konflikte mit System-Cargo/Rust
-  - Automatische Dependency-Installation
-  - One-Click Installation via `quick-install.sh`
-- **Package Contents**:
-  - Binary: `/usr/bin/imagestacker`
-  - Desktop File: `/usr/share/applications/imagestacker.desktop`
-  - Icons: `/usr/share/pixmaps/` und `/usr/share/icons/hicolor/`
-  - Post-Install Scripts: Icon-Cache und Desktop-Database Updates
-- **Dateien**: 
-  - `packaging/linux/imagestacker.spec` (RPM spec file)
-  - `packaging/linux/build-rpm.sh` (Build automation)
-  - `packaging/linux/quick-install.sh` (One-click installer)
-  - `packaging/linux/Makefile` (Build targets)
-  - `packaging/linux/README.md` (Packaging documentation)
-  - `packaging/linux/INSTALL.md` (Quick start guide)
+#### 6. Smart Button States & Thumbnail-Farbcodierung
+
+- Buttons nur aktiv wenn Voraussetzungen erfüllt
+- Blau: Input, Grün: Verarbeitete Bilder
+
+#### 7. Externe Anwendungsintegration
+
+- External Viewer (Linksklick) und Editor (Rechtsklick) konfigurierbar
+
+#### 8. Selektives Stacking
+
+- Wähle einzelne aligned Bilder oder Bunches zum Stacking
+- Select All/Deselect All für schnelle Massenauswahl
+
+#### 9. Linux RPM Packaging für SUSE Tumbleweed
+
+- Vollständiges RPM-Paket mit Desktop Integration und Icons
+- One-Click Installation via `quick-install.sh`
 
 ### Technische Details
 
 #### Wichtige Dateien
 
-- **`src/alignment.rs`** (1056 Zeilen): Feature-basierte Alignment mit GPU-Beschleunigung
-  - `extract_features()`: ORB/SIFT/AKAZE mit Feature-Limitierung und GPU Preprocessing
-  - `align_images()`: Batch-Processing mit detector-spezifischen Batch-Größen
-  - Regional sharpness detection mit konfigurierbarem Grid (GPU-beschleunigt)
-  - Permissive threshold für Focus-Stacking
-  - Global OpenCL Mutex für thread-sichere GPU-Operationen
-  - UMat-basierte GPU-Pipeline mit optimierten Transfers
-  
-- **`src/sharpness.rs`** (371 Zeilen): GPU-beschleunigte Schärfe-Analyse
-  - `compute_regional_sharpness_umat()`: GPU Grid-basierte Analyse mit UMat
-  - `compute_sharpness_umat()`: GPU Globale Schärfe-Messung
-  - Laplacian Variance, Tenengrad, Modified Laplacian auf GPU
-  - Fallback CPU-Funktionen für Kompatibilität
-
-- **`src/stacking.rs`** (613 Zeilen): GPU Laplacian Pyramid Focus Stacking
-  - `stack_images()`: 7-Level Pyramid mit Winner-Take-All und GPU-Beschleunigung
-  - UMat-basierte Pyramid-Operationen
-  - Keine Mittelung auf irgendeiner Ebene (ghosting-frei)
-  - Energy-basierte Pixelselektion mit GPU
-
-- **`src/gui.rs`** (1663 Zeilen): iced GUI mit responsivem Design
-  - `render_settings_panel()`: 3-Pane Layout mit responsive Umschaltung
-  - `render_help_window()`: Separates Help-Fenster mit Close Button
-  - `subscription()`: Auto-Refresh + Window Resize Events
-  - Smart button states, thumbnail rendering, preview modal
-  - Multi-window support via iced daemon API
-
-- **`src/main.rs`**: Daemon-basierte Anwendung
-  - Verwendet `iced::daemon()` statt `application()` für Multi-Window Support
-  - Initialisiert Hauptfenster mit 1800x1000 Größe
-  - Window title handling für main und help windows
-
-- **`USER_MANUAL.md`**: Komplette User-Dokumentation
-  - Markdown-Format für einfache Bearbeitung
-  - 8 Hauptsektionen mit detaillierten Anleitungen
-  - Wird dynamisch von Help-Fenster geladen
-
-- **`src/config.rs`** (67 Zeilen): Processing Configuration
-  - `ProcessingConfig`: Alle verarbeitungsrelevanten Parameter
-  - `FeatureDetector` enum: ORB, SIFT, AKAZE
-  - Serializable für Settings-Persistenz
-
-- **`src/messages.rs`** (53 Zeilen): GUI Message Enum
-  - Settings-Messages (Threshold, Grid Size, Detector, etc.)
-  - Processing-Messages (Align, Stack, Progress)
-  - UI-Messages (Toggle Settings/Help, CloseHelp, Preview, Scroll)
-  - Window Resize Message für responsive Layout
+| Datei | Zeilen | Beschreibung |
+|-------|--------|--------------|
+| `src/stacking.rs` | 601 | Laplacian Pyramid Focus Stacking mit 7 Helper-Funktionen |
+| `src/alignment.rs` | 2100 | Feature-basierte + ECC Alignment mit GPU |
+| `src/sharpness.rs` | 463 | GPU-beschleunigte Schärfe-Analyse |
+| `src/sharpness_cache.rs` | — | YAML-basiertes Sharpness-Caching |
+| `src/config.rs` | 120 | ProcessingConfig, FeatureDetector, EccMotionType |
+| `src/messages.rs` | 113 | GUI Message Enum (~65 Varianten) |
+| `src/main.rs` | 105 | Daemon-basierte App mit clap CLI |
+| `src/gui/` | 5530 | Modulare GUI (handlers/ + views/) |
 
 #### Dependencies (Cargo.toml)
+
 ```toml
+[package]
+name = "imagestacker"
+version = "1.0.0"
+
 [dependencies]
 iced = { version = "0.13", features = ["image", "canvas", "tokio"] }
-opencv = { version = "0.92", features = ["default"] }
-rayon = "1.10"
+opencv = "0.94"
+image = "0.25"
+rfd = "0.15"
 anyhow = "1.0"
 log = "0.4"
 env_logger = "0.11"
+opener = "0.8.4"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+serde_yaml = "0.9"
 dirs = "5.0"
+rayon = "1.10"
+tokio = { version = "1.0", features = ["fs", "rt-multi-thread"] }
+pulldown-cmark = "0.9"
+clap = { version = "4.5", features = ["derive"] }
+chrono = "0.4"
 ```
 
-**Wichtig**: `tokio` Feature ist erforderlich für `iced::time::every()` und Event-Subscriptions
+### Bekannte Limitierungen
 
-#### Performance-Parameter (Konfigurierbar in GUI)
-```rust
-// Feature Detector (GUI: 3 Buttons)
-FeatureDetector::ORB    // Fast, low memory
-FeatureDetector::SIFT   // Best quality, high memory
-FeatureDetector::AKAZE  // Balanced
-
-// Sharpness Grid Size (GUI: Slider 4-16)
-sharpness_grid_size: 4-16  // Default: 4 (4x4 Grid)
-
-// Blur Threshold (GUI: Slider 10-100)
-sharpness_threshold: 10.0-100.0  // Default: 30.0
-
-// Adaptive Batch Sizes (GUI: Checkbox)
-use_adaptive_batches: bool  // Auto-adjust based on RAM
-
-// CLAHE (GUI: Checkbox)
-use_clahe: bool  // Enhance dark images
-
-// Post-Processing (GUI: Checkboxes + Sliders)
-enable_noise_reduction: bool
-noise_reduction_strength: 1.0-10.0
-enable_sharpening: bool
-sharpening_strength: 0.0-5.0
-enable_color_correction: bool
-contrast_boost: 0.5-3.0
-brightness_boost: -100.0-100.0
-saturation_boost: 0.0-3.0
-```
-
-#### Automatische Batch-Größen-Berechnung
-```rust
-// In src/system_info.rs & src/alignment.rs
-let available_ram_gb = get_available_memory_gb();
-let base_batch_size = calculate_batch_size(available_ram_gb);
-
-// Detector-spezifische Skalierung:
-ORB:   batch_size = base_batch_size (16)
-SIFT:  batch_size = base_batch_size / 4 (4)  // 128-dim float = 512 bytes/desc
-AKAZE: batch_size = base_batch_size / 4 (4)  // Limited to 3000 features
-```
-
-### Bekannte Limitierungen & Nächste Schritte
-
-#### Aktuelle Limitierungen
 1. **Memory-Intensiv bei sehr großen Bildern**: 42MP Bilder benötigen conservative Batch-Größen
 2. **SIFT/AKAZE langsamer als ORB**: Höhere Qualität kostet Processing-Zeit
-3. **Keine GPU-Beschleunigung**: Läuft komplett auf CPU
+3. **ECC benötigt ähnliche Belichtung**: Funktioniert nicht gut bei stark unterschiedlichen Belichtungen
+4. **Stärkere Beschneidung bei Transparenz**: AND-Alpha + Erosion schneidet etwas mehr ab als nötig (bewusster Trade-off für artefaktfreie Ergebnisse)
 
-#### Mögliche zukünftige Verbesserungen
-1. **GPU-Beschleunigung**: OpenCV CUDA für Feature Detection
-2. **Multi-Threading für Stacking**: Parallele Pyramid-Ebenen-Verarbeitung
-3. **Konfigurierbare Pyramid Levels**: User-definierte Tiefe für Stacking
-4. **Batch Progress Details**: Zeige aktuellen Batch-Fortschritt (z.B. "Batch 3/10")
-5. **Image Quality Metrics**: Automatische Bewertung der Stack-Qualität
+### Mögliche zukünftige Verbesserungen
+
+1. **Konfigurierbare Pyramid Levels**: User-definierte Tiefe für Stacking
+2. **Batch Progress Details**: Zeige aktuellen Batch-Fortschritt
+3. **Image Quality Metrics**: Automatische Bewertung der Stack-Qualität
+4. **Konfigurierbare Erosion**: Slider für Erosion-Stärke (derzeit fest 5px)
+5. **OR-Alpha Option**: Alternative Alpha-Kombination für weniger Beschneidung
 
 ### Typische Probleme & Lösungen
 
 #### Problem: Out of Memory bei SIFT/AKAZE
-**Lösung**: 
-- Automatisch behandelt durch adaptive Batch-Größen (4 Bilder/Batch)
-- Bei Bedarf manuell in `src/alignment.rs` weitere Reduzierung möglich
-- Alternative: ORB verwenden (schneller, weniger Memory)
+
+**Lösung**: Automatisch behandelt durch adaptive Batch-Größen. Alternative: ORB verwenden.
 
 #### Problem: Alignment schlägt fehl
-**Lösung**: 
-- CLAHE aktivieren in Settings (für dunkle Bilder)
-- SIFT Detector verwenden (beste Qualität)
-- Sharpness Threshold reduzieren (mehr Bilder akzeptieren)
-- Sharpness Grid Size erhöhen (16x16 für feinere Analyse)
+
+**Lösung**: CLAHE aktivieren, SIFT/ECC verwenden, Threshold reduzieren.
+
+#### Problem: Weiße/helle Artefakte an transparenten Rändern
+
+**Lösung**: ✅ Behoben durch AND-Alpha + 5px Erosion + BGR-only Pyramid.
 
 #### Problem: Ghosting in Final Image
-**Lösung**: 
-- ✅ Bereits behoben durch Winner-Take-All Algorithmus
-- Sollte nicht mehr auftreten
 
-#### Problem: Zu viele/wenige Bilder gefiltert
-**Lösung**: 
-- Sharpness Threshold in Settings anpassen (Slider 10-100)
-- Sharpness Grid Size anpassen (kleineres Grid = strenger)
-- Regional sharpness: Akzeptiert Bilder mit mind. einem scharfen Bereich
-
-#### Problem: Finale Bilder zu dunkel/hell
-**Lösung**:
-- Color Correction in Settings aktivieren
-- Contrast Boost anpassen (0.5-3.0)
-- Brightness Boost anpassen (-100 bis +100)
-- Saturation Boost anpassen (0.0-3.0)
+**Lösung**: ✅ Behoben durch Winner-Take-All Algorithmus (keine Mittelung).
 
 ### Build & Run
 
 ```bash
 cd /home/dirk/devel/rust/imagestacker
-cargo build --release  # Für optimierte Performance (wichtig!)
-cargo run --release   # Development & Testing
-./target/release/imagestacker  # Direct execution
+cargo build --release    # Für optimierte Performance (wichtig!)
+cargo run --release      # Development & Testing
+
+# Mit Debug-Logging:
+RUST_LOG=debug cargo run --release
 ```
 
-**Performance-Tipp**: Immer `--release` verwenden für reale Verarbeitung! Debug-Builds sind 10-100x langsamer.
+**Performance-Tipp**: Immer `--release` verwenden! Debug-Builds sind 10-100× langsamer.
 
 ### Installation (Linux RPM)
 
 ```bash
 cd /home/dirk/devel/rust/imagestacker/packaging/linux
 ./quick-install.sh  # One-click build & install
-# Oder manuell:
-make clean && make rpm
-sudo zypper install --allow-unsigned-rpm -f ~/rpmbuild/RPMS/x86_64/imagestacker-0.1.0-1.x86_64.rpm
 ```
 
-**Nach Installation**:
-- Start aus Terminal: `imagestacker`
-- Start aus Application Menu: ImageStacker Icon
-- Bei KDE Desktop-Integration Problemen:
-  ```bash
-  kbuildsycoca5 --noincremental  # Rebuild KDE cache
-  ```
-
-**Wichtig**: Alte lokale Desktop-Dateien in `~/.local/share/applications/` können System-Einträge überschreiben und zu Startproblemen führen.
-
-### Testing
-Testbilder in: `/home/dirk/devel/rust/imagestacker/testimages/`
-- Import-Bilder über GUI "Add Images" oder "Add Folder"
-- `aligned/`: Aligned Bilder (automatisch erstellt)
-- `bunches/`: Batch-gruppierte Bilder (automatisch erstellt)
-- `final/`: Gestackte Ergebnisse (automatisch erstellt)
-
-**Test-Workflow**:
-1. Start App: `cargo run --release`
-2. "Add Folder" → testimages/ auswählen
-3. Settings öffnen → Parameter anpassen
-4. "Align Images" klicken
-5. Warten bis aligned/ Thumbnails erscheinen
-6. "Stack Images" klicken
-7. Ergebnis in final/ prüfen
-
 ## Prompt für Fortsetzung
-
-Nutze diesen Prompt um an diesem Projekt weiterzuarbeiten:
 
 ```text
 Ich arbeite am Rust-Projekt ImageStacker (@workspace). Es ist eine Focus-Stacking-Anwendung
 mit OpenCV und iced GUI (v0.13).
 
-AKTUELLER STAND (31. Januar 2026):
-- Regional Sharpness Detection: Grid-basiert (4x4 bis 16x16), max-regional scoring
-- Winner-Take-All Stacking: Ghosting-frei durch keine Mittelung
-- Memory-Optimierungen: SIFT/AKAZE mit Feature-Limits und adaptiven Batch-Größen
-- Responsive Settings UI: 3-Pane Layout mit automatischer Anpassung an Fenstergröße
-- Adaptive Slider-Breiten: Verhindert Text-Wrapping in horizontalem Layout
-- Help System: Separates Fenster mit USER_MANUAL.md, Multi-Window Support via daemon API
-- Smart Features: Auto-cleanup, smart button states, colored thumbnails
-- External Applications: Right-click für Editor, Left-click optional für Viewer
-- Linux RPM Packaging: Vollständige SUSE Tumbleweed Integration mit Desktop Entry und Icons
+AKTUELLER STAND (6. Februar 2026):
+- Laplacian Pyramid (7 Level) mit Winner-Take-All: Ghosting-frei
+- Alpha-Kanal-Behandlung: AND-Alpha + 5px Erosion für artefaktfreie transparente Ränder
+- BGR-only Pyramid: Alpha separat verarbeitet
+- GPU-Beschleunigung: Vollständig via OpenCL (2-6× Speedup)
+- 4 Alignment-Methoden: ORB, SIFT, AKAZE, ECC (Sub-Pixel)
+- Sharpness Caching: YAML-basiert pro Bild
+- Modularer Stacking-Code: 7 Helper-Funktionen in stacking.rs
+- Responsive Settings UI: 3-Pane Layout
 
-MEMORY HANDLING:
-- ORB: 16 Bilder/Batch, 5000 Features
-- SIFT: 4 Bilder/Batch, 3000 Features (512 bytes/descriptor)
-- AKAZE: 4 Bilder/Batch, 3000 Features (nach Sortierung)
-- Läuft stabil mit 42MP Bildern (7952x5304)
-
-PACKAGING:
-- RPM Build System mit rustup-Detection
-- Desktop Integration: KDE-kompatibel, FreeDesktop.org Standards
-- Icon Support: Multi-Size (64x64, 128x128, 256x256), HiDPI-ready
-- Installation: Terminal (imagestacker) und Application Menu funktionieren
-- Wichtig: Lokale Desktop-Dateien in ~/.local/share/applications/ können System-Einträge überschreiben
+STACKING-ALGORITHMUS:
+- extract_bgr_and_alpha() → init_alpha() → to_grayscale()
+- compute_sharpness_energy() → fuse_layer_with_alpha()
+- update_fused_alpha() (AND) → assemble_final_image() (Erosion 5px)
 
 DATEIEN:
-- src/alignment.rs: Feature extraction mit detector-spezifischen Batch-Größen
-- src/sharpness.rs: Regional sharpness detection mit Grid-Analyse
-- src/stacking.rs: Winner-Take-All Laplacian Pyramid (7 levels, ghosting-frei)
-- src/gui.rs: Responsive 3-pane settings, adaptive slider widths, help window, external apps
-- src/main.rs: Daemon API für Multi-Window Support
-- src/config.rs: ProcessingConfig mit external_viewer_path und external_editor_path
-- src/messages.rs: Alle GUI Messages inkl. WindowResized, CloseHelp, External*PathChanged
-- USER_MANUAL.md: Externe User-Dokumentation mit "Image Preview & Editing" Sektion
-- packaging/linux/*: Komplettes RPM Build-System für SUSE
-- icons/imagestacker_icon.png: Application Icon (multi-size generation)
+- src/stacking.rs (601): Focus Stacking mit 7 Helper-Funktionen
+- src/alignment.rs (2100): Feature-basiert + ECC Alignment
+- src/sharpness.rs (463): GPU-beschleunigte Schärfe-Analyse
+- src/config.rs (120): ProcessingConfig mit ECC-Parametern
+- src/gui/ (5530): Modulare GUI (handlers/ + views/)
 
-Lies PROJECT_STATUS.md für vollständige Details zu allen Optimierungen.
+Lies PROJECT_STATUS.md für vollständige Details.
 
 [Hier deine konkrete Aufgabe einfügen]
 ```
@@ -432,44 +288,34 @@ Lies PROJECT_STATUS.md für vollständige Details zu allen Optimierungen.
 ## Hinweise für AI-Assistenten
 
 - **Immer** `PROJECT_STATUS.md` lesen bei Fortsetzung
-- **Regional Sharpness beibehalten** - essentiell für Focus-Stacking
 - **Winner-Take-All nicht ändern** - verhindert Ghosting
+- **Alpha-Behandlung**: AND-Alpha + Erosion beibehalten (45+ Iterationen bis zur Lösung)
+- **BGR-only Pyramid**: Alpha NICHT durch die Pyramide schicken
 - **Batch-Processing beibehalten** für Memory-Sicherheit
 - **Feature-Limits nicht erhöhen** - führt zu OOM bei großen Bildern
 - **Detector-spezifische Batch-Größen kritisch** - nicht vereinheitlichen!
 - **Daemon API erforderlich** - Multi-Window Support benötigt `iced::daemon()`
-- **Help Content in USER_MANUAL.md** - nicht im Code hardcoden
-- **Adaptive Slider-Breiten wichtig** - verhindert Text-Wrapping in responsivem Layout
-- **External Applications konfigurierbar** - viewer/editor Pfade in Settings
-- **RPM Packaging**: Icon aus `icons/imagestacker_icon.png`, nicht aus testimages
-- **Desktop Integration**: Lokale Desktop-Dateien in `~/.local/share/applications/` haben Vorrang vor System-Dateien
-- **Parameter-Änderungen dokumentieren** in diesem File
+- **log::debug! für Details, log::info! nur für High-Level** Messages
 - **Vor größeren Änderungen**: Aktuellen Stand testen mit 42MP Bildern
-- **Nach Optimierungen**: Memory-Usage und Performance-Impact dokumentieren
 
 ### Code-Review Checkliste
 
 - [ ] Memory-sichere Batch-Verarbeitung verwendet?
 - [ ] Feature-Limits für SIFT/AKAZE eingehalten?
-- [ ] Parallele Verarbeitung mit rayon wo sinnvoll?
+- [ ] Alpha-Kanal korrekt behandelt (AND + Erosion)?
+- [ ] BGR-only Pyramid ohne Alpha-Kanal?
+- [ ] log::debug! für Detail-Logging, log::info! für High-Level?
 - [ ] Error-Handling mit `Result<>` und proper Logging?
 - [ ] GUI-Updates über Messages statt direkte Änderungen?
-- [ ] Multi-Window: Daemon API korrekt verwendet?
-- [ ] Help Content: In USER_MANUAL.md statt hardcoded?
-- [ ] Responsive UI: Slider-Breiten adaptiv an Layout?
-- [ ] External Applications: Viewer/Editor Pfade konfigurierbar?
 - [ ] Settings in `ProcessingConfig` serializable?
-- [ ] Dokumentation in Kommentaren aktualisiert?
-- [ ] RPM Packaging: Icon-Pfade korrekt in spec file?
-- [ ] Desktop Integration: Absolute Pfade in .desktop file?
+- [ ] Dokumentation aktualisiert?
 
 ---
 
-**Letztes Update**: 31. Januar 2026
-**Status**: ✅ Produktionsreif - Alle kritischen Features implementiert
-**Architecture**: Multi-Window Support via iced daemon API (v0.13)
-**Performance**: Optimal für 42MP Bilder, stabil, ghosting-frei
-**Memory**: Conservative Batch-Größen verhindern OOM bei SIFT/AKAZE
-**GUI**: Vollständig responsiv, adaptive Slider-Breiten, separates Help-Fenster, external apps, user-freundlich
-**Documentation**: USER_MANUAL.md (externe Markdown-Datei)
-**Packaging**: RPM für SUSE Tumbleweed mit vollständiger Desktop-Integration, KDE-kompatibel
+**Letztes Update**: 6. Februar 2026
+**Version**: 1.0.0
+**Status**: ✅ Produktionsreif
+**Stacking**: 7-Level Laplacian Pyramid, Winner-Take-All, AND-Alpha + 5px Erosion
+**Performance**: GPU-beschleunigt via OpenCL (2-6×), stabil für 42MP Bilder
+**GUI**: 5530 Zeilen, modulare Architektur (handlers/ + views/)
+**Packaging**: RPM (SUSE), macOS .app, Windows portable ZIP

@@ -1,0 +1,399 @@
+2026-02-05T22:50:02Z INFO  imagestacker::alignment]    Proceeding with 92 sharp images
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment] Using image /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04619.JPG as reference (sharpness: 1678.93)
+Loading image: A7R04619.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04619.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loaded A7R04619.JPG in 112.629353ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 112.629353ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment] ✓ Reference image preprocessed (will be reused for all 91 alignments)
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment] 📦 Processing in batches of 12 images to limit memory usage
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    Configure via Settings dialog or IMAGESTACKER_ECC_BATCH_SIZE environment variable
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment] 🚀 Starting batch ECC alignment of 91 images (batch_size=12)
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    Using Rayon parallel processing with 16 threads per batch
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    ✓ ECC mutex DISABLED (fully parallel processing)
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    If crashes occur, set IMAGESTACKER_ECC_MUTEX=1
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment] 📦 Processing 8 batches
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment] 📦 Batch 1/8: Processing 12 images
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 0] Loading: A7R04593.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 1] Loading: A7R04606.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 2] Loading: A7R04595.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 3] Loading: A7R04603.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 4] Loading: A7R04592.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 12] Loading: A7R04608.JPG
+Loading image: A7R04595.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 7] Loading: A7R04626.JPG
+Loading image: A7R04606.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04595.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 10] Loading: A7R04594.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04606.JPG
+Loading image: A7R04603.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 9] Loading: A7R04601.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 8] Loading: A7R04610.JPG
+Loading image: A7R04608.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 11] Loading: A7R04612.JPG
+Loading image: A7R04592.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04603.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04592.JPG
+Loading image: A7R04594.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::alignment]    [Thread 5] Loading: A7R04598.JPG
+Loading image: A7R04626.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04594.JPG
+Loading image: A7R04593.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04626.JPG
+Loading image: A7R04601.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04608.JPG
+Loading image: A7R04610.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04601.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04610.JPG
+Loading image: A7R04612.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04593.JPG
+Loading image: A7R04598.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04598.JPG
+[2026-02-05T22:50:02Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04612.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04598.JPG in 138.694315ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 138.694315ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04603.JPG in 145.087296ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 145.087296ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04610.JPG in 168.958848ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 168.958848ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 5] Computing ECC for: A7R04598.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04612.JPG in 184.327939ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 184.327939ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04626.JPG in 203.594241ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 203.594241ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04595.JPG in 209.143458ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 209.143458ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04601.JPG in 211.417963ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 211.417963ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04593.JPG in 212.390966ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 212.390966ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04608.JPG in 213.26531ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 213.26531ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04594.JPG in 214.236431ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 214.236431ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04606.JPG in 216.37741ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 216.37741ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 11] Computing ECC for: A7R04612.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::image_io] Loaded A7R04592.JPG in 256.307401ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 256.307401ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 1] Computing ECC for: A7R04606.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 3] Computing ECC for: A7R04603.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 8] Computing ECC for: A7R04610.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 9] Computing ECC for: A7R04601.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 12] Computing ECC for: A7R04608.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 10] Computing ECC for: A7R04594.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 7] Computing ECC for: A7R04626.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 2] Computing ECC for: A7R04595.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 0] Computing ECC for: A7R04593.JPG
+[2026-02-05T22:50:03Z INFO  imagestacker::alignment]    [Thread 4] Computing ECC for: A7R04592.JPG
+[2026-02-05T22:50:13Z WARN  imagestacker::alignment]    [Thread 5] ⚠  ECC did not converge for A7R04598.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:50:13Z WARN  imagestacker::alignment]    [Thread 5]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:50:13Z INFO  imagestacker::alignment]    [Thread 5] Warping: A7R04598.JPG
+[2026-02-05T22:50:13Z INFO  imagestacker::alignment]    [Thread 5] Saving: A7R04598.JPG
+[2026-02-05T22:50:13Z INFO  imagestacker::alignment]    [Thread 5] ✓ Completed: A7R04598.JPG
+[2026-02-05T22:50:22Z WARN  imagestacker::alignment]    [Thread 11] ⚠  ECC did not converge for A7R04612.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:50:22Z WARN  imagestacker::alignment]    [Thread 11]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:50:22Z INFO  imagestacker::alignment]    [Thread 11] Warping: A7R04612.JPG
+[2026-02-05T22:50:22Z INFO  imagestacker::alignment]    [Thread 11] Saving: A7R04612.JPG
+[2026-02-05T22:50:22Z INFO  imagestacker::alignment]    [Thread 11] ✓ Completed: A7R04612.JPG
+[2026-02-05T22:50:29Z WARN  imagestacker::alignment]    [Thread 1] ⚠  ECC did not converge for A7R04606.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:50:29Z WARN  imagestacker::alignment]    [Thread 1]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:50:29Z INFO  imagestacker::alignment]    [Thread 1] Warping: A7R04606.JPG
+[2026-02-05T22:50:29Z INFO  imagestacker::alignment]    [Thread 1] Saving: A7R04606.JPG
+[2026-02-05T22:50:29Z INFO  imagestacker::alignment]    [Thread 1] ✓ Completed: A7R04606.JPG
+[2026-02-05T22:50:47Z WARN  imagestacker::alignment]    [Thread 8] ⚠  ECC did not converge for A7R04610.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:50:47Z WARN  imagestacker::alignment]    [Thread 8]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:50:47Z INFO  imagestacker::alignment]    [Thread 8] Warping: A7R04610.JPG
+[2026-02-05T22:50:47Z INFO  imagestacker::alignment]    [Thread 8] Saving: A7R04610.JPG
+[2026-02-05T22:50:47Z INFO  imagestacker::alignment]    [Thread 8] ✓ Completed: A7R04610.JPG
+[2026-02-05T22:50:56Z WARN  imagestacker::alignment]    [Thread 9] ⚠  ECC did not converge for A7R04601.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:50:56Z WARN  imagestacker::alignment]    [Thread 9]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:50:56Z INFO  imagestacker::alignment]    [Thread 9] Warping: A7R04601.JPG
+[2026-02-05T22:50:56Z INFO  imagestacker::alignment]    [Thread 9] Saving: A7R04601.JPG
+[2026-02-05T22:50:56Z INFO  imagestacker::alignment]    [Thread 9] ✓ Completed: A7R04601.JPG
+[2026-02-05T22:51:09Z WARN  imagestacker::alignment]    [Thread 3] ⚠  ECC did not converge for A7R04603.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:51:09Z WARN  imagestacker::alignment]    [Thread 3]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:51:09Z INFO  imagestacker::alignment]    [Thread 3] Warping: A7R04603.JPG
+[2026-02-05T22:51:09Z INFO  imagestacker::alignment]    [Thread 3] Saving: A7R04603.JPG
+[2026-02-05T22:51:09Z INFO  imagestacker::alignment]    [Thread 3] ✓ Completed: A7R04603.JPG
+[2026-02-05T22:51:14Z WARN  imagestacker::alignment]    [Thread 10] ⚠  ECC did not converge for A7R04594.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:51:14Z WARN  imagestacker::alignment]    [Thread 10]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:51:14Z INFO  imagestacker::alignment]    [Thread 10] Warping: A7R04594.JPG
+[2026-02-05T22:51:14Z INFO  imagestacker::alignment]    [Thread 10] Saving: A7R04594.JPG
+[2026-02-05T22:51:14Z INFO  imagestacker::alignment]    [Thread 10] ✓ Completed: A7R04594.JPG
+[2026-02-05T22:51:14Z WARN  imagestacker::alignment]    [Thread 12] ⚠  ECC did not converge for A7R04608.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:51:14Z WARN  imagestacker::alignment]    [Thread 12]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:51:14Z INFO  imagestacker::alignment]    [Thread 12] Warping: A7R04608.JPG
+[2026-02-05T22:51:14Z INFO  imagestacker::alignment]    [Thread 12] Saving: A7R04608.JPG
+[2026-02-05T22:51:14Z INFO  imagestacker::alignment]    [Thread 12] ✓ Completed: A7R04608.JPG
+[2026-02-05T22:51:22Z WARN  imagestacker::alignment]    [Thread 7] ⚠  ECC did not converge for A7R04626.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:51:22Z WARN  imagestacker::alignment]    [Thread 7]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:51:22Z INFO  imagestacker::alignment]    [Thread 7] Warping: A7R04626.JPG
+[2026-02-05T22:51:22Z INFO  imagestacker::alignment]    [Thread 7] Saving: A7R04626.JPG
+[2026-02-05T22:51:22Z INFO  imagestacker::alignment]    [Thread 7] ✓ Completed: A7R04626.JPG
+[2026-02-05T22:51:39Z WARN  imagestacker::alignment]    [Thread 0] ⚠  ECC did not converge for A7R04593.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:51:39Z WARN  imagestacker::alignment]    [Thread 0]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:51:39Z INFO  imagestacker::alignment]    [Thread 0] Warping: A7R04593.JPG
+[2026-02-05T22:51:39Z INFO  imagestacker::alignment]    [Thread 0] Saving: A7R04593.JPG
+[2026-02-05T22:51:39Z INFO  imagestacker::alignment]    [Thread 0] ✓ Completed: A7R04593.JPG
+[2026-02-05T22:51:52Z WARN  imagestacker::alignment]    [Thread 4] ⚠  ECC did not converge for A7R04592.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:51:52Z WARN  imagestacker::alignment]    [Thread 4]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:51:52Z INFO  imagestacker::alignment]    [Thread 4] Warping: A7R04592.JPG
+[2026-02-05T22:51:52Z INFO  imagestacker::alignment]    [Thread 4] Saving: A7R04592.JPG
+[2026-02-05T22:51:53Z INFO  imagestacker::alignment]    [Thread 4] ✓ Completed: A7R04592.JPG
+[2026-02-05T22:52:09Z WARN  imagestacker::alignment]    [Thread 2] ⚠  ECC did not converge for A7R04595.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:52:09Z WARN  imagestacker::alignment]    [Thread 2]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 2] Warping: A7R04595.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 2] Saving: A7R04595.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 2] ✓ Completed: A7R04595.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment] 📦 Batch 1/8: All threads completed, checking for errors...
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment] 📦 Batch 1/8 completed successfully
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment] 📦 Batch 2/8: Processing 12 images
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 2] Loading: A7R04618.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 0] Loading: A7R04615.JPG
+Loading image: A7R04618.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 1] Loading: A7R04596.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04618.JPG
+Loading image: A7R04615.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04615.JPG
+Loading image: A7R04596.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 3] Loading: A7R04636.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 9] Loading: A7R04605.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04596.JPG
+Loading image: A7R04636.JPG
+Loading image: A7R04605.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04636.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04605.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 8] Loading: A7R04597.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 4] Loading: A7R04614.JPG
+Loading image: A7R04597.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04597.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 11] Loading: A7R04621.JPG
+Loading image: A7R04614.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04614.JPG
+Loading image: A7R04621.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 6] Loading: A7R04645.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 7] Loading: A7R04613.JPG
+Loading image: A7R04613.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 12] Loading: A7R04633.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04621.JPG
+Loading image: A7R04633.JPG
+Loading image: A7R04645.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04633.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04613.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04645.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 5] Loading: A7R04624.JPG
+Loading image: A7R04624.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04624.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04633.JPG in 133.484299ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 133.484299ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04615.JPG in 133.981611ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 133.981611ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04636.JPG in 134.2421ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 134.2421ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 12] Computing ECC for: A7R04633.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04624.JPG in 158.085447ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 158.085447ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04618.JPG in 183.390203ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 183.390203ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 5] Computing ECC for: A7R04624.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04614.JPG in 186.854667ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 186.854667ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04613.JPG in 188.551767ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 188.551767ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04621.JPG in 190.952084ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 190.952084ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04597.JPG in 194.133626ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 194.133626ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04596.JPG in 198.751098ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 198.751098ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04645.JPG in 203.576438ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 203.576438ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 4] Computing ECC for: A7R04614.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 3] Computing ECC for: A7R04636.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 0] Computing ECC for: A7R04615.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 2] Computing ECC for: A7R04618.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::image_io] Loaded A7R04605.JPG in 235.201707ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 235.201707ms - Size: 5964x3978, Channels: 3
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 7] Computing ECC for: A7R04613.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 6] Computing ECC for: A7R04645.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 8] Computing ECC for: A7R04597.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 11] Computing ECC for: A7R04621.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 9] Computing ECC for: A7R04605.JPG
+[2026-02-05T22:52:09Z INFO  imagestacker::alignment]    [Thread 1] Computing ECC for: A7R04596.JPG
+[2026-02-05T22:52:20Z WARN  imagestacker::alignment]    [Thread 12] ⚠  ECC did not converge for A7R04633.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:52:20Z WARN  imagestacker::alignment]    [Thread 12]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:52:20Z INFO  imagestacker::alignment]    [Thread 12] Warping: A7R04633.JPG
+[2026-02-05T22:52:20Z INFO  imagestacker::alignment]    [Thread 12] Saving: A7R04633.JPG
+[2026-02-05T22:52:20Z INFO  imagestacker::alignment]    [Thread 12] ✓ Completed: A7R04633.JPG
+[2026-02-05T22:52:27Z WARN  imagestacker::alignment]    [Thread 5] ⚠  ECC did not converge for A7R04624.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:52:27Z WARN  imagestacker::alignment]    [Thread 5]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:52:27Z INFO  imagestacker::alignment]    [Thread 5] Warping: A7R04624.JPG
+[2026-02-05T22:52:27Z INFO  imagestacker::alignment]    [Thread 5] Saving: A7R04624.JPG
+[2026-02-05T22:52:27Z INFO  imagestacker::alignment]    [Thread 5] ✓ Completed: A7R04624.JPG
+[2026-02-05T22:53:32Z WARN  imagestacker::alignment]    [Thread 7] ⚠  ECC did not converge for A7R04613.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:53:32Z WARN  imagestacker::alignment]    [Thread 7]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:53:32Z INFO  imagestacker::alignment]    [Thread 7] Warping: A7R04613.JPG
+[2026-02-05T22:53:32Z INFO  imagestacker::alignment]    [Thread 7] Saving: A7R04613.JPG
+[2026-02-05T22:53:32Z INFO  imagestacker::alignment]    [Thread 7] ✓ Completed: A7R04613.JPG
+[2026-02-05T22:53:58Z WARN  imagestacker::alignment]    [Thread 8] ⚠  ECC did not converge for A7R04597.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:53:58Z WARN  imagestacker::alignment]    [Thread 8]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:53:58Z INFO  imagestacker::alignment]    [Thread 8] Warping: A7R04597.JPG
+[2026-02-05T22:53:58Z INFO  imagestacker::alignment]    [Thread 8] Saving: A7R04597.JPG
+[2026-02-05T22:53:58Z INFO  imagestacker::alignment]    [Thread 8] ✓ Completed: A7R04597.JPG
+[2026-02-05T22:54:43Z WARN  imagestacker::alignment]    [Thread 3] ⚠  ECC did not converge for A7R04636.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:54:43Z WARN  imagestacker::alignment]    [Thread 3]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:54:43Z INFO  imagestacker::alignment]    [Thread 3] Warping: A7R04636.JPG
+[2026-02-05T22:54:43Z INFO  imagestacker::alignment]    [Thread 3] Saving: A7R04636.JPG
+[2026-02-05T22:54:43Z INFO  imagestacker::alignment]    [Thread 3] ✓ Completed: A7R04636.JPG
+[2026-02-05T22:54:53Z WARN  imagestacker::alignment]    [Thread 9] ⚠  ECC did not converge for A7R04605.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:54:53Z WARN  imagestacker::alignment]    [Thread 9]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:54:53Z INFO  imagestacker::alignment]    [Thread 9] Warping: A7R04605.JPG
+[2026-02-05T22:54:53Z INFO  imagestacker::alignment]    [Thread 9] Saving: A7R04605.JPG
+[2026-02-05T22:54:53Z INFO  imagestacker::alignment]    [Thread 9] ✓ Completed: A7R04605.JPG
+[2026-02-05T22:54:57Z INFO  imagestacker::alignment]    [Thread 2] Warping: A7R04618.JPG
+[2026-02-05T22:54:57Z INFO  imagestacker::alignment]    [Thread 2] Saving: A7R04618.JPG
+[2026-02-05T22:54:57Z INFO  imagestacker::alignment]    [Thread 2] ✓ Completed: A7R04618.JPG
+[2026-02-05T22:55:04Z WARN  imagestacker::alignment]    [Thread 1] ⚠  ECC did not converge for A7R04596.JPG, using identity transform (image too different from reference)
+[2026-02-05T22:55:04Z WARN  imagestacker::alignment]    [Thread 1]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T22:55:04Z INFO  imagestacker::alignment]    [Thread 1] Warping: A7R04596.JPG
+[2026-02-05T22:55:04Z INFO  imagestacker::alignment]    [Thread 1] Saving: A7R04596.JPG
+[2026-02-05T22:55:04Z INFO  imagestacker::alignment]    [Thread 1] ✓ Completed: A7R04596.JPG
+[2026-02-05T22:56:58Z INFO  imagestacker::alignment]    [Thread 0] Warping: A7R04615.JPG
+[2026-02-05T22:56:58Z INFO  imagestacker::alignment]    [Thread 0] Saving: A7R04615.JPG
+[2026-02-05T22:56:58Z INFO  imagestacker::alignment]    [Thread 0] ✓ Completed: A7R04615.JPG
+[2026-02-05T22:57:03Z INFO  imagestacker::alignment]    [Thread 11] Warping: A7R04621.JPG
+[2026-02-05T22:57:03Z INFO  imagestacker::alignment]    [Thread 11] Saving: A7R04621.JPG
+[2026-02-05T22:57:03Z INFO  imagestacker::alignment]    [Thread 11] ✓ Completed: A7R04621.JPG
+[2026-02-05T22:58:27Z INFO  imagestacker::alignment]    [Thread 6] Warping: A7R04645.JPG
+[2026-02-05T22:58:27Z INFO  imagestacker::alignment]    [Thread 6] Saving: A7R04645.JPG
+[2026-02-05T22:58:27Z INFO  imagestacker::alignment]    [Thread 6] ✓ Completed: A7R04645.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 4] Warping: A7R04614.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 4] Saving: A7R04614.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 4] ✓ Completed: A7R04614.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment] 📦 Batch 2/8: All threads completed, checking for errors...
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment] 📦 Batch 2/8 completed successfully
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment] 📦 Batch 3/8: Processing 12 images
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 0] Loading: A7R04628.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 2] Loading: A7R04630.JPG
+Loading image: A7R04628.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 6] Loading: A7R04641.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 1] Loading: A7R04627.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04628.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 5] Loading: A7R04643.JPG
+Loading image: A7R04641.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 10] Loading: A7R04599.JPG
+Loading image: A7R04627.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 8] Loading: A7R04622.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 9] Loading: A7R04649.JPG
+Loading image: A7R04630.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 4] Loading: A7R04600.JPG
+Loading image: A7R04643.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 11] Loading: A7R04647.JPG
+Loading image: A7R04599.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 12] Loading: A7R04639.JPG
+Loading image: A7R04649.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04627.JPG
+Loading image: A7R04600.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04641.JPG
+Loading image: A7R04622.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04630.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04622.JPG
+Loading image: A7R04647.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04643.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 3] Loading: A7R04616.JPG
+Loading image: A7R04639.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04639.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04649.JPG
+Loading image: A7R04616.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04616.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04600.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04647.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loading image: /home/dirk/Bilder/FocusStacking/Meterstab_small/A7R04599.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04641.JPG in 135.565761ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 135.565761ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 6] Computing ECC for: A7R04641.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04649.JPG in 185.103067ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 185.103067ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04622.JPG in 185.274545ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 185.274545ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04639.JPG in 200.811004ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 200.811004ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04643.JPG in 218.351422ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 218.351422ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 9] Computing ECC for: A7R04649.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04628.JPG in 219.23231ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 219.23231ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04600.JPG in 219.63966ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 219.63966ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04630.JPG in 227.054202ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 227.054202ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04599.JPG in 236.013183ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 236.013183ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04616.JPG in 237.102149ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 237.102149ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04627.JPG in 236.041968ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 236.041968ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 0] Computing ECC for: A7R04628.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::image_io] Loaded A7R04647.JPG in 256.48167ms - Size: 5964x3978, Channels: 3
+  ✓ Loaded in 256.48167ms - Size: 5964x3978, Channels: 3
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 5] Computing ECC for: A7R04643.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 12] Computing ECC for: A7R04639.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 10] Computing ECC for: A7R04599.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 8] Computing ECC for: A7R04622.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 11] Computing ECC for: A7R04647.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 2] Computing ECC for: A7R04630.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 4] Computing ECC for: A7R04600.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 1] Computing ECC for: A7R04627.JPG
+[2026-02-05T23:04:35Z INFO  imagestacker::alignment]    [Thread 3] Computing ECC for: A7R04616.JPG
+[2026-02-05T23:04:44Z WARN  imagestacker::alignment]    [Thread 6] ⚠  ECC did not converge for A7R04641.JPG, using identity transform (image too different from reference)
+[2026-02-05T23:04:44Z WARN  imagestacker::alignment]    [Thread 6]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T23:04:44Z INFO  imagestacker::alignment]    [Thread 6] Warping: A7R04641.JPG
+[2026-02-05T23:04:44Z INFO  imagestacker::alignment]    [Thread 6] Saving: A7R04641.JPG
+[2026-02-05T23:04:44Z INFO  imagestacker::alignment]    [Thread 6] ✓ Completed: A7R04641.JPG
+[2026-02-05T23:05:05Z WARN  imagestacker::alignment]    [Thread 0] ⚠  ECC did not converge for A7R04628.JPG, using identity transform (image too different from reference)
+[2026-02-05T23:05:05Z WARN  imagestacker::alignment]    [Thread 0]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T23:05:05Z INFO  imagestacker::alignment]    [Thread 0] Warping: A7R04628.JPG
+[2026-02-05T23:05:05Z INFO  imagestacker::alignment]    [Thread 0] Saving: A7R04628.JPG
+[2026-02-05T23:05:05Z INFO  imagestacker::alignment]    [Thread 0] ✓ Completed: A7R04628.JPG
+[2026-02-05T23:05:23Z WARN  imagestacker::alignment]    [Thread 9] ⚠  ECC did not converge for A7R04649.JPG, using identity transform (image too different from reference)
+[2026-02-05T23:05:23Z WARN  imagestacker::alignment]    [Thread 9]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T23:05:23Z INFO  imagestacker::alignment]    [Thread 9] Warping: A7R04649.JPG
+[2026-02-05T23:05:23Z INFO  imagestacker::alignment]    [Thread 9] Saving: A7R04649.JPG
+[2026-02-05T23:05:23Z INFO  imagestacker::alignment]    [Thread 9] ✓ Completed: A7R04649.JPG
+[2026-02-05T23:05:30Z WARN  imagestacker::alignment]    [Thread 10] ⚠  ECC did not converge for A7R04599.JPG, using identity transform (image too different from reference)
+[2026-02-05T23:05:30Z WARN  imagestacker::alignment]    [Thread 10]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T23:05:30Z INFO  imagestacker::alignment]    [Thread 10] Warping: A7R04599.JPG
+[2026-02-05T23:05:30Z INFO  imagestacker::alignment]    [Thread 10] Saving: A7R04599.JPG
+[2026-02-05T23:05:30Z INFO  imagestacker::alignment]    [Thread 10] ✓ Completed: A7R04599.JPG
+[2026-02-05T23:05:51Z WARN  imagestacker::alignment]    [Thread 11] ⚠  ECC did not converge for A7R04647.JPG, using identity transform (image too different from reference)
+[2026-02-05T23:05:51Z WARN  imagestacker::alignment]    [Thread 11]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T23:05:51Z INFO  imagestacker::alignment]    [Thread 11] Warping: A7R04647.JPG
+[2026-02-05T23:05:51Z INFO  imagestacker::alignment]    [Thread 11] Saving: A7R04647.JPG
+[2026-02-05T23:05:51Z INFO  imagestacker::alignment]    [Thread 11] ✓ Completed: A7R04647.JPG
+[2026-02-05T23:06:03Z WARN  imagestacker::alignment]    [Thread 2] ⚠  ECC did not converge for A7R04630.JPG, using identity transform (image too different from reference)
+[2026-02-05T23:06:03Z WARN  imagestacker::alignment]    [Thread 2]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T23:06:03Z INFO  imagestacker::alignment]    [Thread 2] Warping: A7R04630.JPG
+[2026-02-05T23:06:03Z INFO  imagestacker::alignment]    [Thread 2] Saving: A7R04630.JPG
+[2026-02-05T23:06:03Z INFO  imagestacker::alignment]    [Thread 2] ✓ Completed: A7R04630.JPG
+[2026-02-05T23:06:11Z INFO  imagestacker::alignment]    [Thread 8] Warping: A7R04622.JPG
+[2026-02-05T23:06:11Z INFO  imagestacker::alignment]    [Thread 8] Saving: A7R04622.JPG
+[2026-02-05T23:06:11Z INFO  imagestacker::alignment]    [Thread 8] ✓ Completed: A7R04622.JPG
+[2026-02-05T23:06:40Z WARN  imagestacker::alignment]    [Thread 3] ⚠  ECC did not converge for A7R04616.JPG, using identity transform (image too different from reference)
+[2026-02-05T23:06:40Z WARN  imagestacker::alignment]    [Thread 3]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T23:06:40Z INFO  imagestacker::alignment]    [Thread 3] Warping: A7R04616.JPG
+[2026-02-05T23:06:40Z INFO  imagestacker::alignment]    [Thread 3] Saving: A7R04616.JPG
+[2026-02-05T23:06:40Z INFO  imagestacker::alignment]    [Thread 3] ✓ Completed: A7R04616.JPG
+[2026-02-05T23:07:53Z WARN  imagestacker::alignment]    [Thread 4] ⚠  ECC did not converge for A7R04600.JPG, using identity transform (image too different from reference)
+[2026-02-05T23:07:53Z WARN  imagestacker::alignment]    [Thread 4]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T23:07:53Z INFO  imagestacker::alignment]    [Thread 4] Warping: A7R04600.JPG
+[2026-02-05T23:07:53Z INFO  imagestacker::alignment]    [Thread 4] Saving: A7R04600.JPG
+[2026-02-05T23:07:53Z INFO  imagestacker::alignment]    [Thread 4] ✓ Completed: A7R04600.JPG
+[2026-02-05T23:10:39Z WARN  imagestacker::alignment]    [Thread 1] ⚠  ECC did not converge for A7R04627.JPG, using identity transform (image too different from reference)
+[2026-02-05T23:10:39Z WARN  imagestacker::alignment]    [Thread 1]    This is normal for focus stacking with diverse focal planes
+[2026-02-05T23:10:39Z INFO  imagestacker::alignment]    [Thread 1] Warping: A7R04627.JPG
+[2026-02-05T23:10:39Z INFO  imagestacker::alignment]    [Thread 1] Saving: A7R04627.JPG
+[2026-02-05T23:10:39Z INFO  imagestacker::alignment]    [Thread 1] ✓ Completed: A7R04627.JPG
+[2026-02-05T23:14:12Z INFO  imagestacker::alignment]    [Thread 12] Warping: A7R04639.JPG
+[2026-02-05T23:14:12Z INFO  imagestacker::alignment]    [Thread 12] Saving: A7R04639.JPG
+[2026-02-05T23:14:12Z INFO  imagestacker::alignment]    [Thread 12] ✓ Completed: A7R04639.JPG
+

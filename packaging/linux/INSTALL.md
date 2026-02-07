@@ -49,12 +49,15 @@ After installation, ImageStacker provides:
 ## Features
 
 - **Focus Stacking:** Combine images with different focus points
-- **Alignment:** Automatic alignment using ORB, SIFT, or AKAZE
-- **GUI:** Modern interface with preview and editing capabilities
+- **Alignment:** Automatic alignment using ORB, SIFT, AKAZE, or ECC (sub-pixel precision)
+- **GPU Acceleration:** OpenCL-based processing for 2-6× speedup
+- **Alpha Handling:** Artifact-free transparent edges with AND-alpha + erosion
+- **GUI:** Modern dark-themed interface with preview and editing capabilities
 - **Selection Modes:** Choose specific images to stack
 - **External Tools:** Configure GIMP, Darktable, or other editors
 - **CLI Support:** Automate with `--import` parameter
 - **Post-Processing:** Noise reduction, sharpening, color correction
+- **Sharpness Caching:** YAML-based per-image sharpness caching
 
 ## System Requirements
 

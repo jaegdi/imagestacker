@@ -1,37 +1,42 @@
 # GUI Module Structure
 
-The GUI has been refactored into a modular structure for better maintainability and code organization. The original monolithic `gui.rs` (~3300 lines) is now split into 17 focused modules totaling ~3800 lines.
+The GUI has been refactored into a modular structure for better maintainability and code organization. The original monolithic `gui.rs` is now split into focused modules totaling ~5586 lines.
 
 **Performance Note**: The application features **GPU acceleration via OpenCL** for all image processing operations (blur detection, alignment, stacking). This provides 2-6x speedup compared to CPU-only processing.
+
+**Visual Design**: Each processing pane (Imported, Sharpness, Aligned, Bunches) has a distinct subtle background color with matching Stack button colors for visual association. The Settings button turns orange when the settings dialog is open. The Final pane uses a neutral style.
 
 ## Directory Structure
 
 ```text
 src/gui/
 ├── mod.rs              (57 lines)   - Module entry point, theme & title
-├── state.rs            (115 lines)  - Application state (ImageStacker struct)
-├── update.rs           (108 lines)  - Message dispatcher
-├── subscriptions.rs    (94 lines)   - Event subscriptions
+├── state.rs            (131 lines)  - Application state (ImageStacker struct)
+├── update.rs           (140 lines)  - Message dispatcher
+├── subscriptions.rs    (98 lines)   - Event subscriptions
 ├── log_capture.rs      (41 lines)   - Thread-safe log buffer
 │
 ├── handlers/                        - Message handler implementations
-│   ├── mod.rs               (12 lines)   - Handler module exports
-│   ├── file_handlers.rs     (330 lines)  - File loading & thumbnails
-│   ├── alignment_handlers.rs (184 lines) - Image alignment
-│   ├── stacking_handlers.rs  (335 lines) - Stacking & selection
-│   ├── preview_handlers.rs   (233 lines) - Image preview & navigation
-│   ├── refresh_handlers.rs   (238 lines) - Pane refresh operations
-│   ├── settings_handlers.rs  (175 lines) - Settings changes
-│   └── window_handlers.rs    (169 lines) - Window management
+│   ├── mod.rs                (13 lines)   - Handler module exports
+│   ├── file_handlers.rs      (416 lines)  - File loading & thumbnails
+│   ├── alignment_handlers.rs (243 lines)  - Image alignment
+│   ├── stacking_handlers.rs  (490 lines)  - Stacking & selection
+│   ├── preview_handlers.rs   (263 lines)  - Image preview & navigation
+│   ├── refresh_handlers.rs   (309 lines)  - Pane refresh operations
+│   ├── settings_handlers.rs  (248 lines)  - Settings changes
+│   ├── sharpness_handlers.rs (177 lines)  - Sharpness analysis
+│   └── window_handlers.rs    (193 lines)  - Window management
 │
 └── views/                           - UI rendering functions
-    ├── mod.rs           (10 lines)   - View module exports
-    ├── main_view.rs     (355 lines)  - Main application view
-    ├── settings.rs      (452 lines)  - Settings panel
-    ├── pane_aligned.rs  (245 lines)  - Aligned images pane
-    ├── pane_bunches.rs  (245 lines)  - Bunches pane
-    ├── pane_generic.rs  (216 lines)  - Generic pane (Imported/Final)
-    └── windows.rs       (233 lines)  - Help & Log windows
+    ├── mod.rs            (12 lines)   - View module exports
+    ├── main_view.rs      (533 lines)  - Main view, colored buttons
+    ├── settings.rs       (678 lines)  - Settings panel
+    ├── pane_imported.rs  (242 lines)  - Imported pane (steel blue)
+    ├── pane_sharpness.rs (339 lines)  - Sharpness pane (teal)
+    ├── pane_aligned.rs   (242 lines)  - Aligned pane (indigo)
+    ├── pane_bunches.rs   (242 lines)  - Bunches pane (warm slate)
+    ├── pane_generic.rs   (207 lines)  - Generic pane (Final - neutral)
+    └── windows.rs        (272 lines)  - Help & Log windows
 ```
 
 ## Module Responsibilities
@@ -110,7 +115,7 @@ Each handler module contains methods on ImageStacker for a specific category of 
 - handle_load_full_image(path) - Load full resolution
 - handle_close_image_preview() - Close preview or cancel processing
 - Navigation: handle_next_image_in_preview(), handle_previous_image_in_preview()
-- Scroll tracking for all four panes
+- Scroll tracking for all panes
 
 #### refresh_handlers.rs - Pane Refresh
 
@@ -122,10 +127,17 @@ Each handler module contains methods on ImageStacker for a specific category of 
 
 - Sharpness settings: threshold, grid size, IQR multiplier
 - Processing options: adaptive batches, CLAHE, feature detector
+- ECC parameters: motion type, iterations, epsilon, filter size, chunk size
 - Advanced options: noise reduction, sharpening, color correction
 - Preview settings: internal preview, max dimensions
 - External application paths
 - handle_reset_to_defaults()
+
+#### sharpness_handlers.rs - Sharpness Analysis
+
+- handle_analyze_sharpness() - Start sharpness analysis
+- handle_sharpness_done(result) - Process analysis results
+- Display sharpness scores and regional analysis
 
 #### window_handlers.rs - Window Management
 
@@ -146,8 +158,9 @@ Each handler module contains methods on ImageStacker for a specific category of 
 #### settings.rs - Settings Panel
 
 - render_settings_panel() - Collapsible settings UI
-- Three sections: Alignment, Post-Processing, Preview Settings
-- Responsive layout (horizontal/vertical based on window width)
+- Three sections: Alignment & Detection, Post-Processing, Preview & UI
+- Responsive layout (horizontal/vertical based on window width ≥1200px)
+- ECC parameter panel (shown conditionally when ECC detector selected)
 
 #### pane_aligned.rs - Aligned Images Pane
 
@@ -162,17 +175,24 @@ Each handler module contains methods on ImageStacker for a specific category of 
 - render_bunches_pane() - Bunches pane with selection mode
 - Parallel structure to aligned pane with bunch-specific messages
 - Selection mode tracking via selected_bunches HashSet
-- Same visual design and button layout as aligned pane
+
+#### pane_imported.rs - Imported Images Pane
+
+- render_imported_pane() - Imported images pane
+- Click for preview, right-click for external editor
 - Fixed 2-column grid layout
 
 #### pane_generic.rs - Generic Pane
 
-- render_pane() - Generic pane for Imported and Final images
+- render_pane() - Generic pane for Final images
 - render_pane_with_columns() - Multi-column thumbnail grid helper
-- No selection mode (simpler than aligned/bunches panes)
 - Supports scrolling with position preservation
-- Click for preview, right-click for external editor
-- Fixed 2-column grid layout
+
+#### pane_sharpness.rs - Sharpness Analysis Pane
+
+- render_sharpness_pane() - Sharpness analysis display
+- Shows per-image sharpness scores
+- Regional sharpness visualization
 
 #### windows.rs - Help and Log Windows
 
@@ -214,13 +234,14 @@ view() re-renders based on new state
 ### Responsive Layout
 
 - Window width tracked in state
-- Settings panel adapts layout based on available space
+- Settings panel adapts layout based on available space (≥1200px horizontal, <1200px vertical)
 - Thumbnail grid columns adjust to pane width
+- Adaptive slider widths prevent text wrapping
 
 ## Dependencies
 
 - iced (v0.13): GUI framework with Task-based async
-- opencv (v4.12.0): Image processing with **OpenCL GPU acceleration**
+- opencv (v0.94): Image processing with **OpenCL GPU acceleration**
 - tokio: Async runtime for file I/O
 - rayon: Parallel processing for thumbnails and batch operations
 - pulldown-cmark: Markdown to HTML conversion
@@ -230,21 +251,22 @@ view() re-renders based on new state
 ## GPU Acceleration Architecture
 
 ### OpenCL Integration
+
 - **UMat-based processing**: All GPU operations use OpenCV's UMat for GPU memory
 - **Thread-safe GPU access**: Global OpenCL mutex serializes GPU operations
 - **Minimal CPU↔GPU transfers**: Data uploaded once, all ops on GPU, downloaded once
 - **Hybrid parallelism**: Rayon threads for I/O, OpenCL for compute
 
 ### Performance Optimizations
+
 - **Adaptive batch sizing**: Adjusts based on image size (>30MP: 2-3 images/batch)
 - **SIFT optimization**: Reduced from 3000 to 2000 features (~30% faster)
 - **GPU pipeline**: color→CLAHE→resize→feature detection (CPU)→warp (GPU)
-- **Parallel + GPU**: Multiple images load in parallel, GPU processes sequentially
 
 ### Memory Management
+
 - **Typical usage**: 8-10GB RAM for 46×42MP images
 - **No OOM errors**: Adaptive batching prevents memory exhaustion
-- **UMat reference handling**: Automatic cloning to prevent deallocation errors
 
 ## Adding New Features
 

@@ -4,7 +4,7 @@
 
 use iced::Task;
 
-use crate::config::{FeatureDetector, ProcessingConfig};
+use crate::config::{EccMotionType, FeatureDetector, ProcessingConfig};
 use crate::messages::Message;
 use crate::settings::save_settings;
 use crate::system_info;
@@ -65,6 +65,85 @@ impl ImageStacker {
     /// Handle FeatureDetectorChanged
     pub fn handle_feature_detector_changed(&mut self, detector: FeatureDetector) -> Task<Message> {
         self.config.feature_detector = detector;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccMotionTypeChanged
+    pub fn handle_ecc_motion_type_changed(&mut self, motion_type: EccMotionType) -> Task<Message> {
+        self.config.ecc_motion_type = motion_type;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccMaxIterationsChanged
+    pub fn handle_ecc_max_iterations_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_max_iterations = value as i32;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccEpsilonChanged (logarithmic slider: -8 to -4 maps to 1e-8 to 1e-4)
+    pub fn handle_ecc_epsilon_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_epsilon = 10_f64.powf(value as f64);
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccGaussFilterSizeChanged
+    pub fn handle_ecc_gauss_filter_size_changed(&mut self, value: f32) -> Task<Message> {
+        // Ensure odd number (3, 5, 7, 9, 11, 13, 15)
+        let size = (value as i32) | 1;  // Make odd by setting lowest bit
+        self.config.ecc_gauss_filter_size = size;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccChunkSizeChanged
+    pub fn handle_ecc_chunk_size_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_chunk_size = value as usize;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccBatchSizeChanged
+    pub fn handle_ecc_batch_size_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_batch_size = value as usize;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccUseHybridChanged
+    pub fn handle_ecc_use_hybrid_changed(&mut self, enabled: bool) -> Task<Message> {
+        self.config.ecc_use_hybrid = enabled;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle EccTimeoutChanged
+    pub fn handle_ecc_timeout_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.ecc_timeout_seconds = value as u64;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle MaxTransformScaleChanged
+    pub fn handle_max_transform_scale_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.max_transform_scale = value;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle MaxTransformTranslationChanged
+    pub fn handle_max_transform_translation_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.max_transform_translation = value;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle MaxTransformDeterminantChanged
+    pub fn handle_max_transform_determinant_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.max_transform_determinant = value;
         let _ = save_settings(&self.config);
         Task::none()
     }
@@ -167,9 +246,33 @@ impl ImageStacker {
         Task::none()
     }
 
+    /// Handle GpuConcurrencyChanged
+    pub fn handle_gpu_concurrency_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.gpu_concurrency = value as usize;
+        let _ = save_settings(&self.config);
+        // Note: GPU semaphore is initialized once at startup from config/env.
+        // Changes take effect on next app restart.
+        Task::none()
+    }
+
+    /// Handle AutoBunchSizeChanged - toggle auto/manual bunch size
+    pub fn handle_auto_bunch_size_changed(&mut self, enabled: bool) -> Task<Message> {
+        self.config.auto_bunch_size = enabled;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
+    /// Handle BunchSizeChanged - set manual bunch/batch size for stacking
+    pub fn handle_bunch_size_changed(&mut self, value: f32) -> Task<Message> {
+        self.config.stacking_bunch_size = value as usize;
+        let _ = save_settings(&self.config);
+        Task::none()
+    }
+
     /// Handle WindowResized
-    pub fn handle_window_resized(&mut self, width: f32, _height: f32) -> Task<Message> {
+    pub fn handle_window_resized(&mut self, width: f32, height: f32) -> Task<Message> {
         self.window_width = width;
+        self.window_height = height;
         Task::none()
     }
 }

@@ -44,7 +44,15 @@ impl ImageStacker {
                                 Some(Message::PreviousImageInPreview)
                             }
                             iced::keyboard::Key::Named(iced::keyboard::key::Named::Escape) => {
-                                Some(Message::CloseImagePreview)
+                                // Check if we're in preview mode or if a process is running
+                                // If process is running, send CancelProcessing
+                                // Otherwise, close preview
+                                // The update() function will handle the logic
+                                Some(Message::CloseImagePreview)  // Will be handled by update() to check state
+                            }
+                            iced::keyboard::Key::Named(iced::keyboard::key::Named::Delete) => {
+                                // Delete current preview image and all its cache derivatives
+                                Some(Message::DeletePreviewImage)
                             }
                             _ => None,
                         }

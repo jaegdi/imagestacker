@@ -12,3 +12,5 @@ nohup.out
 retag.sh
 .vscode/settings.json
 dist
+/testimages-focus-stack-pyramid
+/testimages_small
