@@ -82,6 +82,8 @@ pub struct ProcessingConfig {
     // Stacking bunch size
     pub auto_bunch_size: bool,         // true = auto-calculate bunch size based on RAM, false = use manual value
     pub stacking_bunch_size: usize,    // Manual bunch size (4-64, default 12) — how many images per bunch/batch
+    // Font settings
+    pub default_font: String,          // System font family name for the GUI (default: "DejaVu Sans")
 }
 
 impl Default for ProcessingConfig {
@@ -128,6 +130,8 @@ impl Default for ProcessingConfig {
             // Stacking bunch size defaults
             auto_bunch_size: true,                       // Auto-calculate based on RAM
             stacking_bunch_size: 12,                     // Manual default: 12 images per bunch
+            // Font settings
+            default_font: "DejaVu Sans".to_string(),
         }
     }
 }

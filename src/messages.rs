@@ -108,6 +108,8 @@ pub enum Message {
     // Stacking bunch size settings
     AutoBunchSizeChanged(bool),
     BunchSizeChanged(f32),
+    // Font settings
+    DefaultFontChanged(String),
     // Scroll position tracking
     AlignedScrollChanged(f32),
     BunchesScrollChanged(f32),
@@ -116,6 +118,9 @@ pub enum Message {
     SharpnessScrollChanged(f32),
     // Window resize for responsive layout
     WindowResized(f32, f32),
+    // PaneGrid events
+    PaneResized(iced::widget::pane_grid::ResizeEvent),
+    PaneDragged(iced::widget::pane_grid::DragEvent),
     Exit,
     None,
 }

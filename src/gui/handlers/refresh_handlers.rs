@@ -135,7 +135,7 @@ impl ImageStacker {
                         }
                     }
                     paths.sort();
-                    Message::InternalPathsScanned(vec![], vec![], vec![], vec![], paths)
+                    Message::InternalPathsScanned(paths, vec![], vec![], vec![], vec![])
                 },
                 |msg| msg,
             );

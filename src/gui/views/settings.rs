@@ -3,13 +3,14 @@
 //! This module contains the settings panel UI with all configuration options.
 
 use iced::widget::{
-    button, checkbox, column, container, horizontal_rule, mouse_area, row, scrollable, slider, text, text_input,
+    button, checkbox, column, container, horizontal_rule, horizontal_space, mouse_area, pick_list, row, scrollable, slider, text, text_input,
 };
 use iced::{Element, Length};
 use iced::mouse::ScrollDelta;
 
 use crate::config::{EccMotionType, FeatureDetector};
 use crate::messages::Message;
+use crate::gui::theme;
 use super::super::state::ImageStacker;
 
 /// Helper function to create a slider with mouse wheel support for fine-grained adjustments
@@ -42,17 +43,9 @@ fn scrollable_slider<'a>(
 
 impl ImageStacker {
     pub(crate) fn render_settings_panel(&self) -> Element<'_, Message> {
-        // Determine layout based on window width
-        // Minimum width per pane: 380px, so need at least 1200px for horizontal (3*380 + spacing + padding)
-        let use_horizontal_layout = self.window_width >= 1200.0;
-        
         // ============== PANE 1: ALIGNMENT & DETECTION ==============
-        // Adjust slider widths based on layout to prevent value stacking
-        let (label_width, slider_width, value_width) = if use_horizontal_layout {
-            (120, 150, 60)  // Narrower for horizontal pane layout
-        } else {
-            (150, 200, 50)  // Original widths for vertical layout
-        };
+        // Compact widths for horizontal 4-pane layout
+        let (label_width, slider_width, value_width) = (120, 150, 60);
         
         let sharpness_slider = row![
             text("Blur Threshold:").width(label_width),
@@ -96,8 +89,6 @@ impl ImageStacker {
         )
         .on_toggle(Message::UseCLAHE);
 
-        let feature_detector_label = text("Feature Detector:");
-        
         let orb_selected = self.config.feature_detector == FeatureDetector::ORB;
         let orb_button = button(
             text(if orb_selected { 
@@ -106,49 +97,8 @@ impl ImageStacker {
                 "  ORB (Fast)" 
             })
         )
-        .style(move |theme, status| {
-            if orb_selected {
-                button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.3))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        color: iced::Color::from_rgb(0.4, 0.7, 0.4),
-                        width: 2.0,
-                        radius: 4.0.into(),
-                    },
-                    ..Default::default()
-                }
-            } else {
-                button::secondary(theme, status)
-            }
-        })
+        .style(theme::ecc_toggle_button(orb_selected))
         .on_press(Message::FeatureDetectorChanged(FeatureDetector::ORB));
-
-        let sift_selected = self.config.feature_detector == FeatureDetector::SIFT;
-        let sift_button = button(
-            text(if sift_selected { 
-                "✓ SIFT (Best)" 
-            } else { 
-                "  SIFT (Best)" 
-            })
-        )
-        .style(move |theme, status| {
-            if sift_selected {
-                button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.3))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        color: iced::Color::from_rgb(0.4, 0.7, 0.4),
-                        width: 2.0,
-                        radius: 4.0.into(),
-                    },
-                    ..Default::default()
-                }
-            } else {
-                button::secondary(theme, status)
-            }
-        })
-        .on_press(Message::FeatureDetectorChanged(FeatureDetector::SIFT));
 
         let akaze_selected = self.config.feature_detector == FeatureDetector::AKAZE;
         let akaze_button = button(
@@ -158,70 +108,44 @@ impl ImageStacker {
                 "  AKAZE (Balanced)" 
             })
         )
-        .style(move |theme, status| {
-            if akaze_selected {
-                button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.3))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        color: iced::Color::from_rgb(0.4, 0.7, 0.4),
-                        width: 2.0,
-                        radius: 4.0.into(),
-                    },
-                    ..Default::default()
-                }
-            } else {
-                button::secondary(theme, status)
-            }
-        })
+        .style(theme::ecc_toggle_button(akaze_selected))
         .on_press(Message::FeatureDetectorChanged(FeatureDetector::AKAZE));
 
-        let ecc_button = button(text("ECC").size(14))
-        .style(move |theme, status| {
-            if self.config.feature_detector == FeatureDetector::ECC {
-                button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.4, 0.6))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        color: iced::Color::from_rgb(0.4, 0.5, 0.8),
-                        width: 2.0,
-                        radius: 4.0.into(),
-                    },
-                    ..Default::default()
-                }
+        let sift_selected = self.config.feature_detector == FeatureDetector::SIFT;
+        let sift_button = button(
+            text(if sift_selected { 
+                "✓ SIFT (Best)" 
+            } else { 
+                "  SIFT (Best)" 
+            })    
+        )    
+        .style(theme::ecc_toggle_button(sift_selected))
+        .on_press(Message::FeatureDetectorChanged(FeatureDetector::SIFT));
+
+        let ecc_selected = self.config.feature_detector == FeatureDetector::ECC;
+        let ecc_button = button(
+            text(if ecc_selected {
+                "✓ ECC (ULTRA sub-pixel-precise)"
             } else {
-                button::secondary(theme, status)
-            }
-        })
+                "  ECC (ULTRA sub-pixel-precise)"
+            })
+        )
+        .style(theme::ecc_toggle_button(ecc_selected))
         .on_press(Message::FeatureDetectorChanged(FeatureDetector::ECC));
 
-        // Feature detector layout: vertical when horizontal pane layout, horizontal when vertical pane layout
-        let feature_layout: Element<'_, Message> = if use_horizontal_layout {
-            // Horizontal layout -> stack detector buttons vertically
-            column![
-                text("Feature Detector:").size(14),
-                orb_button.width(Length::Fixed(160.0)),
-                sift_button.width(Length::Fixed(160.0)),
-                akaze_button.width(Length::Fixed(160.0)),
-                ecc_button.width(Length::Fixed(160.0)),
+        // Feature detector layout: stack buttons vertically for compact horizontal panes
+        let feature_layout: Element<'_, Message> = column![
+                text("Feature Detector:").size(16),
+                orb_button.width(Length::Fixed(300.0)),
+                akaze_button.width(Length::Fixed(300.0)),
+                sift_button.width(Length::Fixed(300.0)),
+                ecc_button.width(Length::Fixed(300.0)),
             ]
             .spacing(5)
-            .into()
-        } else {
-            // Vertical layout -> stack detector buttons horizontally
-            row![
-                feature_detector_label,
-                orb_button,
-                sift_button,
-                akaze_button,
-                ecc_button,
-            ]
-            .spacing(10)
-            .into()
-        };
+            .into();
 
-        // ECC-specific parameters (conditionally shown)
-        let ecc_params_ui: Element<'_, Message> = if self.config.feature_detector == FeatureDetector::ECC {
+        // ECC-specific parameters — built only when ECC is selected, displayed in a separate pane
+        let ecc_params_ui: Option<Element<'_, Message>> = if self.config.feature_detector == FeatureDetector::ECC {
             // Motion Type buttons
             let translation_selected = self.config.ecc_motion_type == EccMotionType::Translation;
             let euclidean_selected = self.config.ecc_motion_type == EccMotionType::Euclidean;
@@ -255,108 +179,40 @@ impl ImageStacker {
                 text(format!("Batch Size: {} images (controls memory usage)", self.config.ecc_batch_size)).size(12),
                 scrollable_slider(2.0..=16.0, self.config.ecc_batch_size as f32, Message::EccBatchSizeChanged, 1.0, Length::Fill),
                 text("Lower = less memory, slower | Higher = more memory, faster").size(10)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                    })
+                    .style(|t| theme::muted_text(t))
             ].spacing(3);
 
             let timeout_slider = column![
                 text(format!("ECC Timeout: {}s per image", self.config.ecc_timeout_seconds)).size(12),
                 scrollable_slider(10.0..=300.0, self.config.ecc_timeout_seconds as f32, Message::EccTimeoutChanged, 5.0, Length::Fill),
                 text("Prevents hangs on difficult images. Falls back to feature-based alignment on timeout.").size(10)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                    })
+                    .style(|t| theme::muted_text(t))
             ].spacing(3);
 
             let hybrid_checkbox = column![
                 checkbox("Use Hybrid Mode (40-50% faster)", self.config.ecc_use_hybrid)
                     .on_toggle(Message::EccUseHybridChanged),
                 text("SIFT initialization + ECC refinement for speed with quality").size(10)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                    })
+                    .style(|t| theme::muted_text(t))
             ].spacing(3);
 
-            column![
-                text("ECC Parameters:").size(13).style(|_| text::Style {
-                    color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
-                }),
+            Some(column![
+                text("ECC Parameters").size(16).style(|t| theme::heading_text(t)),
                 text("Motion Type:").size(12),
                 row![
                     button(text("Translation (2-DOF)").size(12))
-                        .style(move |theme, status| {
-                            if translation_selected {
-                                button::Style {
-                                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.6))),
-                                    text_color: iced::Color::WHITE,
-                                    border: iced::Border {
-                                        color: iced::Color::from_rgb(0.4, 0.7, 0.8),
-                                        width: 2.0,
-                                        radius: 3.0.into(),
-                                    },
-                                    ..Default::default()
-                                }
-                            } else {
-                                button::secondary(theme, status)
-                            }
-                        })
+                        .style(theme::ecc_toggle_button(translation_selected))
                         .on_press(Message::EccMotionTypeChanged(EccMotionType::Translation)),
                     button(text("Euclidean (3-DOF)").size(12))
-                        .style(move |theme, status| {
-                            if euclidean_selected {
-                                button::Style {
-                                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.6))),
-                                    text_color: iced::Color::WHITE,
-                                    border: iced::Border {
-                                        color: iced::Color::from_rgb(0.4, 0.7, 0.8),
-                                        width: 2.0,
-                                        radius: 3.0.into(),
-                                    },
-                                    ..Default::default()
-                                }
-                            } else {
-                                button::secondary(theme, status)
-                            }
-                        })
+                        .style(theme::ecc_toggle_button(euclidean_selected))
                         .on_press(Message::EccMotionTypeChanged(EccMotionType::Euclidean)),
                 ].spacing(5),
                 row![
                     button(text("Affine (6-DOF)").size(12))
-                        .style(move |theme, status| {
-                            if affine_selected {
-                                button::Style {
-                                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.6))),
-                                    text_color: iced::Color::WHITE,
-                                    border: iced::Border {
-                                        color: iced::Color::from_rgb(0.4, 0.7, 0.8),
-                                        width: 2.0,
-                                        radius: 3.0.into(),
-                                    },
-                                    ..Default::default()
-                                }
-                            } else {
-                                button::secondary(theme, status)
-                            }
-                        })
+                        .style(theme::ecc_toggle_button(affine_selected))
                         .on_press(Message::EccMotionTypeChanged(EccMotionType::Affine)),
                     button(text("Homography (8-DOF)").size(12))
-                        .style(move |theme, status| {
-                            if homography_selected {
-                                button::Style {
-                                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.3, 0.5, 0.6))),
-                                    text_color: iced::Color::WHITE,
-                                    border: iced::Border {
-                                        color: iced::Color::from_rgb(0.4, 0.7, 0.8),
-                                        width: 2.0,
-                                        radius: 3.0.into(),
-                                    },
-                                    ..Default::default()
-                                }
-                            } else {
-                                button::secondary(theme, status)
-                            }
-                        })
+                        .style(theme::ecc_toggle_button(homography_selected))
                         .on_press(Message::EccMotionTypeChanged(EccMotionType::Homography)),
                 ].spacing(5),
                 iterations_slider,
@@ -368,46 +224,34 @@ impl ImageStacker {
                 hybrid_checkbox,
             ]
             .spacing(8)
-            .padding(10)
-            .into()
+            .into())
         } else {
-            // Empty column when ECC not selected
-            column![].into()
+            None
         };
 
         // Transform validation sliders - shown for ALL alignment methods
         let transform_validation_ui = column![
             horizontal_rule(1),
-            text("Transform Validation (All Alignment Methods):").size(13).style(|_| text::Style {
-                color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
-            }),
+            text("Transform Validation (All Alignment Methods):").size(13).style(|t| theme::section_label(t)),
             text("Reject distorted transformations - applies to ORB, SIFT, AKAZE, and ECC").size(10)
-                .style(|_| text::Style {
-                    color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                }),
+                .style(|t| theme::muted_text(t)),
             column![
                 text(format!("Max Transform Scale: {:.2}x", self.config.max_transform_scale)).size(12),
                 scrollable_slider(1.1..=3.0, self.config.max_transform_scale, Message::MaxTransformScaleChanged, 0.1, Length::Fill),
                 text("Maximum allowed scale deviation (reject if exceeded)").size(10)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                    })
+                    .style(|t| theme::muted_text(t))
             ].spacing(3),
             column![
                 text(format!("Max Translation: {:.0} pixels", self.config.max_transform_translation)).size(12),
                 scrollable_slider(100.0..=1000.0, self.config.max_transform_translation, Message::MaxTransformTranslationChanged, 50.0, Length::Fill),
                 text("Maximum allowed translation distance (reject if exceeded)").size(10)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                    })
+                    .style(|t| theme::muted_text(t))
             ].spacing(3),
             column![
                 text(format!("Max Determinant: {:.1}x", self.config.max_transform_determinant)).size(12),
                 scrollable_slider(1.5..=5.0, self.config.max_transform_determinant, Message::MaxTransformDeterminantChanged, 0.5, Length::Fill),
                 text("Maximum determinant deviation (skew/distortion threshold)").size(10)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                    })
+                    .style(|t| theme::muted_text(t))
             ].spacing(3),
         ]
         .spacing(8)
@@ -427,9 +271,7 @@ impl ImageStacker {
 
         let alignment_pane = container(
             column![
-                text("Alignment & Detection").size(16).style(|_| text::Style { 
-                    color: Some(iced::Color::from_rgb(0.8, 0.8, 1.0)) 
-                }),
+                text("Alignment & Detection").size(16).style(|t| theme::heading_text(t)),
                 sharpness_slider,
                 grid_size_slider,
                 iqr_multiplier_slider,
@@ -437,23 +279,12 @@ impl ImageStacker {
                 batch_info,
                 clahe_checkbox,
                 feature_layout,
-                ecc_params_ui,
                 transform_validation_ui,
             ]
             .spacing(10)
         )
         .padding(10)
-        .style(|_theme| {
-            container::Style {
-                background: Some(iced::Background::Color(iced::Color::from_rgba(0.1, 0.1, 0.15, 0.3))),
-                border: iced::Border {
-                    color: iced::Color::from_rgb(0.3, 0.3, 0.4),
-                    width: 1.0,
-                    radius: 8.0.into(),
-                },
-                ..Default::default()
-            }
-        })
+        .style(|t| theme::settings_section(t))
         .width(Length::Fill);
 
         // ============== PANE 2: POST-PROCESSING ==============
@@ -517,9 +348,7 @@ impl ImageStacker {
 
         let postprocessing_pane = container(
             column![
-                text("Post-Processing").size(16).style(|_| text::Style { 
-                    color: Some(iced::Color::from_rgb(0.8, 0.8, 1.0)) 
-                }),
+                text("Post-Processing").size(16).style(|t| theme::heading_text(t)),
                 noise_section,
                 sharpen_section,
                 color_section,
@@ -527,31 +356,19 @@ impl ImageStacker {
             .spacing(10)
         )
         .padding(10)
-        .style(|_theme| {
-            container::Style {
-                background: Some(iced::Background::Color(iced::Color::from_rgba(0.1, 0.1, 0.15, 0.3))),
-                border: iced::Border {
-                    color: iced::Color::from_rgb(0.3, 0.3, 0.4),
-                    width: 1.0,
-                    radius: 8.0.into(),
-                },
-                ..Default::default()
-            }
-        })
+        .style(|t| theme::settings_section(t))
         .width(Length::Fill);
 
         // ============== PANE 3: PREVIEW & UI ==============
         let preview_pane = container(
             column![
-                text("Preview & UI").size(16).style(|_| text::Style { 
-                    color: Some(iced::Color::from_rgb(0.8, 0.8, 1.0)) 
-                }),
+                text("Preview & UI").size(16).style(|t| theme::heading_text(t)),
                 
                 checkbox("Use Internal Preview (modal overlay)", self.config.use_internal_preview)
                     .on_toggle(Message::UseInternalPreview),
                 
                 text("When disabled, left-click opens in external viewer (configurable below)").size(10)
-                    .style(|_| text::Style { color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6)) }),
+                    .style(|t| theme::muted_text(t)),
                 
                 row![
                     text("Preview Max Width:").width(label_width),
@@ -572,7 +389,7 @@ impl ImageStacker {
                 container(column![]).height(10),  // Spacer
                 
                 text("External Image Viewer (for left-click when internal preview disabled)").size(12)
-                    .style(|_| text::Style { color: Some(iced::Color::from_rgb(0.7, 0.7, 0.9)) }),
+                    .style(|t| theme::section_label(t)),
                 
                 text_input(
                     "Path to viewer (e.g., /usr/bin/eog, /usr/bin/geeqie)...",
@@ -583,12 +400,12 @@ impl ImageStacker {
                 
                 text("Leave empty to use system default viewer. Used when 'Use Internal Preview' is disabled.")
                     .size(10)
-                    .style(|_| text::Style { color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6)) }),
+                    .style(|t| theme::muted_text(t)),
                 
                 container(column![]).height(10),  // Spacer
                 
                 text("External Image Editor (for right-click)").size(12)
-                    .style(|_| text::Style { color: Some(iced::Color::from_rgb(0.7, 0.7, 0.9)) }),
+                    .style(|t| theme::section_label(t)),
                 
                 text_input(
                     "Path to editor (e.g., /usr/bin/gimp, darktable, photoshop)...",
@@ -599,22 +416,29 @@ impl ImageStacker {
                 
                 text("Leave empty to use system default viewer. Right-click any thumbnail to open with editor.")
                     .size(10)
-                    .style(|_| text::Style { color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6)) }),
+                    .style(|t| theme::muted_text(t)),
+                
+                container(column![]).height(10),  // Spacer
+                
+                text("Application Font").size(12)
+                    .style(|t| theme::section_label(t)),
+                
+                pick_list(
+                    self.available_fonts.as_slice(),
+                    Some(self.config.default_font.clone()),
+                    Message::DefaultFontChanged,
+                )
+                .width(Length::Fill)
+                .padding(5),
+                
+                text("⚠ Font changes take effect on next app restart.")
+                    .size(10)
+                    .style(|t| theme::muted_text(t)),
             ]
             .spacing(10)
         )
         .padding(10)
-        .style(|_theme| {
-            container::Style {
-                background: Some(iced::Background::Color(iced::Color::from_rgba(0.1, 0.1, 0.15, 0.3))),
-                border: iced::Border {
-                    color: iced::Color::from_rgb(0.3, 0.3, 0.4),
-                    width: 1.0,
-                    radius: 8.0.into(),
-                },
-                ..Default::default()
-            }
-        })
+        .style(|t| theme::settings_section(t))
         .width(Length::Fill);
 
         // ============== PANE 4: GPU / PERFORMANCE ==============
@@ -627,17 +451,11 @@ impl ImageStacker {
 
         let gpu_pane = container(
             column![
-                text("GPU / Performance").size(16).style(|_| text::Style { 
-                    color: Some(iced::Color::from_rgb(0.8, 0.8, 1.0)) 
-                }),
+                text("GPU / Performance").size(16).style(|t| theme::heading_text(t)),
 
-                text("GPU Concurrency").size(13).style(|_| text::Style {
-                    color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
-                }),
+                text("GPU Concurrency").size(13).style(|t| theme::section_label(t)),
                 text("Max simultaneous GPU operations. Lower = less VRAM usage, higher = faster.").size(10)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                    }),
+                    .style(|t| theme::muted_text(t)),
                 row![
                     text("GPU Concurrency:").width(label_width),
                     scrollable_slider(0.0..=8.0, self.config.gpu_concurrency as f32, Message::GpuConcurrencyChanged, 1.0, slider_width),
@@ -646,27 +464,19 @@ impl ImageStacker {
                 .spacing(10)
                 .align_y(iced::Alignment::Center),
                 text(gpu_concurrency_desc).size(11)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.5, 0.7, 0.5))
-                    }),
+                    .style(|t| theme::success_text(t)),
 
                 container(column![]).height(10),  // Spacer
                 
                 text("⚠ Changes take effect on next app restart").size(11)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.8, 0.6, 0.3))
-                    }),
+                    .style(|t| theme::warning_text(t)),
                 
                 horizontal_rule(1),
 
                 // Stacking Bunch Size
-                text("Stacking Bunch Size").size(13).style(|_| text::Style {
-                    color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
-                }),
+                text("Stacking Bunch Size").size(13).style(|t| theme::section_label(t)),
                 text("Number of images per bunch during recursive stacking. More images per bunch = fewer levels, but higher memory usage.").size(10)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                    }),
+                    .style(|t| theme::muted_text(t)),
                 checkbox(
                     format!("Auto (RAM-based: {})", self.config.batch_config.stacking_batch_size),
                     self.config.auto_bunch_size,
@@ -682,153 +492,120 @@ impl ImageStacker {
                         .spacing(10)
                         .align_y(iced::Alignment::Center),
                         text(format!("Active: {} images per bunch", self.config.stacking_bunch_size)).size(11)
-                            .style(|_| text::Style {
-                                color: Some(iced::Color::from_rgb(0.5, 0.7, 0.5))
-                            }),
+                            .style(|t| theme::success_text(t)),
                     ].spacing(4)
                 } else {
                     column![
                         text(format!("Active: {} images per bunch (auto)", self.config.batch_config.stacking_batch_size)).size(11)
-                            .style(|_| text::Style {
-                                color: Some(iced::Color::from_rgb(0.5, 0.7, 0.5))
-                            }),
+                            .style(|t| theme::success_text(t)),
                     ]
                 },
 
                 horizontal_rule(1),
                 
-                text("Environment Variable Overrides").size(13).style(|_| text::Style {
-                    color: Some(iced::Color::from_rgb(0.7, 0.8, 1.0))
-                }),
+                text("Environment Variable Overrides").size(13).style(|t| theme::section_label(t)),
                 text("Env vars override settings (for testing/debugging):").size(10)
-                    .style(|_| text::Style {
-                        color: Some(iced::Color::from_rgb(0.6, 0.6, 0.6))
-                    }),
+                    .style(|t| theme::muted_text(t)),
                 
                 column![
                     text("IMAGESTACKER_GPU_CONCURRENCY=N").size(11)
-                        .style(|_| text::Style {
-                            color: Some(iced::Color::from_rgb(0.6, 0.8, 0.6))
-                        }),
+                        .style(|t| theme::env_var_text(t)),
                     text("  Override GPU concurrency (0=unlimited, 1=serialized)").size(10)
-                        .style(|_| text::Style {
-                            color: Some(iced::Color::from_rgb(0.5, 0.5, 0.5))
-                        }),
+                        .style(|t| theme::muted_text(t)),
                 ].spacing(2),
                 
                 column![
                     text("IMAGESTACKER_OPENCL_MUTEX=1").size(11)
-                        .style(|_| text::Style {
-                            color: Some(iced::Color::from_rgb(0.6, 0.8, 0.6))
-                        }),
+                        .style(|t| theme::env_var_text(t)),
                     text("  Force GPU concurrency to 1 (fully serialized)").size(10)
-                        .style(|_| text::Style {
-                            color: Some(iced::Color::from_rgb(0.5, 0.5, 0.5))
-                        }),
+                        .style(|t| theme::muted_text(t)),
                 ].spacing(2),
                 
                 column![
                     text("IMAGESTACKER_ECC_BATCH_SIZE=N").size(11)
-                        .style(|_| text::Style {
-                            color: Some(iced::Color::from_rgb(0.6, 0.8, 0.6))
-                        }),
+                        .style(|t| theme::env_var_text(t)),
                     text("  Override ECC batch size (overrides 'Batch Size' setting)").size(10)
-                        .style(|_| text::Style {
-                            color: Some(iced::Color::from_rgb(0.5, 0.5, 0.5))
-                        }),
+                        .style(|t| theme::muted_text(t)),
                 ].spacing(2),
             ]
             .spacing(8)
         )
         .padding(10)
-        .style(|_theme| {
-            container::Style {
-                background: Some(iced::Background::Color(iced::Color::from_rgba(0.1, 0.1, 0.15, 0.3))),
-                border: iced::Border {
-                    color: iced::Color::from_rgb(0.3, 0.3, 0.4),
-                    width: 1.0,
-                    radius: 8.0.into(),
-                },
-                ..Default::default()
-            }
-        })
+        .style(|t| theme::settings_section(t))
         .width(Length::Fill);
 
         // ============== RESET BUTTON ==============
         let reset_button = button(
-            row![
-                text("🔄").size(16),
-                text("Reset to Defaults"),
-            ]
-            .spacing(5)
-            .align_y(iced::Alignment::Center)
+            text("↺ Reset to Defaults")
         )
-        .style(|theme, status| {
-            button::Style {
-                background: Some(iced::Background::Color(iced::Color::from_rgb(0.6, 0.3, 0.3))),
-                text_color: iced::Color::WHITE,
-                border: iced::Border {
-                    color: iced::Color::from_rgb(0.8, 0.4, 0.4),
-                    width: 1.0,
-                    radius: 6.0.into(),
-                },
-                ..button::primary(theme, status)
-            }
-        })
+        .style(theme::reset_button)
         .on_press(Message::ResetToDefaults);
 
         // ============== RESPONSIVE LAYOUT ==============
-        // Use horizontal layout when window is wide enough
-        // Wide: 2x2 grid (2 panes per row at 380px each + spacing)
-        // Narrow: vertical stack
-        const MIN_PANE_WIDTH: f32 = 380.0;
-        
-        let panes_layout: Element<'_, Message> = if use_horizontal_layout {
-            // 2x2 grid for wide screens
-            column![
-                row![
-                    container(alignment_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
-                    container(postprocessing_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
-                    container(preview_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
-                ]
-                .spacing(15),
-                row![
-                    container(gpu_pane).width(Length::Fixed(MIN_PANE_WIDTH)),
-                ]
-                .spacing(15),
+        // Build the panes layout
+        let panes_layout: Element<'_, Message> = if let Some(ecc_content) = ecc_params_ui {
+            // ECC pane as a separate styled section below Post-Processing
+            let ecc_pane = container(ecc_content)
+                .padding(10)
+                .style(|t| theme::settings_section(t))
+                .width(Length::Fill);
+
+            // Stack Post-Processing and ECC vertically in column 2
+            let col2 = column![
+                postprocessing_pane,
+                ecc_pane,
             ]
-            .spacing(15)
+            .spacing(10);
+
+            row![
+                container(alignment_pane).width(Length::FillPortion(1)),
+                container(col2).width(Length::FillPortion(1)),
+                container(preview_pane).width(Length::FillPortion(1)),
+                container(gpu_pane).width(Length::FillPortion(1)),
+            ]
+            .spacing(10)
+            .align_y(iced::Alignment::Start)
             .into()
         } else {
-            // Vertical layout for narrow screens - panes stacked
-            column![
-                alignment_pane,
-                postprocessing_pane,
-                preview_pane,
-                gpu_pane,
+            // No ECC — simple single row
+            row![
+                container(alignment_pane).width(Length::FillPortion(1)),
+                container(postprocessing_pane).width(Length::FillPortion(1)),
+                container(preview_pane).width(Length::FillPortion(1)),
+                container(gpu_pane).width(Length::FillPortion(1)),
             ]
-            .spacing(15)
+            .spacing(10)
+            .align_y(iced::Alignment::Start)
             .into()
         };
+
+        // Title row with heading on the left and reset button on the right
+        let title_row = row![
+            text("Processing Settings").size(20).style(|t| theme::heading_text(t)),
+            horizontal_space(),
+            reset_button,
+        ]
+        .spacing(10)
+        .align_y(iced::Alignment::Center);
+
+        // Use up to 4/5 of the window height for settings.
+        // The scrollable activates only when content exceeds this limit.
+        let max_settings_height = (self.window_height * 4.0 / 5.0) as f32;
 
         container(
             scrollable(
                 column![
-                    text("Processing Settings").size(20).style(|_| text::Style { 
-                        color: Some(iced::Color::from_rgb(0.9, 0.9, 1.0)) 
-                    }),
+                    title_row,
                     panes_layout,
-                    reset_button,
                 ]
-                .spacing(15)
+                .spacing(10)
+                .width(Length::Fill)
             )
-            .height(Length::Fill)
         )
-        .padding(15)
+        .padding(10)
         .width(Length::Fill)
-        .height(Length::Fill)
-        .style(|_| container::Style::default()
-            .background(iced::Color::from_rgb(0.2, 0.2, 0.25)))
+        .max_height(max_settings_height)
+        .style(|t| theme::settings_panel(t))
         .into()
     }
 }

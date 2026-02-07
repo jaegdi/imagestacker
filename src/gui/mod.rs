@@ -25,6 +25,7 @@
 
 pub mod log_capture;
 pub mod state;
+pub mod theme;
 mod update;
 mod handlers;
 mod subscriptions;
@@ -36,12 +37,20 @@ pub use log_capture::append_log;
 // Re-export the main GUI types
 pub use state::ImageStacker;
 
-use iced::{Theme, window};
+use iced::{Color, Theme, window};
+use iced::theme::Palette;
 
 impl ImageStacker {
-    /// Theme for the application
+    /// Custom dark theme for the application
     pub fn theme(&self, _window: window::Id) -> Theme {
-        Theme::Dark
+        let palette = Palette {
+            background: Color::from_rgb(0.10, 0.10, 0.13),
+            text: Color::from_rgb(0.92, 0.92, 0.95),
+            primary: Color::from_rgb(0.30, 0.52, 0.80),
+            success: Color::from_rgb(0.25, 0.62, 0.35),
+            danger: Color::from_rgb(0.75, 0.28, 0.28),
+        };
+        Theme::custom("ImageStacker".to_string(), palette)
     }
 
     /// Window title

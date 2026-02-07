@@ -11,6 +11,7 @@ use std::path::PathBuf;
 
 use crate::messages::Message;
 use crate::gui::state::ImageStacker;
+use crate::gui::theme;
 
 impl ImageStacker {
     /// Render a generic pane (for Imported and Final panes)
@@ -66,7 +67,7 @@ impl ImageStacker {
                         .center_x(Length::Fill)
                         .center_y(Length::Fill)
                         .style(|_| {
-                            container::Style::default().background(iced::Color::from_rgb(0.2, 0.2, 0.2))
+                            container::Style::default().background(theme::bg::PLACEHOLDER)
                         })
                         .into()
                 };
@@ -154,9 +155,7 @@ impl ImageStacker {
                     .align_x(iced::Alignment::Center),
                 text(format!("{} images", images.len()))
                     .size(12)
-                    .style(|_theme| text::Style {
-                        color: Some(iced::Color::from_rgb(0.7, 0.7, 0.7))
-                    })
+                    .style(|t| theme::secondary_text(t))
                     .align_x(iced::Alignment::Center)
             ]
             .width(Length::Fill)
@@ -164,15 +163,7 @@ impl ImageStacker {
             button("Refresh")
                 .on_press(refresh_message)
                 .padding(4)
-                .style(|theme, status| button::Style {
-                    background: Some(iced::Background::Color(iced::Color::from_rgb(0.2, 0.7, 0.2))),
-                    text_color: iced::Color::WHITE,
-                    border: iced::Border {
-                        radius: 4.0.into(),
-                        ..Default::default()
-                    },
-                    ..button::secondary(theme, status)
-                })
+                .style(theme::refresh_button)
         ]
         .spacing(5)
         .align_y(iced::Alignment::Center);
@@ -183,12 +174,7 @@ impl ImageStacker {
                 container(scrollable_widget)
                     .width(Length::Fill)
                     .height(Length::Fill)
-                    .style(|_| container::Style {
-                        background: Some(iced::Background::Color(iced::Color::TRANSPARENT)),
-                        border: iced::Border::default(),
-                        text_color: Some(iced::Color::TRANSPARENT),
-                        shadow: iced::Shadow::default(),
-                    })
+                    .style(|t| theme::scrollable_inner(t))
             ]
             .spacing(10),
         )
@@ -196,11 +182,7 @@ impl ImageStacker {
         .height(Length::Fill)
         .padding(5)
         .style(|_| {
-            container::Style::default().border(
-                iced::Border::default()
-                    .width(1.0)
-                    .color(iced::Color::from_rgb(0.3, 0.3, 0.3)),
-            )
+            theme::pane_container(theme::pane::FINAL_BG, theme::pane::FINAL_BORDER)
         })
         .into()
     }

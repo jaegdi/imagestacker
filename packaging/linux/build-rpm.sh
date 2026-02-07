@@ -79,8 +79,12 @@ echo "# Step 5: Build RPM using rpmbuild (without sudo)"
 cd "$RPMBUILD_DIR/SPECS"
 echo "Building RPM package..."
 rpmbuild -v -bb \
+    --define "_topdir $RPMBUILD_DIR" \
     --define "_sourcedir $RPMBUILD_DIR/SOURCES" \
     --define "_builddir $RPMBUILD_DIR/BUILD" \
+    --define "_rpmdir $RPMBUILD_DIR/RPMS" \
+    --define "_srcrpmdir $RPMBUILD_DIR/SRPMS" \
+    --define "_specdir $RPMBUILD_DIR/SPECS" \
     --buildroot="/tmp/imagestacker-build-root" \
     "$PACKAGE_NAME.spec"
 
