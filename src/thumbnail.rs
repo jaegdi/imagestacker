@@ -84,17 +84,17 @@ fn mat_to_rgba_handle(img: &core::Mat) -> anyhow::Result<iced::widget::image::Ha
         1 => {
             // Grayscale → RGBA
             let mut rgba = core::Mat::default();
-            imgproc::cvt_color(&img_8bit, &mut rgba, imgproc::COLOR_GRAY2RGBA, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+            crate::opencv_compat::cvt_color(&img_8bit, &mut rgba, imgproc::COLOR_GRAY2RGBA, 0)?;
             rgba
         }
         3 => {
             let mut rgba = core::Mat::default();
-            imgproc::cvt_color(&img_8bit, &mut rgba, imgproc::COLOR_BGR2RGBA, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+            crate::opencv_compat::cvt_color(&img_8bit, &mut rgba, imgproc::COLOR_BGR2RGBA, 0)?;
             rgba
         }
         4 => {
             let mut rgba = core::Mat::default();
-            imgproc::cvt_color(&img_8bit, &mut rgba, imgproc::COLOR_BGRA2RGBA, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+            crate::opencv_compat::cvt_color(&img_8bit, &mut rgba, imgproc::COLOR_BGRA2RGBA, 0)?;
             rgba
         }
         _ => return Err(anyhow::anyhow!("Unsupported image format: {} channels", channels)),
@@ -156,7 +156,7 @@ pub fn generate_thumbnail(path: &PathBuf) -> anyhow::Result<iced::widget::image:
     } else {
         // Grayscale → BGR for consistent handling
         let mut bgr = core::Mat::default();
-        imgproc::cvt_color(&img_8bit, &mut bgr, imgproc::COLOR_GRAY2BGR, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+        crate::opencv_compat::cvt_color(&img_8bit, &mut bgr, imgproc::COLOR_GRAY2BGR, 0)?;
         bgr
     };
 

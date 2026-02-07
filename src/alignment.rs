@@ -259,7 +259,7 @@ fn compute_ecc_transform(
         reference.clone()
     } else {
         let mut gray = Mat::default();
-        imgproc::cvt_color(reference, &mut gray, imgproc::COLOR_BGR2GRAY, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+        crate::opencv_compat::cvt_color(reference, &mut gray, imgproc::COLOR_BGR2GRAY, 0)?;
         gray
     };
     
@@ -267,7 +267,7 @@ fn compute_ecc_transform(
         target.clone()
     } else {
         let mut gray = Mat::default();
-        imgproc::cvt_color(target, &mut gray, imgproc::COLOR_BGR2GRAY, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+        crate::opencv_compat::cvt_color(target, &mut gray, imgproc::COLOR_BGR2GRAY, 0)?;
         gray
     };
     
@@ -276,8 +276,8 @@ fn compute_ecc_transform(
     let mut tgt_blurred = Mat::default();
     
     let kernel_size = core::Size::new(config.ecc_gauss_filter_size, config.ecc_gauss_filter_size);
-    imgproc::gaussian_blur(&ref_gray, &mut ref_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
-    imgproc::gaussian_blur(&tgt_gray, &mut tgt_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+    crate::opencv_compat::gaussian_blur(&ref_gray, &mut ref_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT)?;
+    crate::opencv_compat::gaussian_blur(&tgt_gray, &mut tgt_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT)?;
     
     compute_ecc_transform_internal(&ref_blurred, &tgt_blurred, config)
 }
@@ -294,14 +294,14 @@ fn compute_ecc_transform_with_ref(
         target.clone()
     } else {
         let mut gray = Mat::default();
-        imgproc::cvt_color(target, &mut gray, imgproc::COLOR_BGR2GRAY, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+        crate::opencv_compat::cvt_color(target, &mut gray, imgproc::COLOR_BGR2GRAY, 0)?;
         gray
     };
     
     // 2. Apply Gaussian blur to target
     let mut tgt_blurred = Mat::default();
     let kernel_size = core::Size::new(config.ecc_gauss_filter_size, config.ecc_gauss_filter_size);
-    imgproc::gaussian_blur(&tgt_gray, &mut tgt_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+    crate::opencv_compat::gaussian_blur(&tgt_gray, &mut tgt_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT)?;
     
     compute_ecc_transform_internal(ref_blurred, &tgt_blurred, config)
 }
@@ -879,13 +879,13 @@ fn align_images_ecc(
         reference_img.clone()
     } else {
         let mut gray = Mat::default();
-        imgproc::cvt_color(&reference_img, &mut gray, imgproc::COLOR_BGR2GRAY, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+        crate::opencv_compat::cvt_color(&reference_img, &mut gray, imgproc::COLOR_BGR2GRAY, 0)?;
         gray
     };
     
     let mut ref_blurred = Mat::default();
     let kernel_size = core::Size::new(config.ecc_gauss_filter_size, config.ecc_gauss_filter_size);
-    imgproc::gaussian_blur(&ref_gray, &mut ref_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+    crate::opencv_compat::gaussian_blur(&ref_gray, &mut ref_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT)?;
     
     log::info!("✓ Reference image preprocessed (will be reused for all {} alignments)", image_metadata.len() - 1);
     
@@ -987,13 +987,13 @@ fn align_images_ecc(
                 img.clone()
             } else {
                 let mut gray = Mat::default();
-                imgproc::cvt_color(&img, &mut gray, imgproc::COLOR_BGR2GRAY, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+                crate::opencv_compat::cvt_color(&img, &mut gray, imgproc::COLOR_BGR2GRAY, 0)?;
                 gray
             };
             
             let mut tgt_blurred = Mat::default();
             let kernel_size = core::Size::new(config.ecc_gauss_filter_size, config.ecc_gauss_filter_size);
-            imgproc::gaussian_blur(&tgt_gray, &mut tgt_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+            crate::opencv_compat::gaussian_blur(&tgt_gray, &mut tgt_blurred, kernel_size, 0.0, 0.0, core::BORDER_DEFAULT)?;
             
             // Step 2: Compute ECC transform (with optional hybrid acceleration)
             log::info!("   [Thread {}] Computing ECC for: {}", thread_id, filename);
@@ -1610,23 +1610,21 @@ pub fn align_images(
                     let gray_umat = if img.channels() == 4 {
                         // BGRA to Gray
                         let mut gray = core::UMat::new_def();
-                        imgproc::cvt_color(
+                        crate::opencv_compat::cvt_color(
                             &img_umat,
                             &mut gray,
                             imgproc::COLOR_BGRA2GRAY,
                             0,
-                            core::AlgorithmHint::ALGO_HINT_DEFAULT,
                         )?;
                         gray
                     } else if img.channels() == 3 {
                         // BGR to Gray
                         let mut gray = core::UMat::new_def();
-                        imgproc::cvt_color(
+                        crate::opencv_compat::cvt_color(
                             &img_umat,
                             &mut gray,
                             imgproc::COLOR_BGR2GRAY,
                             0,
-                            core::AlgorithmHint::ALGO_HINT_DEFAULT,
                         )?;
                         gray
                     } else {
@@ -2030,7 +2028,7 @@ pub fn align_images(
                     // Convert to BGRA if needed (to support transparent borders)
                     let img_with_alpha = if img.channels() == 3 {
                         let mut bgra = Mat::default();
-                        imgproc::cvt_color(&img, &mut bgra, imgproc::COLOR_BGR2BGRA, 0, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+                        crate::opencv_compat::cvt_color(&img, &mut bgra, imgproc::COLOR_BGR2BGRA, 0)?;
                         bgra
                     } else {
                         img.clone()

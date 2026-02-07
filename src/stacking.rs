@@ -315,8 +315,7 @@ fn process_image_into_pyramid(
         let img_normalized = if img.channels() == 3 {
             log::debug!("Converting 3-channel BGR to 4-channel BGRA");
             let mut bgra = Mat::default();
-            imgproc::cvt_color(img, &mut bgra, imgproc::COLOR_BGR2BGRA, 0,
-                core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+            crate::opencv_compat::cvt_color(img, &mut bgra, imgproc::COLOR_BGR2BGRA, 0)?;
             bgra
         } else {
             img.clone()
@@ -425,10 +424,8 @@ fn init_alpha(original_alpha: &Option<core::UMat>, rows: i32, cols: i32) -> Resu
 fn to_grayscale(img: &core::UMat) -> Result<core::UMat> {
     let mut gray = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
     match img.channels() {
-        4 => imgproc::cvt_color(img, &mut gray, imgproc::COLOR_BGRA2GRAY, 0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT)?,
-        3 => imgproc::cvt_color(img, &mut gray, imgproc::COLOR_BGR2GRAY, 0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT)?,
+        4 => crate::opencv_compat::cvt_color(img, &mut gray, imgproc::COLOR_BGRA2GRAY, 0)?,
+        3 => crate::opencv_compat::cvt_color(img, &mut gray, imgproc::COLOR_BGR2GRAY, 0)?,
         _ => gray = img.clone(),
     }
     Ok(gray)
@@ -445,8 +442,8 @@ fn compute_sharpness_energy(layer: &core::UMat) -> Result<core::UMat> {
     core::absdiff(&laplacian, &core::Scalar::all(0.0), &mut energy)?;
 
     let mut blurred = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-    imgproc::gaussian_blur(&energy, &mut blurred, core::Size::new(3, 3), 0.0, 0.0,
-        core::BORDER_DEFAULT, core::AlgorithmHint::ALGO_HINT_DEFAULT)?;
+    crate::opencv_compat::gaussian_blur(&energy, &mut blurred, core::Size::new(3, 3), 0.0, 0.0,
+        core::BORDER_DEFAULT)?;
 
     Ok(blurred)
 }

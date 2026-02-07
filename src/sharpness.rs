@@ -68,20 +68,18 @@ pub fn compute_regional_sharpness_auto(img: &Mat, grid_size: i32) -> Result<(f64
 pub fn compute_sharpness(img: &Mat) -> Result<f64> {
     let mut gray = Mat::default();
     if img.channels() == 3 {
-        imgproc::cvt_color(
+        crate::opencv_compat::cvt_color(
             img,
             &mut gray,
             imgproc::COLOR_BGR2GRAY,
             0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
     } else if img.channels() == 4 {
-        imgproc::cvt_color(
+        crate::opencv_compat::cvt_color(
             img,
             &mut gray,
             imgproc::COLOR_BGRA2GRAY,
             0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
     } else {
         gray = img.clone();
@@ -93,14 +91,13 @@ pub fn compute_sharpness(img: &Mat) -> Result<f64> {
 
     // Method 1: Laplacian Variance (with Gaussian blur to reduce noise sensitivity)
     let mut blurred = Mat::default();
-    imgproc::gaussian_blur(
+    crate::opencv_compat::gaussian_blur(
         &gray_float,
         &mut blurred,
         core::Size::new(3, 3),
         0.0,
         0.0,
         core::BORDER_DEFAULT,
-        core::AlgorithmHint::ALGO_HINT_DEFAULT,
     )?;
 
     let mut laplacian = Mat::default();
@@ -272,22 +269,20 @@ pub fn compute_regional_sharpness(img: &Mat, grid_size: i32) -> Result<(f64, f64
 pub fn compute_sharpness_umat(img_umat: &core::UMat) -> Result<f64> {
     let gray_umat = if img_umat.channels() == 3 {
         let mut gray = core::UMat::new_def();
-        imgproc::cvt_color(
+        crate::opencv_compat::cvt_color(
             img_umat,
             &mut gray,
             imgproc::COLOR_BGR2GRAY,
             0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
         gray
     } else if img_umat.channels() == 4 {
         let mut gray = core::UMat::new_def();
-        imgproc::cvt_color(
+        crate::opencv_compat::cvt_color(
             img_umat,
             &mut gray,
             imgproc::COLOR_BGRA2GRAY,
             0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
         gray
     } else {
@@ -300,14 +295,13 @@ pub fn compute_sharpness_umat(img_umat: &core::UMat) -> Result<f64> {
 
     // Method 1: Laplacian Variance (with Gaussian blur to reduce noise sensitivity)
     let mut blurred = core::UMat::new_def();
-    imgproc::gaussian_blur(
+    crate::opencv_compat::gaussian_blur(
         &gray_float,
         &mut blurred,
         core::Size::new(3, 3),
         0.0,
         0.0,
         core::BORDER_DEFAULT,
-        core::AlgorithmHint::ALGO_HINT_DEFAULT,
     )?;
 
     let mut laplacian = core::UMat::new_def();

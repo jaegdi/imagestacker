@@ -4,6 +4,7 @@ mod gui;
 mod image_io;
 mod logger;
 mod messages;
+mod opencv_compat;
 mod post_processing;
 mod settings;
 mod sharpness;

@@ -30,12 +30,11 @@ pub fn apply_noise_reduction(image: Mat, strength: f32) -> Result<Mat> {
     let has_alpha = image.channels() == 4;
     let working_img = if has_alpha {
         let mut bgr = Mat::default();
-        imgproc::cvt_color(
+        crate::opencv_compat::cvt_color(
             &image,
             &mut bgr,
             imgproc::COLOR_BGRA2BGR,
             0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
         bgr
     } else {
@@ -64,12 +63,11 @@ pub fn apply_noise_reduction(image: Mat, strength: f32) -> Result<Mat> {
     // Convert back to BGRA if needed
     if has_alpha {
         let mut bgra = Mat::default();
-        imgproc::cvt_color(
+        crate::opencv_compat::cvt_color(
             &result,
             &mut bgra,
             imgproc::COLOR_BGR2BGRA,
             0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
         Ok(bgra)
     } else {
@@ -87,14 +85,13 @@ pub fn apply_sharpening(mut image: Mat, strength: f32) -> Result<Mat> {
 
     // Unsharp masking: blur - original + original = sharpened
     let mut blurred = Mat::default();
-    imgproc::gaussian_blur(
+    crate::opencv_compat::gaussian_blur(
         &float_img,
         &mut blurred,
         core::Size::new(0, 0),
         (strength * 3.0) as f64, // sigma
         0.0,
         core::BORDER_DEFAULT,
-        core::AlgorithmHint::ALGO_HINT_DEFAULT,
     )?;
 
     // Calculate: sharpened = original + (original - blurred) * amount
@@ -127,12 +124,11 @@ pub fn apply_color_correction(image: Mat, contrast: f32, brightness: f32, satura
     let has_alpha = image.channels() == 4;
     let working_img = if has_alpha {
         let mut bgr = Mat::default();
-        imgproc::cvt_color(
+        crate::opencv_compat::cvt_color(
             &image,
             &mut bgr,
             imgproc::COLOR_BGRA2BGR,
             0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
         bgr
     } else {
@@ -141,12 +137,11 @@ pub fn apply_color_correction(image: Mat, contrast: f32, brightness: f32, satura
 
     // Convert to HSV for saturation adjustment
     let mut hsv = Mat::default();
-    imgproc::cvt_color(
+    crate::opencv_compat::cvt_color(
         &working_img,
         &mut hsv,
         imgproc::COLOR_BGR2HSV,
         0,
-        core::AlgorithmHint::ALGO_HINT_DEFAULT,
     )?;
 
     // Split channels
@@ -171,12 +166,11 @@ pub fn apply_color_correction(image: Mat, contrast: f32, brightness: f32, satura
 
     // Convert back to BGR
     let mut result = Mat::default();
-    imgproc::cvt_color(
+    crate::opencv_compat::cvt_color(
         &hsv,
         &mut result,
         imgproc::COLOR_HSV2BGR,
         0,
-        core::AlgorithmHint::ALGO_HINT_DEFAULT,
     )?;
 
     // Apply contrast and brightness to the entire image
@@ -196,12 +190,11 @@ pub fn apply_color_correction(image: Mat, contrast: f32, brightness: f32, satura
     // Convert back to BGRA if needed
     if has_alpha {
         let mut bgra = Mat::default();
-        imgproc::cvt_color(
+        crate::opencv_compat::cvt_color(
             &result,
             &mut bgra,
             imgproc::COLOR_BGR2BGRA,
             0,
-            core::AlgorithmHint::ALGO_HINT_DEFAULT,
         )?;
         Ok(bgra)
     } else {
