@@ -23,13 +23,25 @@ impl ImageStacker {
             return Task::none();
         }
 
+        // Use resized images when available, fall back to originals
+        let images = if !self.resized_images.is_empty() {
+            log::info!(
+                "Sharpness: using {} resized images from resized/",
+                self.resized_images.len()
+            );
+            self.resized_images.clone()
+        } else {
+            self.images.clone()
+        };
+
         self.is_processing = true;
         self.status = "Detecting sharpness...".to_string();
         self.progress_value = 0.0;
         self.progress_message = "Starting sharpness detection...".to_string();
 
-        let images = self.images.clone();
-        let output_dir = images[0]
+        // Derive output dir from the *original* images (sharpness YAML always
+        // lives under the original source directory, independent of resized/).
+        let output_dir = self.images[0]
             .parent()
             .unwrap_or(std::path::Path::new("."))
             .to_path_buf();
@@ -78,11 +90,9 @@ impl ImageStacker {
                                 .to_string_lossy()
                                 .to_string();
 
-                            // Load image
-                            let img = opencv::imgcodecs::imread(
-                                image_path.to_str().ok_or_else(|| "Invalid path".to_string())?,
-                                opencv::imgcodecs::IMREAD_COLOR,
-                            ).map_err(|e| format!("Failed to load {}: {}", image_path.display(), e))?;
+                            // Load image (supports standard formats + RAW via rawloader)
+                            let img = crate::image_io::load_image(image_path)
+                                .map_err(|e| format!("Failed to load {}: {}", image_path.display(), e))?;
 
                             // Compute sharpness - GPU concurrency bounded by gpu_semaphore()
                             let _gpu_permit = crate::alignment::gpu_semaphore().acquire();

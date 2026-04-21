@@ -130,23 +130,9 @@ pub fn generate_thumbnail(path: &PathBuf) -> anyhow::Result<iced::widget::image:
         }
     }
 
-    // Slow path: load full image and resize
-    let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_UNCHANGED)?;
-    if img.empty() {
-        return Err(anyhow::anyhow!("Failed to load image for thumbnail"));
-    }
-
-    let channels = img.channels();
-    let depth = img.depth();
-
-    // Convert 16-bit to 8-bit if necessary
-    let img_8bit = if depth == core::CV_16U || depth == core::CV_16S {
-        let mut img_8 = core::Mat::default();
-        img.convert_to(&mut img_8, core::CV_8U, 1.0 / 256.0, 0.0)?;
-        img_8
-    } else {
-        img
-    };
+    // Slow path: load full image and resize (handles standard + RAW formats)
+    let img_8bit = crate::image_io::load_image(&path.to_path_buf())?;
+    let channels = img_8bit.channels();
 
     // Convert to a standard format for resizing (BGR or BGRA)
     let img_for_resize = if channels == 4 {
@@ -289,11 +275,9 @@ pub fn load_preview_for_screen(path: &Path, screen_width: f32, screen_height: f3
             }
         }
     } else {
-        // Non-JPEG (PNG, TIFF): must load full resolution
-        let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_UNCHANGED)?;
-        if img.empty() {
-            return Err(anyhow::anyhow!("Failed to load image"));
-        }
+        // Non-JPEG (PNG, TIFF, RAW, …): load via load_image which handles RAW fallback
+        // and 16-bit→8-bit conversion automatically.
+        let img = crate::image_io::load_image(&path.to_path_buf())?;
         (img, 1.0)
     };
 

@@ -2,6 +2,21 @@ use serde::{Deserialize, Serialize};
 use crate::system_info;
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub enum ResizeAlgorithm {
+    Fast,        // INTER_LINEAR  – schnelle bilineare Interpolation
+    HighQuality, // INTER_LANCZOS4 – Lanczos-Resampling (beste Qualität)
+}
+
+impl std::fmt::Display for ResizeAlgorithm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ResizeAlgorithm::Fast => write!(f, "Fast (Bilinear)"),
+            ResizeAlgorithm::HighQuality => write!(f, "High Quality (Lanczos)"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum FeatureDetector {
     ORB,
     SIFT,
@@ -84,6 +99,9 @@ pub struct ProcessingConfig {
     pub stacking_bunch_size: usize,    // Manual bunch size (4-64, default 12) — how many images per bunch/batch
     // Font settings
     pub default_font: String,          // System font family name for the GUI (default: "DejaVu Sans")
+    // Resize settings
+    pub resize_width: String,          // Target width: "2400" (px) or "50%" – empty = disabled
+    pub resize_algorithm: ResizeAlgorithm, // Interpolation: Fast (bilinear) or HighQuality (Lanczos)
 }
 
 impl Default for ProcessingConfig {
@@ -132,6 +150,9 @@ impl Default for ProcessingConfig {
             stacking_bunch_size: 12,                     // Manual default: 12 images per bunch
             // Font settings
             default_font: "DejaVu Sans".to_string(),
+            // Resize settings
+            resize_width: String::new(),                 // Disabled by default
+            resize_algorithm: ResizeAlgorithm::HighQuality,
         }
     }
 }

@@ -97,9 +97,32 @@ impl ImageStacker {
                 .style(theme::button_disabled)
         };
 
+        // Resize button: shown only when a valid resize_width is configured
+        let resize_button_opt: Option<iced::widget::Button<'_, Message>> =
+            if self.has_valid_resize_config() {
+                let btn = if !self.images.is_empty() && !self.is_processing {
+                    button("Resize").on_press(Message::ResizeImages)
+                } else {
+                    button("Resize").style(theme::button_disabled)
+                };
+                Some(btn)
+            } else {
+                None
+            };
+
         let sharpness_group = container(
             column![
-                sharpness_button
+                row(
+                    {
+                        let mut btns: Vec<iced::Element<'_, Message>> = Vec::new();
+                        if let Some(rb) = resize_button_opt {
+                            btns.push(rb.into());
+                        }
+                        btns.push(sharpness_button.into());
+                        btns
+                    }
+                )
+                .spacing(6)
             ]
         )
         .padding(8)

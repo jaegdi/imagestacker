@@ -123,4 +123,9 @@ pub enum Message {
     PaneDragged(iced::widget::pane_grid::DragEvent),
     Exit,
     None,
+    // Resize images
+    ResizeImages,
+    ResizeDone(Result<usize, String>),
+    ResizeWidthChanged(String),
+    ResizeAlgorithmChanged(crate::config::ResizeAlgorithm),
 }

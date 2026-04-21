@@ -11,3 +11,4 @@ pub mod preview_handlers;
 pub mod refresh_handlers;
 pub mod settings_handlers;
 pub mod window_handlers;
+pub mod resize_handlers;

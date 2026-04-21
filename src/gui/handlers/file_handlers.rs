@@ -20,7 +20,19 @@ impl ImageStacker {
         Task::perform(
             async {
                 let files = rfd::AsyncFileDialog::new()
-                    .add_filter("Images", &["jpg", "jpeg", "png", "tif", "tiff", "JPG", "JPEG", "PNG", "TIF", "TIFF"])
+                    .add_filter("All Images", &[
+                        "jpg", "jpeg", "png", "tif", "tiff",
+                        "arw", "cr2", "cr3", "nef", "dng", "orf", "raf", "rw2", "pef", "srw",
+                        "3fr", "mef", "mrw", "x3f", "dcr", "kdc", "erf", "nrw", "raw", "sr2", "rwl",
+                        "JPG", "JPEG", "PNG", "TIF", "TIFF",
+                        "ARW", "CR2", "CR3", "NEF", "DNG", "ORF", "RAF", "RW2", "PEF", "SRW",
+                        "3FR", "MEF", "MRW", "X3F", "DCR", "KDC", "ERF", "NRW", "RAW", "SR2", "RWL",
+                    ])
+                    .add_filter("JPEG / PNG / TIFF", &["jpg", "jpeg", "png", "tif", "tiff"])
+                    .add_filter("RAW Camera", &[
+                        "arw", "cr2", "cr3", "nef", "dng", "orf", "raf", "rw2", "pef", "srw",
+                        "3fr", "mef", "mrw", "x3f", "dcr", "kdc", "erf", "nrw", "raw", "sr2", "rwl",
+                    ])
                     .pick_files()
                     .await;
 
@@ -62,10 +74,7 @@ impl ImageStacker {
                         let p = entry.path();
                         if p.is_file() {
                             if let Some(ext) = p.extension().and_then(|e| e.to_str()) {
-                                let ext = ext.to_lowercase();
-                                if ["jpg", "jpeg", "png", "tif", "tiff"]
-                                    .contains(&ext.as_str())
-                                {
+                                if crate::image_io::is_any_image_ext(ext) {
                                     paths.push(p);
                                 }
                             }
@@ -178,6 +187,7 @@ impl ImageStacker {
         self.aligned_images.clear();
         self.bunch_images.clear();
         self.final_images.clear();
+        self.resized_images.clear();
         self.preview_handle = None;
         self.result_mat = None;
         self.crop_rect = None;
@@ -377,6 +387,28 @@ impl ImageStacker {
         all_paths.extend(aligned.clone());
         all_paths.extend(bunches.clone());
         all_paths.extend(final_imgs.clone());
+
+        // Scan resized/ directory and keep resized_images up to date
+        if let Some(first_path) = self.images.first() {
+            let resized_dir = first_path
+                .parent()
+                .unwrap_or(std::path::Path::new("."))
+                .to_path_buf()
+                .join("resized");
+            if resized_dir.exists() {
+                self.resized_images =
+                    crate::gui::handlers::resize_handlers::scan_image_dir(&resized_dir);
+                if !self.resized_images.is_empty() {
+                    log::info!(
+                        "Found {} resized images in {}",
+                        self.resized_images.len(),
+                        resized_dir.display()
+                    );
+                }
+            } else {
+                self.resized_images.clear();
+            }
+        }
 
         // Filter out paths that already have thumbnails (for refresh operations)
         let cache_locked = self.thumbnail_cache.read().unwrap();

@@ -126,8 +126,7 @@ impl ImageStacker {
                             let p = entry.path();
                             if p.is_file() {
                                 if let Some(ext) = p.extension().and_then(|e| e.to_str()) {
-                                    let ext = ext.to_lowercase();
-                                    if ["jpg", "jpeg", "png", "tif", "tiff"].contains(&ext.as_str()) {
+                                    if crate::image_io::is_any_image_ext(ext) {
                                         paths.push(p);
                                     }
                                 }

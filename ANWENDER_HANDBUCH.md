@@ -1,37 +1,37 @@
-# 📖 Rust Image Stacker - User Manual
+# 📖 Rust Image Stacker - Anwenderhandbuch
 
-**Version 1.0.0 - Focus Stacking Application**
+**Version 1.0.0 - Focus Stacking Anwendung**
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Erste Schritte
 
-### Quick Start
+### Schnellstart
 
-The easiest way to start is using **Add Folder**:
+Der einfachste Weg zu starten ist über **"Add Folder"**:
 
-1. Click 'Add Folder' button or start imagestacker with parameter --import
+1. Klicken Sie auf die Schaltfläche 'Ordner hinzufügen' oder starten Sie imagestacker mit dem Parameter --import
    `imagestacker --import <path to directory with images>`
-2. Select a folder containing your focus stack images
-3. **Automatic Loading for existing projects:**
-   - All images in the folder → **Imported** pane
-   - Existing `sharpness/` subfolder images → **Sharpness** pane
-   - Existing `aligned/` subfolder images → **Aligned** pane
-   - Existing `bunches/` subfolder images → **Bunches** pane
-   - Existing `final/` subfolder images → **Final** pane
+2. Wählen Sie einen Ordner aus, der Ihre Fokus-Stack-Bilder enthält
+3. **Automatisches Laden für bestehende Projekte:**
+   - Alle Bilder im Ordner → Bereich **Importiert**
+   - Vorhandene Bilder im Unterordner `sharpness/` → Bereich **Schärfe**
+   - Vorhandene Bilder im Unterordner `aligned/` → Bereich **Ausgerichtet**
+   - Vorhandene Bilder im Unterordner `bunches/` → Bereich **Stapelgruppen**
+   - Vorhandene Bilder im Unterordner `final/` → Bereich **Finale Bilder**
 
-This allows you to resume work on a previous project or review existing results!
+Dies ermöglicht es Ihnen, die Arbeit an einem früheren Projekt fortzusetzen oder bestehende Ergebnisse zu sichten!
 
-**On a fresh project, one folder with a focus bracketing image set, you can follow this steps**:
+**Bei einem neuen Projekt mit einem Satz Fokus-Bracketing-Bilder können Sie diesen Schritten folgen**:
 
-- select "Import Folder", and in the file dialog select the folder with your images set
-- select "Detect Sharpness", this calculates the sharpness  for subparts of every image
-- select "Align", this align all images
-- select "Stack aligned", this stacks the aligned images by selecting from every image the sharp parts and create bunches and a final image
+- Wählen Sie "Ordner importieren" und selektieren Sie im Dateidialog den Ordner mit Ihrem Bildersatz.
+- Wählen Sie "Schärfe erkennen", dies berechnet die Schärfe für Teilbereiche jedes Bildes.
+- Wählen Sie "Ausrichten", dies richtet alle Bilder geometrisch zueinander aus.
+- Wählen Sie "Ausgerichtete stapeln", dies stapelt die ausgerichteten Bilder, indem aus jedem Bild die scharfen Teile ausgewählt werden, und erstellt "Bunches" (Zwischenstapel) sowie ein finales Bild.
 
-### Command Line Usage
+### Nutzung über die Kommandozeile
 
-You can also start the application with a folder pre-loaded:
+Sie können die Anwendung auch mit einem bereits vorgeladenen Ordner starten:
 
 ```bash
 # Linux/macOS
@@ -44,131 +44,131 @@ imagestacker.exe --import C:\path\to\your\images
 ./imagestacker -i /path/to/images
 ```
 
-The application will:
+Die Anwendung wird:
 
-- Open the GUI window
-- Automatically load the specified folder
-- Scan for images and existing results (sharpness/, aligned/, bunches/, final/) and load them
-- Ready to start processing immediately
+- Das GUI-Fenster öffnen
+- Den angegebenen Ordner automatisch laden
+- Nach Bildern und vorhandenen Ergebnissen suchen (sharpness/, aligned/, bunches/, final/) und diese laden
+- Sofort bereit für die Verarbeitung sein
 
-**Tip:** Relative paths are automatically converted to absolute paths.
+**Tipp:** Relative Pfade werden automatisch in absolute Pfade umgewandelt.
 
-### Alternative: Add Individual Images
+### Alternative: Einzelne Bilder hinzufügen
 
-- Click 'Add Images' to select specific image files
-- Supported formats: JPG, PNG, TIFF
-- Images appear in the 'Imported' pane
-
----
-
-## 📂 Understanding the Panes
-
-### Imported (Dark Gray Border)
-
-- Original images loaded from your folder
-- Click any thumbnail to preview in full size
-- These are your source images for alignment
-
-### Sharpness
-
-- Images after Sharpness calulation process
-- Thats YAML files with link to the original images and the calculated sharpness data
-- saved to `<source_folder/sharpness>`
-- presented as the original image with a text overlay of the sharpness data
-
-### Aligned (Dark Gray Border)
-
-- Images after alignment process
-- Geometrically corrected to match each other
-- Saved to: `<source_folder>/aligned/`
-- **Selective Stacking:** Choose which aligned images to stack
-
-### Bunches (Dark Gray Border)
-
-- Intermediate images during stacking process
-- Shows progressive stacking of image groups
-- Saved to: `<source_folder>/bunches/`
-- **Selective Stacking:** Choose which bunches to stack into final
-
-### Final (Dark Gray Border)
-
-- Completed focus-stacked images
-- Contains sharp details from all source images
-- Saved to: `<source_folder>/final/result_0001.png`, `result_0002.png`, etc.
-- Each stacking operation creates a new numbered result
+- Klicken Sie auf 'Bilder hinzufügen', um spezifische Bilddateien auszuwählen
+- Unterstützte Formate: JPG, PNG, TIFF
+- Bilder erscheinen im Bereich 'Importiert'
 
 ---
 
-## �️ Image Preview & Editing
+## 📂 Die Programmbereiche verstehen
 
-### Thumbnail Interactions
+### Importiert (Dunkelgrauer Rand)
 
-Each thumbnail in all panes (Imported, Aligned, Bunches, Final) supports:
+- Aus Ihrem Ordner geladene Originalbilder
+- Klicken Sie auf ein Vorschaubild für die Vollbildansicht
+- Dies sind Ihre Quellbilder für die Ausrichtung
 
-- **Left-click:**
+### Schärfe (Sharpness)
 
-  - Opens image in internal preview (if enabled in Settings)
-  - Or opens in configured external viewer (if internal preview disabled)
-- **Right-click:**
+- Bilder nach der Schärfeberechnung
+- Dies sind YAML-Dateien mit Verknüpfung zum Originalbild und den berechneten Schärfedaten
+- Gespeichert unter `<Quellordner>/sharpness/`
+- Dargestellt als Originalbild mit einer Textüberlagerung der Schärfedaten
 
-  - Opens image in your configured external editor
-  - Perfect for quick edits in GIMP, Darktable, Photoshop, etc.
-  - Falls back to system default if no editor configured
+### Ausgerichtet (Aligned - Dunkelgrauer Rand)
 
-### Image Preview Navigation
+- Bilder nach dem Ausrichtungsprozess
+- Geometrisch korrigiert, um zueinander zu passen
+- Gespeichert unter: `<Quellordner>/aligned/`
+- **Selektives Stapeln:** Wählen Sie aus, welche ausgerichteten Bilder gestapelt werden sollen
 
-When viewing an image in the internal preview, you can navigate through all images in the current pane:
+### Stapelgruppen (Bunches - Dunkelgrauer Rand)
 
-- **Arrow Keys:**
+- Zwischenbilder während des Stacking-Prozesses
+- Zeigt das schrittweise Stapeln von Bildgruppen
+- Gespeichert unter: `<Quellordner>/bunches/`
+- **Selektives Stapeln:** Wählen Sie aus, welche Gruppen zum Endergebnis kombiniert werden sollen
 
-  - **LEFT Arrow:** Show previous image in pane
-  - **RIGHT Arrow:** Show next image in pane
-  - **DEL Key:** Delete the Image, in Sharpness pane it deletes the YAML file and the original image file
-  - **ESC:** Close preview
-- **Mouse Wheel:**
+### Finale Bilder (Final - Dunkelgrauer Rand)
 
-  - **Scroll Up:** Show previous image
-  - **Scroll Down:** Show next image
-- **Navigation Buttons:**
+- Fertige Focus-Stacking-Ergebnisse
+- Enthält scharfe Details aus allen Quellbildern
+- Gespeichert unter: `<Quellordner>/final/result_0001.png`, `result_0002.png`, etc.
+- Jeder Stacking-Vorgang erzeugt ein neues, nummeriertes Ergebnis
 
-  - **< Previous:** Go to previous image
-  - **Next >:** Go to next image
-- **Info Display:**
+---
 
-  - Shows current position: "Image X of Y"
-  - Reminds you of navigation shortcuts
+## 🖼️ Bildvorschau & Bearbeitung
 
-**Tip:** Navigation wraps around - from the last image, "Next" goes back to the first image, and vice versa.
+### Interaktionen mit Vorschaubildern
 
-### Configuring External Applications
+Jedes Vorschaubild in allen Bereichen (Importiert, Ausgerichtet, Stapelgruppen, Final) unterstützt:
 
-Open **Settings** → **Preview & UI** section:
+- **Linksklick:**
 
-**External Image Viewer (for left-click):**
+  - Öffnet das Bild in der internen Vorschau (wenn in den Einstellungen aktiviert)
+  - Oder öffnet es im konfigurierten externen Betrachter (wenn interne Vorschau deaktiviert)
+- **Rechtsklick:**
 
-- Used when "Use Internal Preview" is disabled
-- Enter the full path to your preferred image viewer:
+  - Öffnet das Bild in Ihrem konfigurierten externen Editor
+  - Ideal für schnelle Bearbeitungen in GIMP, Darktable, Photoshop, etc.
+  - Nutzt den Systemstandard, falls kein Editor konfiguriert ist
+
+### Navigation in der Bildvorschau
+
+Wenn Sie ein Bild in der internen Vorschau betrachten, können Sie durch alle Bilder des aktuellen Bereichs navigieren:
+
+- **Pfeiltasten:**
+
+  - **Pfeil LINKS:** Vorheriges Bild im Bereich anzeigen
+  - **Pfeil RECHTS:** Nächstes Bild im Bereich anzeigen
+  - **ENTF-Taste:** Bild löschen; im Schärfe-Bereich werden sowohl die YAML-Datei als auch die Original-Bilddatei gelöscht
+  - **ESC:** Vorschau schließen
+- **Mausrad:**
+
+  - **Scrollen nach oben:** Vorheriges Bild anzeigen
+  - **Scrollen nach unten:** Nächstes Bild anzeigen
+- **Navigations-Schaltflächen:**
+
+  - **< Zurück:** Zum vorherigen Bild gehen
+  - **Weiter >:** Zum nächsten Bild gehen
+- **Informationsanzeige:**
+
+  - Zeigt die aktuelle Position: "Bild X von Y"
+  - Erinnert an die Tastenkombinationen zur Navigation
+
+**Tipp:** Die Navigation ist endlos – nach dem letzten Bild führt "Weiter" zurück zum ersten Bild und umgekehrt.
+
+### Konfiguration externer Anwendungen
+
+Öffnen Sie **Einstellungen** → Bereich **Vorschau & UI**:
+
+**Externer Bildbetrachter (für Linksklick):**
+
+- Wird verwendet, wenn "Interne Vorschau verwenden" deaktiviert ist
+- Geben Sie den vollständigen Pfad zu Ihrem bevorzugten Bildbetrachter ein:
   - **Linux:** `/usr/bin/eog` (Eye of GNOME), `/usr/bin/geeqie`, `/usr/bin/gwenview`
   - **macOS:** `/Applications/Preview.app/Contents/MacOS/Preview`
   - **Windows:** `C:\Program Files\IrfanView\i_view64.exe`
-- Leave empty to use system default viewer
+- Leer lassen, um den Standard-Betrachter des Systems zu nutzen
 
-**External Image Editor (for right-click):**
+**Externer Bildeditor (für Rechtsklick):**
 
-- Used for editing images when right-clicking thumbnails
-- Enter the full path to your image editor:
+- Wird zum Bearbeiten von Bildern beim Rechtsklick auf Vorschaubilder verwendet
+- Geben Sie den vollständigen Pfad zu Ihrem Bildeditor ein:
   - **Linux:** `/usr/bin/gimp`, `/usr/bin/darktable`, `/usr/bin/krita`
   - **macOS:** `/Applications/GIMP.app/Contents/MacOS/gimp`
   - **Windows:** `C:\Program Files\GIMP\bin\gimp.exe`, `C:\Program Files\Adobe\Photoshop\Photoshop.exe`
-- Leave empty to use system default viewer
+- Leer lassen, um den Standard-Betrachter des Systems zu nutzen
 
-**Tip:** Use absolute paths for best compatibility. Settings are saved automatically.
+**Tipp:** Verwenden Sie absolute Pfade für die beste Kompatibilität. Die Einstellungen werden automatisch gespeichert.
 
-### Internal Preview Settings
+### Einstellungen der internen Vorschau
 
-- **Preview Max Width:** Maximum width for preview window (400-2000px)
-- **Preview Max Height:** Maximum height for preview window (300-1500px)
-- **Use Internal Preview:** Toggle internal preview vs system viewer for left-click
+- **Vorschau Max. Breite:** Maximale Breite des Vorschaufensters (400-2000px)
+- **Vorschau Max. Höhe:** Maximale Höhe des Vorschaufensters (300-1500px)
+- **Interne Vorschau verwenden:** Schaltet zwischen interner Vorschau und System-Betrachter für Linksklicks um
 
 ---
 

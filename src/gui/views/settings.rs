@@ -8,7 +8,7 @@ use iced::widget::{
 use iced::{Element, Length};
 use iced::mouse::ScrollDelta;
 
-use crate::config::{EccMotionType, FeatureDetector};
+use crate::config::{EccMotionType, FeatureDetector, ResizeAlgorithm};
 use crate::messages::Message;
 use crate::gui::theme;
 use super::super::state::ImageStacker;
@@ -352,6 +352,57 @@ impl ImageStacker {
                 noise_section,
                 sharpen_section,
                 color_section,
+                // ---- Image Resize ----
+                horizontal_rule(1),
+                text("Image Resize").size(14).style(|t| theme::section_label(t)),
+                text("Pre-scale before Sharpness & Align (speeds up high-res processing).").size(10)
+                    .style(|t| theme::muted_text(t)),
+                row![
+                    text("Width:").width(label_width),
+                    text_input("e.g. 2400 or 50%", &self.config.resize_width)
+                        .on_input(Message::ResizeWidthChanged)
+                        .padding(5)
+                        .width(Length::Fixed(slider_width as f32)),
+                ]
+                .spacing(10)
+                .align_y(iced::Alignment::Center),
+                {
+                    let s = self.config.resize_width.trim();
+                    if s.is_empty() {
+                        text("Resize disabled — enter a value to enable").size(10)
+                            .style(|t| theme::muted_text(t))
+                    } else if let Some(pct_str) = s.strip_suffix('%') {
+                        match pct_str.trim().parse::<f64>() {
+                            Ok(pct) if pct > 0.0 => text(format!("→ scale to {:.1} % of original width", pct)).size(10)
+                                .style(|t| theme::success_text(t)),
+                            _ => text("Invalid percentage — must be > 0").size(10)
+                                .style(|t| theme::warning_text(t)),
+                        }
+                    } else {
+                        match s.parse::<i64>() {
+                            Ok(w) if w > 0 => text(format!("→ {w} px width, aspect ratio preserved")).size(10)
+                                .style(|t| theme::success_text(t)),
+                            _ => text("Invalid value — enter pixels (e.g. 2400) or percent (e.g. 50%)").size(10)
+                                .style(|t| theme::warning_text(t)),
+                        }
+                    }
+                },
+                row![
+                    button(text(if self.config.resize_algorithm == ResizeAlgorithm::Fast { "✓ Fast (Bilinear)" } else { "  Fast (Bilinear)" }).size(12))
+                        .style(theme::ecc_toggle_button(self.config.resize_algorithm == ResizeAlgorithm::Fast))
+                        .on_press(Message::ResizeAlgorithmChanged(ResizeAlgorithm::Fast)),
+                    button(text(if self.config.resize_algorithm == ResizeAlgorithm::HighQuality { "✓ High Quality (Lanczos)" } else { "  High Quality (Lanczos)" }).size(12))
+                        .style(theme::ecc_toggle_button(self.config.resize_algorithm == ResizeAlgorithm::HighQuality))
+                        .on_press(Message::ResizeAlgorithmChanged(ResizeAlgorithm::HighQuality)),
+                ]
+                .spacing(5),
+                if !self.resized_images.is_empty() {
+                    text(format!("✓ {} resized images in resized/ — used for Sharpness & Align", self.resized_images.len()))
+                        .size(11).style(|t| theme::success_text(t))
+                } else {
+                    text("No resized images yet — click Resize in toolbar to generate")
+                        .size(11).style(|t| theme::muted_text(t))
+                },
             ]
             .spacing(10)
         )

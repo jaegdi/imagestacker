@@ -44,6 +44,7 @@ pub struct ImageStacker {
     pub(crate) aligned_images: Vec<PathBuf>,
     pub(crate) bunch_images: Vec<PathBuf>,
     pub(crate) final_images: Vec<PathBuf>,
+    pub(crate) resized_images: Vec<PathBuf>,    // Images in <source>/resized/ subfolder
     
     // Caching
     pub(crate) thumbnail_cache: Arc<RwLock<HashMap<PathBuf, iced::widget::image::Handle>>>,
@@ -114,6 +115,7 @@ impl Default for ImageStacker {
             aligned_images: Vec::new(),
             bunch_images: Vec::new(),
             final_images: Vec::new(),
+            resized_images: Vec::new(),
             thumbnail_cache: Arc::new(RwLock::new(HashMap::new())),
             status: "Ready".to_string(),
             preview_handle: None,

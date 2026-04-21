@@ -118,12 +118,23 @@ impl ImageStacker {
                 return Task::none();
             }
         };
-        
+
         if let Some(first_path) = self.images.first() {
             let output_dir = first_path
                 .parent()
                 .unwrap_or(std::path::Path::new("."))
                 .to_path_buf();
+
+            // Source images: prefer resized/ when available
+            let source_images = if !self.resized_images.is_empty() {
+                log::info!(
+                    "Alignment: using {} resized images from resized/",
+                    self.resized_images.len()
+                );
+                self.resized_images.clone()
+            } else {
+                self.images.clone()
+            };
 
             // Determine which images to process based on mode
             let images_to_process = match mode {
@@ -131,7 +142,7 @@ impl ImageStacker {
                     // Clean up existing aligned and bunches images before starting new alignment
                     let aligned_dir = output_dir.join("aligned");
                     let bunches_dir = output_dir.join("bunches");
-                    
+
                     if aligned_dir.exists() {
                         log::info!("Starting fresh: Cleaning up existing aligned images in {}", aligned_dir.display());
                         if let Err(e) = std::fs::remove_dir_all(&aligned_dir) {
@@ -142,7 +153,7 @@ impl ImageStacker {
                             log::warn!("Failed to recreate aligned directory: {}", e);
                         }
                     }
-                    
+
                     if bunches_dir.exists() {
                         log::info!("Starting fresh: Cleaning up existing bunches images in {}", bunches_dir.display());
                         if let Err(e) = std::fs::remove_dir_all(&bunches_dir) {
@@ -157,17 +168,16 @@ impl ImageStacker {
                     // Clear aligned and bunches panes
                     self.aligned_images.clear();
                     self.bunch_images.clear();
-                    
-                    // Process all images
-                    self.images.clone()
+
+                    // Process source images (resized or originals)
+                    source_images
                 }
-                
+
                 AlignmentMode::Resume => {
                     log::info!("Resume mode: Will skip already aligned images during processing");
-                    // In resume mode, we pass ALL images to the alignment function
+                    // In resume mode, we pass ALL source images to the alignment function
                     // The function will check if output files already exist and skip them
-                    // This preserves the original indices in the filenames
-                    self.images.clone()
+                    source_images
                 }
             };
             

@@ -153,6 +153,12 @@ impl ImageStacker {
 
             // No-op message
             Message::None => Task::none(),
+
+            // Resize handlers (handlers/resize_handlers.rs)
+            Message::ResizeImages => self.handle_resize_images(),
+            Message::ResizeDone(result) => self.handle_resize_done(result),
+            Message::ResizeWidthChanged(value) => self.handle_resize_width_changed(value),
+            Message::ResizeAlgorithmChanged(algo) => self.handle_resize_algorithm_changed(algo),
         }
     }
 }
