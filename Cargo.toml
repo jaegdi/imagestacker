@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 iced = { version = "0.13", features = ["image", "canvas", "tokio"] }
-opencv = "0.94"
+opencv = "0.95"
 image = "0.25"
 rfd = "0.15"
 anyhow = "1.0"
