@@ -102,6 +102,7 @@ impl ImageStacker {
 
             // Settings handlers (handlers/settings_handlers.rs)
             Message::BrightnessBoostChanged(value) => self.handle_brightness_boost_changed(value),
+            Message::CopyStatus => iced::clipboard::write(self.status.clone()),
             Message::ContrastBoostChanged(value) => self.handle_contrast_boost_changed(value),
             Message::EccBatchSizeChanged(value) => self.handle_ecc_batch_size_changed(value),
             Message::EccChunkSizeChanged(value) => self.handle_ecc_chunk_size_changed(value),

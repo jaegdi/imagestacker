@@ -176,12 +176,25 @@ pub fn load_image(path: &PathBuf) -> Result<opencv::core::Mat> {
     let filename = path.file_name().unwrap_or_default().to_string_lossy();
     log::info!("Loading image: {}", path.display());
 
+    let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
+
+    // Bypass OpenCV for RAW camera files so libtiff does not emit noisy
+    // decoder errors for formats like Sony ARW before we can fall back.
+    if is_raw_ext(ext) {
+        let img = load_raw_via_rawloader(path.as_path())?;
+        let elapsed = start.elapsed();
+        log::info!(
+            "Loaded {} in {:?} – {}×{}, {} ch",
+            filename, elapsed, img.cols(), img.rows(), img.channels()
+        );
+        return Ok(img);
+    }
+
     // Use IMREAD_UNCHANGED to preserve alpha channel (transparency)
     let img = imgcodecs::imread(path.to_str().unwrap(), imgcodecs::IMREAD_UNCHANGED)?;
 
     // If OpenCV returned an empty result, try rawloader for RAW files
     let img = if img.empty() {
-        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
         if is_raw_ext(ext) {
             log::info!("OpenCV returned empty – falling back to rawloader for: {}", filename);
             load_raw_via_rawloader(path.as_path())?

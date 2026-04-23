@@ -16,6 +16,7 @@ use iced::Task;
 use rayon::prelude::*;
 
 use crate::config::ResizeAlgorithm;
+use crate::image_io::{is_any_image_ext, is_raw_ext, load_image};
 use crate::messages::Message;
 use crate::gui::state::ImageStacker;
 
@@ -63,8 +64,7 @@ pub fn scan_image_dir(dir: &Path) -> Vec<PathBuf> {
             let p = entry.path();
             if p.is_file() {
                 if let Some(ext) = p.extension().and_then(|e| e.to_str()) {
-                    let ext = ext.to_lowercase();
-                    if ["jpg", "jpeg", "png", "tif", "tiff"].contains(&ext.as_str()) {
+                    if is_any_image_ext(ext) {
                         paths.push(p);
                     }
                 }
@@ -80,6 +80,22 @@ pub fn scan_image_dir(dir: &Path) -> Vec<PathBuf> {
 // ---------------------------------------------------------------------------
 
 impl ImageStacker {
+    fn resized_output_path(output_dir: &Path, image_path: &Path) -> Result<PathBuf, String> {
+        if let Some(ext) = image_path.extension().and_then(|e| e.to_str()) {
+            if is_raw_ext(ext) {
+                let stem = image_path
+                    .file_stem()
+                    .ok_or_else(|| format!("No filename stem for {}", image_path.display()))?;
+                return Ok(output_dir.join(format!("{}.png", stem.to_string_lossy())));
+            }
+        }
+
+        let out_name = image_path
+            .file_name()
+            .ok_or_else(|| format!("No filename for {}", image_path.display()))?;
+        Ok(output_dir.join(out_name))
+    }
+
     /// Returns `true` when `resize_width` contains a syntactically valid
     /// positive value (pixel count or percentage).
     pub fn has_valid_resize_config(&self) -> bool {
@@ -157,15 +173,16 @@ impl ImageStacker {
                                 return Err("Cancelled".to_string());
                             }
 
-                            let img = opencv::imgcodecs::imread(
-                                image_path.to_str().ok_or("Invalid path")?,
-                                opencv::imgcodecs::IMREAD_UNCHANGED,
-                            )
-                            .map_err(|e| format!("Load failed {}: {}", image_path.display(), e))?;
+                            let img = load_image(image_path)
+                                .map_err(|e| format!("Load failed {}: {}", image_path.display(), e))?;
 
                             use opencv::core::MatTraitConst;
                             let orig_w = img.cols() as u32;
                             let orig_h = img.rows() as u32;
+
+                            if orig_w == 0 || orig_h == 0 {
+                                return Err(format!("Load failed {}: empty image", image_path.display()));
+                            }
 
                             let target_w =
                                 parse_resize_target(&resize_width_str, orig_w)
@@ -185,8 +202,7 @@ impl ImageStacker {
                             )
                             .map_err(|e| format!("Resize failed: {}", e))?;
 
-                            let out_name = image_path.file_name().ok_or("No filename")?;
-                            let out_path = output_dir.join(out_name);
+                            let out_path = Self::resized_output_path(&output_dir, image_path)?;
                             opencv::imgcodecs::imwrite(
                                 out_path.to_str().ok_or("Invalid output path")?,
                                 &resized,

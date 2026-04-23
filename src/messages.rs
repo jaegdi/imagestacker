@@ -91,6 +91,7 @@ pub enum Message {
     // Advanced processing options
     BrightnessBoostChanged(f32),
     ContrastBoostChanged(f32),
+    CopyStatus,
     EnableColorCorrection(bool),
     EnableNoiseReduction(bool),
     EnableSharpening(bool),

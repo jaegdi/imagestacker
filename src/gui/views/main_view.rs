@@ -243,6 +243,8 @@ impl ImageStacker {
                         text(&self.status)
                             .size(13)
                             .width(Length::Fill),
+                        button("Copy")
+                            .on_press(Message::CopyStatus),
                         text(format!(
                             "Imp: {}  Sharp: {}  Align: {}  Bunch: {}  Final: {}",
                             self.images.len(),
@@ -406,6 +408,9 @@ impl ImageStacker {
                             button("Open in External Viewer")
                                 .on_press(Message::OpenImage(path.clone()))
                                 .style(button::secondary),
+                            button("Open in Editor")
+                                .on_press(Message::OpenImageWithExternalEditor(path.clone()))
+                                .style(button::secondary),
                             button("Next >")
                                 .on_press(Message::NextImageInPreview)
                                 .style(button::secondary),
@@ -423,6 +428,9 @@ impl ImageStacker {
                             button("Open in External Viewer")
                                 .on_press(Message::OpenImage(path.clone()))
                                 .style(button::primary),
+                            button("Open in Editor")
+                                .on_press(Message::OpenImageWithExternalEditor(path.clone()))
+                                .style(button::secondary),
                             button("Next >")
                                 .on_press(Message::NextImageInPreview)
                                 .style(button::secondary),
