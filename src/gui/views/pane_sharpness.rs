@@ -203,7 +203,7 @@ impl ImageStacker {
             .height(Length::Shrink);
 
         let scrollable_widget = scrollable(content)
-            .id(iced::widget::scrollable::Id::new("sharpness"))
+            .id(iced::widget::Id::new("sharpness"))
             .on_scroll(|viewport| {
                 Message::SharpnessScrollChanged(viewport.absolute_offset().y)
             })

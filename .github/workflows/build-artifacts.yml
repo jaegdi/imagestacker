@@ -79,13 +79,17 @@ jobs:
             exit 1
           fi
           git merge-base --is-ancestor "$TAG_SHA" origin/master || { echo "ERROR: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"; exit 1; }
-
+          
       - name: Install dependencies (Homebrew)
         run: |
           brew update
-          brew install opencv pkg-config llvm
-          # Help pkg-config find Homebrew OpenCV
-          echo "PKG_CONFIG_PATH=$(brew --prefix)/lib/pkgconfig:$(brew --prefix opencv)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+
+          # Pin OpenCV to avoid binding-generator crashes with newer OpenCV headers
+          brew install opencv@4 pkg-config llvm
+          brew link --force --overwrite opencv@4
+
+          # Help pkg-config find the pinned OpenCV
+          echo "PKG_CONFIG_PATH=$(brew --prefix)/lib/pkgconfig:$(brew --prefix opencv@4)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
 
       - name: Set LLVM environment variables
         run: |

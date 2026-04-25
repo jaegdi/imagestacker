@@ -48,6 +48,7 @@ impl ImageStacker {
             text: Color::from_rgb(0.92, 0.92, 0.95),
             primary: Color::from_rgb(0.30, 0.52, 0.80),
             success: Color::from_rgb(0.25, 0.62, 0.35),
+            warning: Color::from_rgb(0.85, 0.60, 0.15),
             danger: Color::from_rgb(0.75, 0.28, 0.28),
         };
         Theme::custom("ImageStacker".to_string(), palette)

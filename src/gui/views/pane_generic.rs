@@ -116,11 +116,11 @@ impl ImageStacker {
 
         // Create scrollable ID based on pane title
         let scrollable_id = match title {
-            "Imported" => Some(iced::widget::scrollable::Id::new("imported")),
-            "Sharpness" => Some(iced::widget::scrollable::Id::new("sharpness")),
-            "Aligned" => Some(iced::widget::scrollable::Id::new("aligned")),
-            "Bunches" => Some(iced::widget::scrollable::Id::new("bunches")),
-            "Final" => Some(iced::widget::scrollable::Id::new("final")),
+            "Imported" => Some(iced::widget::Id::new("imported")),
+            "Sharpness" => Some(iced::widget::Id::new("sharpness")),
+            "Aligned" => Some(iced::widget::Id::new("aligned")),
+            "Bunches" => Some(iced::widget::Id::new("bunches")),
+            "Final" => Some(iced::widget::Id::new("final")),
             _ => None,
         };
 

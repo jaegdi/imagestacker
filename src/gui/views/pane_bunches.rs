@@ -122,7 +122,7 @@ impl ImageStacker {
                 let offset = viewport.absolute_offset().y;
                 Message::BunchesScrollChanged(offset)
             })
-            .id(iced::widget::scrollable::Id::new("bunches"));
+            .id(iced::widget::Id::new("bunches"));
 
         // Create pane header with title, count, and refresh button
         let pane_header = row![

@@ -52,7 +52,7 @@ impl ImageStacker {
         cancel_flag.store(false, Ordering::Relaxed);
 
         Task::run(
-            iced::stream::channel(100, move |mut sender| async move {
+            iced::stream::channel(100, move |mut sender: iced::futures::channel::mpsc::Sender<Message>| async move {
                 std::thread::spawn(move || {
                     use rayon::prelude::*;
 

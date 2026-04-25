@@ -205,7 +205,7 @@ impl ImageStacker {
         let cache = self.thumbnail_cache.clone();
         // Generate thumbnails in parallel using rayon
         Task::run(
-            iced::stream::channel(100, move |sender| async move {
+            iced::stream::channel(100, move |sender: iced::futures::channel::mpsc::Sender<Message>| async move {
                 std::thread::spawn(move || {
                     use rayon::prelude::*;
                     let sender = Arc::new(std::sync::Mutex::new(sender));
@@ -425,7 +425,7 @@ impl ImageStacker {
         let cache = self.thumbnail_cache.clone();
         // Generate thumbnails in parallel using rayon
         Task::run(
-            iced::stream::channel(100, move |sender| async move {
+            iced::stream::channel(100, move |sender: iced::futures::channel::mpsc::Sender<Message>| async move {
                 std::thread::spawn(move || {
                     use rayon::prelude::*;
                     let sender = Arc::new(std::sync::Mutex::new(sender));

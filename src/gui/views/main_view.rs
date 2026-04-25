@@ -3,7 +3,7 @@
 //! This module contains the main application view and image preview modal.
 
 use iced::widget::{
-    button, column, container, horizontal_space, image as iced_image, row, text,
+    button, column, container, image as iced_image, row, space, text,
     pane_grid,
 };
 use iced::{Element, Length};
@@ -178,7 +178,7 @@ impl ImageStacker {
             sharpness_group,
             align_group,
             stack_group,
-            horizontal_space(),
+            space().width(Length::Fill),
             tools_group,
             button("Exit").on_press(Message::Exit),
         ]
@@ -203,8 +203,7 @@ impl ImageStacker {
                     } else {
                         &self.progress_message
                     }).size(14),
-                    iced::widget::progress_bar(0.0..=100.0, self.progress_value)
-                        .width(Length::Fill),
+                    iced::widget::progress_bar(0.0..=100.0, self.progress_value),
                     text("Press ESC to cancel")
                         .size(12)
                         .style(|t| theme::warning_text(t))

@@ -159,6 +159,7 @@ pub fn toolbar_button(_theme: &iced::Theme, status: button::Status) -> button::S
             radius: 4.0.into(),
         },
         shadow: Shadow::default(),
+            snap: false,
     }
 }
 
@@ -173,6 +174,7 @@ pub fn button_disabled(_theme: &iced::Theme, _status: button::Status) -> button:
             radius: 4.0.into(),
         },
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -209,6 +211,7 @@ pub fn action_button(
                 radius: 4.0.into(),
             },
             shadow: Shadow::default(),
+            snap: false,
         }
     }
 }
@@ -275,6 +278,7 @@ pub fn settings_active_button(_theme: &iced::Theme, status: button::Status) -> b
             radius: 4.0.into(),
         },
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -293,6 +297,7 @@ pub fn refresh_button(_theme: &iced::Theme, status: button::Status) -> button::S
             radius: 4.0.into(),
         },
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -307,6 +312,7 @@ pub fn thumb_selected(_theme: &iced::Theme, _status: button::Status) -> button::
             radius: 4.0.into(),
         },
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -321,6 +327,7 @@ pub fn thumb_unselected(_theme: &iced::Theme, _status: button::Status) -> button
             radius: 4.0.into(),
         },
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -341,6 +348,7 @@ pub fn ecc_toggle_button(selected: bool) -> impl Fn(&iced::Theme, button::Status
                     radius: 4.0.into(),
                 },
                 shadow: Shadow::default(),
+                snap: false,
             }
         } else {
             toolbar_button(_theme, status)
@@ -363,6 +371,7 @@ pub fn reset_button(_theme: &iced::Theme, status: button::Status) -> button::Sty
             radius: 6.0.into(),
         },
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -381,6 +390,7 @@ pub fn pane_container(bg_color: Color, border_color: Color) -> container::Style 
             offset: iced::Vector::new(0.0, 2.0),
             blur_radius: 6.0,
         },
+        snap: false,
     }
 }
 
@@ -399,6 +409,7 @@ pub fn toolbar_container(_theme: &iced::Theme) -> container::Style {
             offset: iced::Vector::new(0.0, 2.0),
             blur_radius: 4.0,
         },
+        snap: false,
     }
 }
 
@@ -413,6 +424,7 @@ pub fn button_group(_theme: &iced::Theme) -> container::Style {
         },
         text_color: None,
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -427,6 +439,7 @@ pub fn settings_panel(_theme: &iced::Theme) -> container::Style {
         },
         text_color: None,
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -441,6 +454,7 @@ pub fn settings_section(_theme: &iced::Theme) -> container::Style {
         },
         text_color: None,
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -455,6 +469,7 @@ pub fn progress_container(_theme: &iced::Theme) -> container::Style {
         },
         text_color: None,
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -469,6 +484,7 @@ pub fn status_bar(_theme: &iced::Theme) -> container::Style {
         },
         text_color: None,
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -487,6 +503,7 @@ pub fn preview_overlay(_theme: &iced::Theme) -> container::Style {
             offset: iced::Vector::new(0.0, 4.0),
             blur_radius: 16.0,
         },
+        snap: false,
     }
 }
 
@@ -500,6 +517,7 @@ pub fn sharpness_badge(_theme: &iced::Theme) -> container::Style {
         },
         text_color: None,
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -510,6 +528,7 @@ pub fn thumb_selected_container(_theme: &iced::Theme) -> container::Style {
         border: Border::default(),
         text_color: None,
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -520,6 +539,7 @@ pub fn scrollable_inner(_theme: &iced::Theme) -> container::Style {
         border: Border::default(),
         text_color: None,
         shadow: Shadow::default(),
+        snap: false,
     }
 }
 
@@ -661,6 +681,7 @@ pub fn pane_title_bar(bg_color: Color) -> impl Fn(&iced::Theme) -> container::St
             },
             text_color: None,
             shadow: Shadow::default(),
+            snap: false,
         }
     }
 }

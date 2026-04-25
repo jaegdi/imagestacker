@@ -3,7 +3,7 @@
 //! This module contains the settings panel UI with all configuration options.
 
 use iced::widget::{
-    button, checkbox, column, container, horizontal_rule, horizontal_space, mouse_area, pick_list, row, scrollable, slider, text, text_input,
+    button, checkbox, column, container, mouse_area, pick_list, row, rule, scrollable, slider, space, text, text_input,
 };
 use iced::{Element, Length};
 use iced::mouse::ScrollDelta;
@@ -77,16 +77,12 @@ impl ImageStacker {
         .spacing(10)
         .align_y(iced::Alignment::Center);
 
-        let adaptive_batch_checkbox = checkbox(
-            "Auto-adjust batch sizes (RAM-based)",
-            self.config.use_adaptive_batches
-        )
+        let adaptive_batch_checkbox = checkbox(self.config.use_adaptive_batches)
+        .label("Auto-adjust batch sizes (RAM-based)")
         .on_toggle(Message::UseAdaptiveBatchSizes);
 
-        let clahe_checkbox = checkbox(
-            "Use CLAHE (enhances dark images)",
-            self.config.use_clahe
-        )
+        let clahe_checkbox = checkbox(self.config.use_clahe)
+        .label("Use CLAHE (enhances dark images)")
         .on_toggle(Message::UseCLAHE);
 
         let orb_selected = self.config.feature_detector == FeatureDetector::ORB;
@@ -190,7 +186,8 @@ impl ImageStacker {
             ].spacing(3);
 
             let hybrid_checkbox = column![
-                checkbox("Use Hybrid Mode (40-50% faster)", self.config.ecc_use_hybrid)
+                checkbox(self.config.ecc_use_hybrid)
+                    .label("Use Hybrid Mode (40-50% faster)")
                     .on_toggle(Message::EccUseHybridChanged),
                 text("SIFT initialization + ECC refinement for speed with quality").size(10)
                     .style(|t| theme::muted_text(t))
@@ -231,7 +228,7 @@ impl ImageStacker {
 
         // Transform validation sliders - shown for ALL alignment methods
         let transform_validation_ui = column![
-            horizontal_rule(1),
+            rule::horizontal(1),
             text("Transform Validation (All Alignment Methods):").size(13).style(|t| theme::section_label(t)),
             text("Reject distorted transformations - applies to ORB, SIFT, AKAZE, and ECC").size(10)
                 .style(|t| theme::muted_text(t)),
@@ -289,7 +286,8 @@ impl ImageStacker {
 
         // ============== PANE 2: POST-PROCESSING ==============
         let noise_section = column![
-            checkbox("Enable Noise Reduction", self.config.enable_noise_reduction)
+            checkbox(self.config.enable_noise_reduction)
+                .label("Enable Noise Reduction")
                 .on_toggle(Message::EnableNoiseReduction),
             
             row![
@@ -303,7 +301,8 @@ impl ImageStacker {
         .spacing(5);
 
         let sharpen_section = column![
-            checkbox("Enable Sharpening", self.config.enable_sharpening)
+            checkbox(self.config.enable_sharpening)
+                .label("Enable Sharpening")
                 .on_toggle(Message::EnableSharpening),
             
             row![
@@ -317,7 +316,8 @@ impl ImageStacker {
         .spacing(5);
 
         let color_section = column![
-            checkbox("Enable Color Correction", self.config.enable_color_correction)
+            checkbox(self.config.enable_color_correction)
+                .label("Enable Color Correction")
                 .on_toggle(Message::EnableColorCorrection),
             
             row![
@@ -353,7 +353,7 @@ impl ImageStacker {
                 sharpen_section,
                 color_section,
                 // ---- Image Resize ----
-                horizontal_rule(1),
+                rule::horizontal(1),
                 text("Image Resize").size(14).style(|t| theme::section_label(t)),
                 text("Pre-scale before Sharpness & Align (speeds up high-res processing).").size(10)
                     .style(|t| theme::muted_text(t)),
@@ -415,7 +415,8 @@ impl ImageStacker {
             column![
                 text("Preview & UI").size(16).style(|t| theme::heading_text(t)),
                 
-                checkbox("Use Internal Preview (modal overlay)", self.config.use_internal_preview)
+                checkbox(self.config.use_internal_preview)
+                    .label("Use Internal Preview (modal overlay)")
                     .on_toggle(Message::UseInternalPreview),
                 
                 text("When disabled, left-click opens in external viewer (configurable below)").size(10)
@@ -522,16 +523,14 @@ impl ImageStacker {
                 text("⚠ Changes take effect on next app restart").size(11)
                     .style(|t| theme::warning_text(t)),
                 
-                horizontal_rule(1),
+                rule::horizontal(1),
 
                 // Stacking Bunch Size
                 text("Stacking Bunch Size").size(13).style(|t| theme::section_label(t)),
                 text("Number of images per bunch during recursive stacking. More images per bunch = fewer levels, but higher memory usage.").size(10)
                     .style(|t| theme::muted_text(t)),
-                checkbox(
-                    format!("Auto (RAM-based: {})", self.config.batch_config.stacking_batch_size),
-                    self.config.auto_bunch_size,
-                )
+                checkbox(self.config.auto_bunch_size)
+                .label(format!("Auto (RAM-based: {})", self.config.batch_config.stacking_batch_size))
                 .on_toggle(Message::AutoBunchSizeChanged),
                 if !self.config.auto_bunch_size {
                     column![
@@ -552,7 +551,7 @@ impl ImageStacker {
                     ]
                 },
 
-                horizontal_rule(1),
+                rule::horizontal(1),
                 
                 text("Environment Variable Overrides").size(13).style(|t| theme::section_label(t)),
                 text("Env vars override settings (for testing/debugging):").size(10)
@@ -633,7 +632,7 @@ impl ImageStacker {
         // Title row with heading on the left and reset button on the right
         let title_row = row![
             text("Processing Settings").size(20).style(|t| theme::heading_text(t)),
-            horizontal_space(),
+            space().width(Length::Fill),
             reset_button,
         ]
         .spacing(10)

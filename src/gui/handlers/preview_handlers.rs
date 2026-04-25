@@ -120,20 +120,20 @@ impl ImageStacker {
             self.preview_navigation_throttle = false;
             // Restore scroll positions after closing preview
             return Task::batch(vec![
-                iced::widget::scrollable::scroll_to(
-                    iced::widget::scrollable::Id::new("imported"),
+                iced::widget::operation::scroll_to(
+                    iced::widget::Id::new("imported"),
                     iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.imported_scroll_offset },
                 ),
-                iced::widget::scrollable::scroll_to(
-                    iced::widget::scrollable::Id::new("aligned"),
+                iced::widget::operation::scroll_to(
+                    iced::widget::Id::new("aligned"),
                     iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.aligned_scroll_offset },
                 ),
-                iced::widget::scrollable::scroll_to(
-                    iced::widget::scrollable::Id::new("bunches"),
+                iced::widget::operation::scroll_to(
+                    iced::widget::Id::new("bunches"),
                     iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.bunches_scroll_offset },
                 ),
-                iced::widget::scrollable::scroll_to(
-                    iced::widget::scrollable::Id::new("final"),
+                iced::widget::operation::scroll_to(
+                    iced::widget::Id::new("final"),
                     iced::widget::scrollable::AbsoluteOffset { x: 0.0, y: self.final_scroll_offset },
                 ),
             ]);

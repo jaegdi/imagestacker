@@ -193,7 +193,7 @@ impl ImageStacker {
             self.is_processing = true;  // Mark as processing
 
             Task::run(
-                iced::stream::channel(1000, move |mut sender| async move {
+                iced::stream::channel(1000, move |mut sender: iced::futures::channel::mpsc::Sender<Message>| async move {
                     // Run processing in a separate thread
                     std::thread::spawn(move || {
                         let progress_cb = std::sync::Arc::new(std::sync::Mutex::new(

@@ -48,6 +48,7 @@ pub fn main() -> iced::Result {
     
     // Parse command line arguments
     let args = Args::parse();
+    let import_arg = args.import.clone();
     
     // Load config to get font setting (must happen before daemon starts)
     let saved_config = settings::load_settings();
@@ -60,25 +61,19 @@ pub fn main() -> iced::Result {
     let window_width = 1600.0;  // Wide enough for all 5 panes without scrolling
     let window_height = 900.0;   // Maintains good aspect ratio
     
-    daemon(ImageStacker::title, ImageStacker::update, ImageStacker::view)
-        .subscription(ImageStacker::subscription)
-        .theme(ImageStacker::theme)
-        .default_font(Font {
-            family: iced::font::Family::Name(font_name),
-            ..Font::DEFAULT
-        })
-        .run_with(move || {
+    daemon(
+        move || {
             let (_id, open) = window::open(window::Settings {
                 size: iced::Size::new(window_width, window_height),
                 resizable: true,
                 ..Default::default()
             });
-            
+
             // Create ImageStacker with optional import directory
             let app = ImageStacker::default();
-            
+
             // Determine initial task - combine window open with optional folder load
-            let initial_task = if let Some(import_dir) = args.import {
+            let initial_task = if let Some(import_dir) = import_arg.as_ref().cloned() {
                 // Convert to absolute path
                 let abs_path = if import_dir.is_absolute() {
                     import_dir
@@ -87,7 +82,7 @@ pub fn main() -> iced::Result {
                         .unwrap_or_else(|_| PathBuf::from("."))
                         .join(&import_dir)
                 };
-                
+
                 if abs_path.is_dir() {
                     log::info!("Auto-importing directory from CLI: {:?}", abs_path);
                     // Combine window open task with folder load
@@ -102,7 +97,18 @@ pub fn main() -> iced::Result {
             } else {
                 open.map(|_| messages::Message::None)
             };
-            
+
             (app, initial_task)
+        },
+        ImageStacker::update,
+        ImageStacker::view,
+    )
+        .title(ImageStacker::title)
+        .subscription(ImageStacker::subscription)
+        .theme(ImageStacker::theme)
+        .default_font(Font {
+            family: iced::font::Family::Name(font_name),
+            ..Font::DEFAULT
         })
+        .run()
 }

@@ -146,7 +146,7 @@ impl ImageStacker {
             .join("resized");
 
         Task::run(
-            iced::stream::channel(100, move |mut sender| async move {
+            iced::stream::channel(100, move |mut sender: iced::futures::channel::mpsc::Sender<Message>| async move {
                 std::thread::spawn(move || {
                     use std::sync::atomic::AtomicUsize;
 
