@@ -80,12 +80,34 @@ jobs:
           fi
           git merge-base --is-ancestor "$TAG_SHA" origin/master || { echo "ERROR: Tag $TAG_REF ($TAG_SHA) is not an ancestor of origin/master"; exit 1; }
 
-      - name: Install dependencies (Homebrew)
+      - name: Install pkg-config and LLVM (Homebrew)
         run: |
           brew update
-          brew install opencv pkg-config llvm
-          # Help pkg-config find Homebrew OpenCV
-          echo "PKG_CONFIG_PATH=$(brew --prefix)/lib/pkgconfig:$(brew --prefix opencv)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          brew install pkg-config llvm
+
+      - name: Install OpenCV 4.9.0 (pinned for opencv Rust crate 0.95.x)
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: |
+          # OpenCV 4.10+ causes opencv-binding-generator to panic with
+          # "unreachable code: Any other kind of class shouldn't be generated".
+          # Pin to 4.9.0 using a custom tap that references the official
+          # Homebrew pre-built bottles via root_url in the formula.
+          brew tap-new local/ocv
+          FORMULA_DEST="$(brew --repository local/ocv)/Formula/opencv.rb"
+          cp "$GITHUB_WORKSPACE/.github/brew/Formula/opencv.rb" "$FORMULA_DEST"
+          git -C "$(brew --repository local/ocv)" add Formula/opencv.rb
+          git -C "$(brew --repository local/ocv)" \
+              -c user.email="ci@local" -c user.name="CI" \
+              commit -m "Add pinned opencv 4.9.0"
+          brew install local/ocv/opencv
+          # Export pkg-config path for the pinned opencv
+          # Use $(brew --prefix)/opt/opencv to avoid API-mode formula-resolution
+          # ambiguity with homebrew/core/opencv (different version).
+          echo "PKG_CONFIG_PATH=$(brew --prefix)/opt/opencv/lib/pkgconfig:$(brew --prefix)/lib/pkgconfig:${PKG_CONFIG_PATH:-}" >> $GITHUB_ENV
+
+      - name: Verify OpenCV version
+        run: pkg-config --modversion opencv4
 
       - name: Set LLVM environment variables
         run: |
@@ -94,6 +116,17 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: macos-arm64-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            macos-arm64-cargo-
 
       - name: Build .app + zip
         run: |
