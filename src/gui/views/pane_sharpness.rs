@@ -39,13 +39,31 @@ impl ImageStacker {
                 
                 // Find the corresponding image path from the original images
                 let image_path = if let Some(info) = &sharpness_info {
-                    // Try to find the image with matching filename
-                    self.images.iter().find(|p| {
+                    // Try exact filename match first
+                    let exact = self.images.iter().find(|p| {
                         p.file_name()
                             .and_then(|n| n.to_str())
                             .map(|n| n == info.image_filename)
                             .unwrap_or(false)
-                    })
+                    });
+                    if exact.is_some() {
+                        exact
+                    } else {
+                        // Fall back to stem match (handles RAW originals vs resized PNGs,
+                        // e.g. YAML stores "DSC_001.png" but self.images has "DSC_001.ARW")
+                        let info_stem = std::path::Path::new(&info.image_filename)
+                            .file_stem()
+                            .map(|s| s.to_string_lossy().into_owned());
+                        if let Some(stem) = info_stem {
+                            self.images.iter().find(|p| {
+                                p.file_stem()
+                                    .map(|s| s.to_string_lossy() == stem.as_str())
+                                    .unwrap_or(false)
+                            })
+                        } else {
+                            None
+                        }
+                    }
                 } else {
                     None
                 };

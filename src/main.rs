@@ -58,8 +58,8 @@ pub fn main() -> iced::Result {
     // Each pane needs ~280-300px width + spacing
     // 5 panes * 300px + spacing = ~1600px minimum
     // Height maintains a good aspect ratio for the 4-pane layout
-    let window_width = 1600.0;  // Wide enough for all 5 panes without scrolling
-    let window_height = 900.0;   // Maintains good aspect ratio
+    let window_width = 1800.0;  // Wide enough for all 5 panes without scrolling
+    let window_height = 1024.0;   // Maintains good aspect ratio
     
     daemon(
         move || {

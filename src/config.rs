@@ -138,8 +138,8 @@ impl Default for ProcessingConfig {
             saturation_boost: 1.0,
             // Preview settings
             use_internal_preview: true,
-            preview_max_width: 900.0,
-            preview_max_height: 700.0,
+            preview_max_width: 1200.0,
+            preview_max_height: 900.0,
             // External applications (empty = use system default)
             external_viewer_path: String::new(),
             external_editor_path: String::new(),

@@ -35,13 +35,6 @@ pub const RAW_IMAGE_EXT: &[&str] = &[
     "rwl",  // Leica RAW
 ];
 
-/// All file extensions useful for a combined filter dialog.
-pub const ALL_IMAGE_EXT: &[&str] = &[
-    "jpg", "jpeg", "png", "tif", "tiff",
-    "arw", "cr2", "cr3", "nef", "dng", "orf", "raf", "rw2", "pef", "srw",
-    "3fr", "mef", "mrw", "x3f", "dcr", "kdc", "erf", "nrw", "raw", "sr2", "rwl",
-];
-
 /// Returns `true` if `ext` (case-insensitive) is a standard raster format.
 pub fn is_standard_image_ext(ext: &str) -> bool {
     let lower = ext.to_lowercase();

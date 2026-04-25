@@ -1,9 +1,10 @@
 use anyhow::Result;
 use opencv::prelude::*;
 use opencv::{core, imgproc};
+use rayon::prelude::*;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use crate::config::ProcessingConfig;
 use crate::image_io::load_image;
@@ -137,121 +138,99 @@ fn stack_recursive(
         return stack_images_direct_from_paths(image_paths);
     }
 
-    let bunches_dir = output_dir.join("bunches");
-    std::fs::create_dir_all(&bunches_dir)?;
+    let bunches_dir = Arc::new(output_dir.join("bunches"));
+    std::fs::create_dir_all(bunches_dir.as_ref())?;
 
-    let mut intermediate_files = Vec::new();
+    // Pre-compute all chunk path lists (including overlaps) so batches can run in parallel.
+    // Overlap images are simply re-loaded from disk in the adjacent chunk instead of being
+    // carried in memory — a negligible I/O trade-off for full multi-core utilisation.
     let step = batch_size - OVERLAP;
-    let mut i = 0;
-    let mut batch_idx = 0;
-    let mut overlapping_images: Vec<Mat> = Vec::new();
+    let mut chunks: Vec<(usize, Vec<PathBuf>)> = Vec::new();
+    {
+        let mut i = 0;
+        let mut batch_idx = 0;
+        while i < image_paths.len() {
+            let end = (i + batch_size).min(image_paths.len());
+            chunks.push((batch_idx, image_paths[i..end].to_vec()));
+            batch_idx += 1;
+            if end == image_paths.len() {
+                break;
+            }
+            i += step;
+        }
+    }
+    let total_batches = chunks.len();
 
-    // Calculate total batches for progress reporting
-    let total_batches = ((image_paths.len() as f32 - OVERLAP as f32) / step as f32).ceil() as usize;
+    log::info!(
+        "Level {}: Processing {} batches in parallel ({} images, batch_size={}, overlap={})",
+        level, total_batches, image_paths.len(), batch_size, OVERLAP
+    );
 
-    while i < image_paths.len() {
-        // Check for cancellation
-        if let Some(ref flag) = cancel_flag {
-            if flag.load(Ordering::Relaxed) {
+    let completed = Arc::new(AtomicUsize::new(0));
+
+    // Process all chunks in parallel — rayon uses all available CPU cores.
+    let results: Vec<(usize, Result<PathBuf, String>)> = chunks
+        .into_par_iter()
+        .map(|(idx, chunk_paths)| {
+            // Check cancellation before starting this batch
+            if cancel_flag
+                .as_ref()
+                .map(|f| f.load(Ordering::Relaxed))
+                .unwrap_or(false)
+            {
+                return (idx, Err("Cancelled by user".to_string()));
+            }
+
+            log::info!("Level {}: Starting batch {} ({} images)", level, idx, chunk_paths.len());
+            println!("  Level {}: Batch {} ({} images)...", level, idx, chunk_paths.len());
+
+            let result = stack_images_direct_from_paths(&chunk_paths)
+                .and_then(|mat| {
+                    let filename = format!("L{}_B{:04}.png", level, idx);
+                    let path = bunches_dir.join(&filename);
+                    opencv::imgcodecs::imwrite(
+                        path.to_str().unwrap_or_default(),
+                        &mat,
+                        &opencv::core::Vector::new(),
+                    )?;
+                    log::info!("  ✓ Level {}: Saved batch {} → {}", level, idx, filename);
+                    println!("    ✓ Saved {}", filename);
+                    Ok(path)
+                })
+                .map_err(|e| e.to_string());
+
+            // Update shared progress counter (lock-free)
+            let done = completed.fetch_add(1, Ordering::Relaxed) + 1;
+            if let Some(ref cb) = progress_cb {
+                if let Ok(mut cb_lock) = cb.lock() {
+                    let pct = 10.0 + (done as f32 / total_batches as f32) * 70.0;
+                    cb_lock(
+                        format!("Stacking: {}/{} batches done (level {})", done, total_batches, level),
+                        pct,
+                    );
+                }
+            }
+
+            (idx, result)
+        })
+        .collect();
+
+    // Collect results in original order (rayon may deliver out-of-order)
+    let mut indexed: Vec<(usize, PathBuf)> = Vec::with_capacity(results.len());
+    for (idx, result) in results {
+        match result {
+            Ok(path) => indexed.push((idx, path)),
+            Err(e) if e.contains("Cancelled") => {
                 log::info!("Stacking cancelled by user during batch processing");
                 return Err(anyhow::anyhow!("Operation cancelled by user"));
             }
-        }
-        
-        let end = (i + batch_size).min(image_paths.len());
-        let batch_paths = &image_paths[i..end];
-
-        log::info!(
-            "Level {}: Stacking batch {} (images {} to {})",
-            level,
-            batch_idx,
-            i,
-            end - 1
-        );
-        println!("  Level {}: Batch {} (images {}-{})...", level, batch_idx, i, end - 1);
-
-        // Report progress for this batch
-        if let Some(ref cb) = progress_cb {
-            if let Ok(mut cb_lock) = cb.lock() {
-                let batch_progress = (batch_idx as f32 / total_batches as f32) * 70.0; // 0-70%
-                let pct = 10.0 + batch_progress;
-                cb_lock(format!("Stacking batch {}/{} (level {})...", batch_idx + 1, total_batches, level), pct);
+            Err(e) => {
+                return Err(anyhow::anyhow!("Batch {} failed: {}", idx, e));
             }
         }
-
-        let mut batch_images = overlapping_images;
-        // Only load images that are not already in memory from the previous batch
-        let start_load = if batch_idx == 0 { 0 } else { OVERLAP };
-
-        // Sequential stacking: process overlap images through the pyramid first,
-        // then load and process remaining images one at a time to minimize GPU memory.
-        // This avoids loading all batch images into memory simultaneously, which can
-        // exhaust GPU VRAM and cause CL_INVALID_COMMAND_QUEUE errors.
-        let levels = 7;
-        let use_gpu_here = crate::opencv_compat::use_opencl();
-        log::info!("stack_images_hybrid: {} overlap + {} new images, OpenCL={}",
-            batch_images.len(), batch_paths[start_load..].len(), use_gpu_here);
-        
-        let mut fused_pyramid: Vec<core::UMat> = Vec::new();
-        let mut max_energies_batch: Vec<core::UMat> = Vec::new();
-        let mut fused_alpha = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-        let mut global_idx = 0;
-        
-        // First: process the overlap images already in memory
-        for img in &batch_images {
-            process_image_into_pyramid(
-                img, global_idx, levels,
-                &mut fused_pyramid, &mut max_energies_batch, &mut fused_alpha,
-            )?;
-            if use_gpu_here { crate::opencv_compat::finish(); }
-            global_idx += 1;
-        }
-        
-        // Second: load and process remaining images one at a time
-        for path in &batch_paths[start_load..] {
-            let img = load_image(path)?;
-            process_image_into_pyramid(
-                &img, global_idx, levels,
-                &mut fused_pyramid, &mut max_energies_batch, &mut fused_alpha,
-            )?;
-            if use_gpu_here { crate::opencv_compat::finish(); }
-            global_idx += 1;
-            batch_images.push(img);
-        }
-        
-        let result_bgr = collapse_pyramid(&fused_pyramid)?;
-        let result = assemble_final_image(&result_bgr, &fused_alpha)?;
-        
-        // Explicitly drop GPU buffers and flush before saving to prevent
-        // OpenCL queue corruption from accumulated GPU memory pressure
-        drop(fused_pyramid);
-        drop(max_energies_batch);
-        drop(fused_alpha);
-        if use_gpu_here { crate::opencv_compat::finish(); }
-
-        let filename = format!("L{}_B{:04}.png", level, batch_idx);
-        let path = bunches_dir.join(&filename);
-
-        opencv::imgcodecs::imwrite(
-            path.to_str().unwrap(),
-            &result,
-            &opencv::core::Vector::new(),
-        )?;
-        println!("    ✓ Saved {}", filename);
-
-        intermediate_files.push(path);
-        batch_idx += 1;
-
-        if end == image_paths.len() {
-            break;
-        }
-
-        // Keep only the last OVERLAP images for the next batch
-        overlapping_images = batch_images.drain(batch_images.len() - OVERLAP..).collect();
-        // batch_images is now empty (or contains what's left after drain) and will be dropped
-
-        i += step;
     }
+    indexed.sort_by_key(|(idx, _)| *idx);
+    let intermediate_files: Vec<PathBuf> = indexed.into_iter().map(|(_, p)| p).collect();
 
     // Report progress before recursive stacking
     if let Some(ref cb) = progress_cb {
@@ -400,49 +379,101 @@ fn process_image_into_pyramid(
         let current_pyramid = generate_laplacian_pyramid(&pyramid_input, levels)?;
 
         if idx == 0 {
-            *fused_pyramid = current_pyramid.clone();
             *fused_alpha = init_alpha(&original_alpha, pyramid_input.rows(), pyramid_input.cols())?;
 
-            // Initialize max energies for all levels (Laplacian + base)
-            for l in 0..=levels as usize {
-                let energy = compute_sharpness_energy(&current_pyramid[l])?;
-                max_energies.push(energy);
+            // Parallel: compute initial max energies for all pyramid levels simultaneously.
+            // Consume current_pyramid into owned items — UMat is Send, so rayon can assign
+            // each level to a separate thread without requiring Sync.
+            let n_levels = levels as usize + 1;
+            let base_idx  = levels as usize;
+
+            let init_results: Vec<Result<(usize, core::UMat, core::UMat)>> = current_pyramid
+                .into_par_iter()
+                .enumerate()
+                .map(|(l, layer)| {
+                    let energy = compute_sharpness_energy(&layer)?;
+                    Ok((l, layer, energy))
+                })
+                .collect();
+
+            *fused_pyramid = vec![core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT); n_levels];
+            *max_energies  = vec![core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT); n_levels];
+
+            for result in init_results {
+                let (l, layer, energy) = result?;
+                (*fused_pyramid)[l] = layer;
+                (*max_energies)[l]  = energy;
             }
-            
-            // Ensure base level is float
-            let base_idx = levels as usize;
+
+            // Convert base level to float
             let mut float_base = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-            fused_pyramid[base_idx].convert_to(&mut float_base, core::CV_32F, 1.0, 0.0)?;
-            fused_pyramid[base_idx] = float_base;
+            (*fused_pyramid)[base_idx].convert_to(&mut float_base, core::CV_32F, 1.0, 0.0)?;
+            (*fused_pyramid)[base_idx] = float_base;
         } else {
-            // Fuse Laplacian levels using winner-take-all based on sharpness energy
-            for l in 0..levels as usize {
-                let layer = &current_pyramid[l];
-                let energy = compute_sharpness_energy(layer)?;
-                
-                let (fused_layer, fused_energy) = fuse_layer_with_alpha(
-                    layer, &energy, &fused_pyramid[l], &max_energies[l], &original_alpha,
-                )?;
-                fused_pyramid[l] = fused_layer;
-                max_energies[l] = fused_energy;
+            let n_levels = levels as usize + 1;
+            let base_idx  = levels as usize;
+
+            // Pre-resize alpha to every pyramid level size (sequential, cheap).
+            // This avoids sharing the alpha UMat across rayon threads (UMat is not Sync).
+            let alphas_per_level: Vec<Option<core::UMat>> = if let Some(ref alpha) = original_alpha {
+                (0..n_levels)
+                    .map(|l| {
+                        let layer_size = current_pyramid[l].size().ok()?;
+                        let mut resized = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+                        imgproc::resize(alpha, &mut resized, layer_size, 0.0, 0.0,
+                            imgproc::INTER_LINEAR).ok()?;
+                        Some(resized)
+                    })
+                    .collect()
+            } else {
+                vec![None; n_levels]
+            };
+
+            // Convert base level to float before consuming current_pyramid
+            let mut cur_base_float = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
+            current_pyramid[base_idx].convert_to(&mut cur_base_float, core::CV_32F, 1.0, 0.0)?;
+
+            // Consume all three Vecs to build owned tuples for parallel processing.
+            // into_par_iter() transfers ownership per item — no Sync needed on UMat.
+            let mut cur_levels = current_pyramid;
+            cur_levels[base_idx] = cur_base_float;
+            let fused_levels: Vec<core::UMat> = std::mem::take(fused_pyramid);
+            let max_e_levels:  Vec<core::UMat> = std::mem::take(max_energies);
+
+            let level_tuples: Vec<(usize, core::UMat, core::UMat, core::UMat, Option<core::UMat>)> =
+                cur_levels
+                    .into_iter()
+                    .zip(fused_levels)
+                    .zip(max_e_levels)
+                    .zip(alphas_per_level)
+                    .enumerate()
+                    .map(|(l, (((cur, fused), max_e), alpha))| (l, cur, fused, max_e, alpha))
+                    .collect();
+
+            // Parallel: compute sharpness energy + fuse each of the 8 pyramid levels.
+            // On an 8-core machine this computes all levels simultaneously instead of serially.
+            let level_results: Vec<Result<(usize, core::UMat, core::UMat)>> = level_tuples
+                .into_par_iter()
+                .map(|(l, cur_layer, fused_layer, max_energy, level_alpha)| {
+                    let energy = compute_sharpness_energy(&cur_layer)?;
+                    let (new_fused, new_energy) = fuse_layer_with_preresized_alpha(
+                        &cur_layer, &energy, &fused_layer, &max_energy, &level_alpha,
+                    )?;
+                    Ok((l, new_fused, new_energy))
+                })
+                .collect();
+
+            // Reconstruct fused_pyramid and max_energies from parallel results
+            *fused_pyramid = vec![core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT); n_levels];
+            *max_energies  = vec![core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT); n_levels];
+
+            for result in level_results {
+                let (l, new_fused, new_energy) = result?;
+                (*fused_pyramid)[l] = new_fused;
+                (*max_energies)[l]  = new_energy;
             }
 
-            // Fuse base level (Gaussian)
-            let base_idx = levels as usize;
-            let base_layer = &current_pyramid[base_idx];
-            let base_energy = compute_sharpness_energy(base_layer)?;
-            
-            let mut float_base_layer = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-            base_layer.convert_to(&mut float_base_layer, core::CV_32F, 1.0, 0.0)?;
-            
-            let (fused_base, fused_base_energy) = fuse_layer_with_alpha(
-                &float_base_layer, &base_energy, &fused_pyramid[base_idx], &max_energies[base_idx],
-                &original_alpha,
-            )?;
-            fused_pyramid[base_idx] = fused_base;
-            max_energies[base_idx] = fused_base_energy;
-
-            // Update fused_alpha: AND-combine so only pixels opaque in ALL images remain opaque
+            // AND-combine alpha: only pixels opaque in ALL images remain opaque
             update_fused_alpha(fused_alpha, &original_alpha)?;
         }
     
@@ -513,43 +544,36 @@ fn compute_sharpness_energy(layer: &core::UMat) -> Result<core::UMat> {
     Ok(blurred)
 }
 
-/// Fuse a new layer into the fused pyramid using winner-take-all based on sharpness energy.
-/// If alpha is present, energy is weighted by alpha to prevent transparent regions from winning.
-/// Returns (updated fused layer, updated max energy).
-fn fuse_layer_with_alpha(
+/// Variant of `fuse_layer_with_alpha` that accepts an already-resized alpha channel.
+/// Used in the parallel pyramid-level processing path to avoid sharing the original
+/// alpha UMat across rayon threads (UMat is Send but not Sync).
+fn fuse_layer_with_preresized_alpha(
     layer: &core::UMat,
     energy: &core::UMat,
     fused_layer: &core::UMat,
     max_energy: &core::UMat,
-    original_alpha: &Option<core::UMat>,
+    level_alpha: &Option<core::UMat>, // already resized to `layer`'s dimensions
 ) -> Result<(core::UMat, core::UMat)> {
     let mut new_fused = fused_layer.clone();
     let mut new_max_energy = max_energy.clone();
 
-    if let Some(ref orig_alpha) = original_alpha {
-        // Resize alpha to match layer size
-        let mut alpha_resized = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
-        imgproc::resize(orig_alpha, &mut alpha_resized, layer.size()?, 0.0, 0.0,
-            imgproc::INTER_LINEAR)?;
-        
-        // Weight energy by alpha [0,1] so transparent regions have zero energy
+    if let Some(ref alpha_resized) = level_alpha {
+        // Normalize alpha from [0,255] float to [0,1]
         let mut alpha_weight = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
         alpha_resized.convert_to(&mut alpha_weight, core::CV_32F, 1.0 / 255.0, 0.0)?;
-        
+
         let mut weighted_energy = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
         core::multiply(energy, &alpha_weight, &mut weighted_energy, 1.0, -1)?;
-        
-        // Winner-take-all: copy where this image has higher weighted energy
+
         let mut mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
         core::compare(&weighted_energy, max_energy, &mut mask, core::CMP_GT)?;
-        
+
         layer.copy_to_masked(&mut new_fused, &mask)?;
         weighted_energy.copy_to_masked(&mut new_max_energy, &mask)?;
     } else {
-        // No alpha: simple energy comparison
         let mut mask = core::UMat::new(core::UMatUsageFlags::USAGE_DEFAULT);
         core::compare(energy, max_energy, &mut mask, core::CMP_GT)?;
-        
+
         layer.copy_to_masked(&mut new_fused, &mask)?;
         energy.copy_to_masked(&mut new_max_energy, &mask)?;
     }

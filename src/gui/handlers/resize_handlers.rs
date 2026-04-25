@@ -150,6 +150,22 @@ impl ImageStacker {
                 std::thread::spawn(move || {
                     use std::sync::atomic::AtomicUsize;
 
+                    // Delete existing resized images before starting fresh
+                    if output_dir.exists() {
+                        if let Ok(entries) = std::fs::read_dir(&output_dir) {
+                            for entry in entries.flatten() {
+                                let p = entry.path();
+                                if p.is_file() {
+                                    if let Some(ext) = p.extension().and_then(|e| e.to_str()) {
+                                        if is_any_image_ext(ext) {
+                                            let _ = std::fs::remove_file(&p);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     if let Err(e) = std::fs::create_dir_all(&output_dir) {
                         let _ = sender.try_send(Message::ResizeDone(Err(
                             format!("Failed to create resized dir: {}", e),
